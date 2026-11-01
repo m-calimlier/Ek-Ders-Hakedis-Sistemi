@@ -10,6 +10,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private readonly Hakedis.Storage.PaymentArchiveStore archiveStore;
     public CommonConstantsViewModel CommonConstants {get;}
     public CommonConstantsViewModel RetiredConstants {get;}
+    public BankConstantsViewModel BankConstants {get;}
     public OutputsViewModel Outputs {get;}
     public PersonalPayrollViewModel Personal {get;}
     public bool CanUseEntry=>!Calculation.IsArchiveEditing;
@@ -38,7 +39,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     {
         new Hakedis.Storage.PayrollEditStore(teacherPath).Recover();
         var root=System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(teacherPath))!;
-        Settings=new(root);CommonConstants=new(root);RetiredConstants=new(root,ModuleId.HalkEgitimEmekliUstaOgretici);Outputs=new(root);Personal=new(root);archiveStore=new(root);
+        Settings=new(root);CommonConstants=new(root);RetiredConstants=new(root,ModuleId.HalkEgitimEmekliUstaOgretici);BankConstants=new(root);Outputs=new(root);Personal=new(root);archiveStore=new(root);
         Teachers = new(teacherPath, activeModule); Registration = new(teacherPath, activeModule);
         registrationModule = listModule = Workspace.Modules.Single(m=>m.Id==activeModule);
         Monthly = new(teacherPath); Calculation = new(teacherPath);
@@ -186,7 +187,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     }
     public void BeginArchiveEdit()
     {
-        if(Calculation.HasActiveWork || Monthly.HasHybridChanges || Registration.IsEditingRecord || CommonConstants.IsEditing || RetiredConstants.IsEditing ||
+        if(Calculation.HasActiveWork || Monthly.HasHybridChanges || Registration.IsEditingRecord || CommonConstants.IsEditing || RetiredConstants.IsEditing || BankConstants.IsEditing ||
            Registration.HasDraft)
             throw new InvalidOperationException("Aktif bir çalışma veya veri girişi var. Önce hakedişi oluşturun ya da Çalışmayı temizle düğmesini kullanın.");
         var record=Outputs.ReadSelected();archiveEdit=record;Calculation.LoadArchive(record);Navigate("Calculation");

@@ -22,6 +22,7 @@
     <None Update="Fixtures/retired-excel-recalculated.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Fixtures/mesleki-excel-recalculated.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../src/Hakedis.App/CommonConstantsViewModel.cs" Link="CommonConstantsViewModel.cs"/>
+    <Compile Include="../../src/Hakedis.App/BankConstantsViewModel.cs" Link="BankConstantsViewModel.cs"/>
     <Compile Include="../../src/Hakedis.App/UiSettingsViewModel.cs" Link="UiSettingsViewModel.cs"/>
     <Compile Include="../../src/Hakedis.App/BillingChoiceViewModel.cs" Link="BillingChoiceViewModel.cs"/>
     <Compile Include="../../src/Hakedis.App/PaymentDetailsViewModel.cs" Link="PaymentDetailsViewModel.cs"/>

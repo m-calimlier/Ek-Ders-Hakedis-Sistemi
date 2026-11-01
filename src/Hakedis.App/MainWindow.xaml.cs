@@ -41,7 +41,7 @@ public partial class MainWindow : Window
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
         if(shell.Monthly.HasHybridChanges || shell.Calculation.HasHybridChanges || shell.Calculation.IsArchiveEditing ||
-           shell.Registration.HasDraft || shell.Registration.IsEditingRecord || shell.CommonConstants.IsEditing || shell.RetiredConstants.IsEditing ||
+           shell.Registration.HasDraft || shell.Registration.IsEditingRecord || shell.CommonConstants.IsEditing || shell.RetiredConstants.IsEditing || shell.BankConstants.IsEditing ||
            shell.Teachers.HasChanges || shell.Outputs.HasDetailsChanges)
             e.Cancel=!ConfirmArchive("Kaydedilmemiş giriş veya tamamlanmamış düzenleme var.\nProgram kapatılırsa bu değişiklikler kaybolur; kayıtlı dosyalar korunur.\nYine de kapatılsın mı?","Kaydedilmemiş değişiklikler");
         base.OnClosing(e);
@@ -106,6 +106,8 @@ public partial class MainWindow : Window
     private void EditMonthly_Click(object sender,RoutedEventArgs e) => RunPeriod(shell.Monthly,shell.Monthly.BeginEdit);
     private void SaveConstants_Click(object sender,RoutedEventArgs e)
     {try{var saving=shell.CommonConstants.IsEditing;shell.CommonConstants.ToggleSave();if(saving)Inform(shell.CommonConstants.Status);}catch(Exception ex) when(ex is ArgumentException or System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException){shell.CommonConstants.ShowError(ex.Message);Inform(ex.Message);}}
+    private void SaveBankConstants_Click(object sender,RoutedEventArgs e)
+    {try{shell.BankConstants.ToggleSave();}catch(Exception ex) when(ex is ArgumentException or System.IO.IOException or UnauthorizedAccessException){shell.BankConstants.ShowError(ex.Message);Inform(ex.Message);}}
     private void SaveRetiredConstants_Click(object sender,RoutedEventArgs e)
     {try{var saving=shell.RetiredConstants.IsEditing;shell.RetiredConstants.ToggleSave();if(saving)Inform(shell.RetiredConstants.Status);}catch(Exception ex) when(ex is ArgumentException or System.IO.IOException or System.IO.InvalidDataException or UnauthorizedAccessException){shell.RetiredConstants.ShowError(ex.Message);Inform(ex.Message);}}
     private void ClearWork_Click(object sender,RoutedEventArgs e)
@@ -161,6 +163,8 @@ public partial class MainWindow : Window
     {SelectOutput(sender);RunOutput(()=>{var folder=new PaymentReportService().Export(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read());shell.Outputs.ShowStatus("Üç PDF kaydedildi: "+folder);MessageBox.Show(this,"Üç PDF kaydedildi:\n"+folder,"Çıktı",MessageBoxButton.OK,MessageBoxImage.Information);});}
     private void PrintOutputs_Click(object sender,RoutedEventArgs e)
     {SelectOutput(sender);RunOutput(()=>{if(new PaymentReportService().Print(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read()))shell.Outputs.ShowStatus("Üç belge yazıcıya gönderildi.");});}
+    private void BankOutput_Click(object sender,RoutedEventArgs e)
+    {SelectOutput(sender);RunOutput(()=>{var dialog=new BankExcelWindow(shell.Outputs.ReadSelected(),shell.Outputs.DataRoot,()=>shell.Outputs.ReadSelected()){Owner=this};if(dialog.ShowDialog()==true)shell.Outputs.ShowStatus("Banka Excel kaydedildi: "+dialog.OutputPath);});}
     private void XmlOutput_Click(object sender,RoutedEventArgs e)
     {
         SelectOutput(sender);RunOutput(()=>{

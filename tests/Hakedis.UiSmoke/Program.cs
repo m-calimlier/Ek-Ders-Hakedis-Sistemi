@@ -19,6 +19,21 @@ internal static class Program
         var app = new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
         foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault"})
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
+        if(args.Length==4 && args[1]=="--verify-local-bank")
+        {
+            var record=new Hakedis.Storage.PaymentArchiveStore(args[2]).ReadAll().First();
+            var templates=new Hakedis.Storage.BankTemplateStore(args[2]);var settings=new Hakedis.Storage.BankSettingsStore(args[2]);
+            var module=record.Document.ModuleId;
+            if(!File.Exists(templates.FilePath(module)))templates.Import(module,args[3]);
+            if(!File.Exists(settings.FilePath(module)))settings.Save(module,Hakedis.Storage.HalkbankExcelService.Inspect(Hakedis.Storage.HalkbankExcelService.ReadTemplate(args[3])));
+            var original=File.ReadAllBytes(record.Path);
+            var dialog=new BankExcelWindow(record,args[2],()=>new Hakedis.Storage.PaymentArchiveStore(args[2]).Read(record.Path));
+            if(((DatePicker)dialog.FindName("PaymentDate")).SelectedDate is not null)throw new InvalidOperationException("Ödeme tarihi kendiliğinden dolduruldu.");
+            dialog.Show();dialog.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);Capture(dialog,Path.Combine(output,"BankExcel-local.png"));
+            dialog.ExportTo(Path.Combine(output,"private-validation.xls"),new DateOnly(2026,11,5));dialog.Close();
+            if(!original.SequenceEqual(File.ReadAllBytes(record.Path)))throw new InvalidOperationException("Banka çıktısı arşivi değiştirdi.");
+            Console.WriteLine($"Banka XLS: {record.Count} kişi, kaynak arşiv değişmedi. Tarih yalnız test amaçlıdır.");return 0;
+        }
         if(args.Length==3 && args[1]=="--verify-data-compat")
         {
             var root=args[2];var teachers=new Hakedis.Storage.TeacherDirectory(Path.Combine(root,"ogretmenler.json")).ReadCanonical();
@@ -204,7 +219,7 @@ internal static class Program
         if(detailsCard.TranslatePoint(new Point(0,0),window).X<=listCard.TranslatePoint(new Point(0,0),window).X || ((DataGrid)window.FindName("TeacherListGrid")).Columns.Count!=3)
             throw new InvalidOperationException("Öğretmen kartları yan yana / ad, TC, IBAN sütunları eksik.");
         model.Navigate("Constants");window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
-        if(Descendants<ComboBox>(window).Any(c=>c.IsVisible))throw new InvalidOperationException("Ortak sabit panelinde modül/dönem seçimi kalmış.");
+        if(Descendants<ComboBox>(window).Any(c=>c.IsVisible && c.Name!="BankModuleCombo"))throw new InvalidOperationException("Ortak sabit panelinde modül/dönem seçimi kalmış.");
         if(Descendants<TextBox>(window).Where(t=>t.IsVisible).Any(t=>!t.IsReadOnly))throw new InvalidOperationException("Sabitler başlangıçta salt okunur değil.");
         var update=(Button)window.FindName("ConstantsUpdateButton");update.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         if(model.CommonConstants.IsReadOnly || update.Content as string!="Dönem sabitlerini değiştir")throw new InvalidOperationException("Sabit güncelleme modu açılmadı.");
@@ -213,9 +228,13 @@ internal static class Program
         model.Registration.Reset();model.ClearCurrentWork();model.Navigate("Outputs");model.Outputs.Selected=model.Outputs.Records.Single();
         var archived=model.Outputs.ReadSelected();var archiveBytes=File.ReadAllBytes(archived.Path);
         window.Width=1366;window.Height=768;window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
-        var rowButtons=Descendants<Button>((DataGrid)window.FindName("OutputsGrid")).Where(b=>b.Content is string text && new[]{"PDF oluştur","Yazdır","Düzenle","Sil","Detay","XML oluştur"}.Contains(text)).ToArray();
-        if(rowButtons.Length!=6 || rowButtons.Any(b=>Math.Abs(b.ActualWidth-100)>1 || Math.Abs(b.ActualHeight-32)>1))throw new InvalidOperationException("Çıktı düğmeleri eşit ölçüde değil.");
+        var rowButtons=Descendants<Button>((DataGrid)window.FindName("OutputsGrid")).Where(b=>b.Content is string text && new[]{"PDF","Yazdır","Düzenle","Sil","Detay","XML","Banka"}.Contains(text)).ToArray();
+        if(rowButtons.Length!=7 || rowButtons.Any(b=>Math.Abs(b.ActualWidth-64)>1 || Math.Abs(b.ActualHeight-32)>1))throw new InvalidOperationException("Çıktı düğmeleri eşit ölçüde değil.");
+        var bankButton=rowButtons.Single(b=>b.Content as string=="Banka");var xmlButton=rowButtons.Single(b=>b.Content as string=="XML");
+        var bankPosition=bankButton.TranslatePoint(new Point(0,0),window);var xmlPosition=xmlButton.TranslatePoint(new Point(0,0),window);
+        if(rowButtons.Any(b=>Math.Abs(b.TranslatePoint(new Point(0,0),window).Y-bankPosition.Y)>1) || bankPosition.X+bankButton.ActualWidth>window.ActualWidth || Math.Abs(bankPosition.Y-xmlPosition.Y)>1 || bankPosition.X<=xmlPosition.X)throw new InvalidOperationException("Banka Excel düğmesi XML yanında ve ekranda görünür olmalı.");
         Capture(window,Path.Combine(output,"Outputs-five-actions.png"));
+        if(args.Length==2 && args[1]=="--verify-bank-layout"){window.Close();Console.WriteLine("Yedi çıktı düğmesi ve banka sabitleri arayüzü doğrulandı.");return 0;}
         var sgkStore=new Hakedis.Storage.SgkXmlStore(model.Outputs.DataRoot);
         sgkStore.Save(Hakedis.Contracts.ModuleId.TemelEgitim,new(new("12345678901234567890120000","ÖRNEK KURUM","ÖRNEK ADRES","13","00000",DefaultMissingReason:"07"),[]));
         var xmlDialog=new SgkXmlWindow(archived,sgkStore,Path.Combine(output,"xml-test"),notifications.Add){Owner=window};
@@ -318,7 +337,7 @@ internal static class Program
         OutputEntryChecks.Run(output,Capture);
         VaultChecks.Run(output);
         if (listener.Errors.Count > 0) { foreach (var message in listener.Errors) Console.Error.WriteLine(message); return 1; }
-        Console.WriteLine($"12 WPF panel görüntüsü, eşit altı çıktı düğmesi, onaylı silme ve tek kayıtla düzenleme, SGK XML ekranı/onayı/şema testi, ortak sabit kilidi, yan yana öğretmen kartları, arşiv iptali, üç PDF ve çok sayfalı yazıcı işi doğrulandı; binding hatası yok. {output}"); return 0;
+        Console.WriteLine($"12 WPF panel görüntüsü, eşit yedi çıktı düğmesi, onaylı silme ve tek kayıtla düzenleme, SGK XML ekranı/onayı/şema testi, ortak sabit kilidi, yan yana öğretmen kartları, arşiv iptali, üç PDF ve çok sayfalı yazıcı işi doğrulandı; binding hatası yok. {output}"); return 0;
     }
     private static void VerifyReportPages(PaymentReportService service,Hakedis.Storage.ArchivedPayment record,Hakedis.Contracts.ReportDetails details,string output,string prefix)
     {

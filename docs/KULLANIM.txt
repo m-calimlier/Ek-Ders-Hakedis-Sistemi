@@ -219,6 +219,16 @@ anahtarı birlikte unutulursa kasa kurtarılamaz. Eski dışa aktarımlar,
 ana parola değiştirilse bile eski parolayla açılır. Zararlı yazılım
 bulunan bir bilgisayarda açık bilgilerin korunması garanti edilemez.
 
-SONRAKİ ALANLAR
-İsteğe bağlı Excel dışa aktarma, banka aktarım dosyası ve diğer modüllerin
-hesaplama çekirdekleri bu sürümde henüz eklenmemiştir.
+BANKA EXCEL ÇIKTISI
+Dönem Sabitleri > Banka Sabitleri alanında bölümü seçin. Güncelle ile
+o bölümün firma müşteri numarasını, şube kodunu ve firma IBAN/hesap
+bilgisini girip kaydedin. Her bölümün bilgisi ayrıdır.
+Çıktı panelinde ilgili hakediş satırındaki Banka düğmesini açın.
+O bölüme ait orijinal Halkbank .xls şablonunu seçin ve ödeme tarihini
+belirleyin. Banka Excel oluştur ile .xls dosyasını kaydedin. Veriler
+seçilen kayıtlı hakedişten alınır. Program bankaya yükleme yapmaz.
+Kişisel banka sabitleri ve şablonları Veriler klasöründe tutulur;
+kurulum paketine ve GitHub kaynaklarına dahil edilmez. Başka PC'ye
+taşırken bu özel dosyaları kendi veri yedeğinizle birlikte taşıyın.
+XLS okuma/yazma bileşeni NPOI Core, Apache-2.0 kaynaklarından yerel
+derlenmiştir. Lisans metni: NPOI-LICENSE.txt.

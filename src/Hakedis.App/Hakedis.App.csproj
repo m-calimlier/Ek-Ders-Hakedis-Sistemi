@@ -14,7 +14,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>Ek Ders Hakediş Sistemi</AssemblyName>
     <RootNamespace>Hakedis.App</RootNamespace>
-    <Version>1.0.6</Version>
+    <Version>1.0.7</Version>
     <Title>Ek Ders Hakediş Sistemi</Title>
     <Product>Ek Ders Hakediş Sistemi</Product>
     <Description>Modüllerle ek ders hakedişi, bordro ve SGK çıktıları.</Description>
@@ -27,5 +27,6 @@
 
   <ItemGroup>
     <Resource Include="Assets\Hakedis.ico" />
+    <EmbeddedResource Include="../../third_party/NPOI/LICENSE" Link="Licenses/NPOI-LICENSE.txt" />
   </ItemGroup>
 </Project>

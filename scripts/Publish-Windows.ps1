@@ -9,9 +9,13 @@ try {
     $packagePath = Join-Path $projectRoot ('dist/Ek Ders Hakediş Sistemi-' + $Runtime + '-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
     dotnet publish src/Hakedis.App -c Release -r $Runtime --self-contained true -o $packagePath /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DebugType=None /p:DebugSymbols=false
     if ($LASTEXITCODE -ne 0) { throw 'EXE yayını başarısız.' }
+    # SkiaSharp'ın yerel hata ayıklama simgesi programın çalışması için gerekmez.
+    $nativeSymbols = Join-Path $packagePath 'libSkiaSharp.pdb'
+    if (Test-Path -LiteralPath $nativeSymbols) { Remove-Item -LiteralPath $nativeSymbols }
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/KULLANIM.txt') -Destination (Join-Path $packagePath 'KULLANIM.txt')
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'third_party/NPOI/LICENSE') -Destination (Join-Path $packagePath 'NPOI-LICENSE.txt')
     Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Create-DesktopShortcut.ps1') -Destination (Join-Path $packagePath 'Masaüstü Kısayolu.ps1')
-    $allowedFiles = @('Ek Ders Hakediş Sistemi.exe', 'KULLANIM.txt', 'Masaüstü Kısayolu.ps1')
+    $allowedFiles = @('Ek Ders Hakediş Sistemi.exe', 'KULLANIM.txt', 'Masaüstü Kısayolu.ps1', 'NPOI-LICENSE.txt')
     $unexpected = @(Get-ChildItem -LiteralPath $packagePath -Force | Where-Object { $_.PSIsContainer -or $_.Name -notin $allowedFiles })
     if ($unexpected.Count -gt 0) { throw 'Paket yalnız program ve kullanım dosyalarını içerebilir; beklenmeyen dosyalar nedeniyle paketleme durduruldu.' }
     Compress-Archive -Path (Join-Path $packagePath '*') -DestinationPath ($packagePath + '.zip')

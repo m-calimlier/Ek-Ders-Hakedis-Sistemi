@@ -1,0 +1,19 @@
+<Window x:Class="Hakedis.App.BankExcelWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Halkbank Excel Oluştur" Width="690" Height="540" MinWidth="580" MinHeight="500" WindowStartupLocation="CenterOwner" Background="#071F38" Foreground="White" xml:lang="tr-TR">
+ <Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+ <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
+ <TextBlock Text="Halkbank ödeme Exceli" Style="{StaticResource CardTitle}"/>
+ <TextBlock x:Name="RecordText" TextWrapping="Wrap" Style="{StaticResource CardSubtitle}" Margin="0,10,0,16"/>
+ <TextBlock Text="Seçilen bölümün firma bilgileri" Style="{StaticResource FieldLabel}"/>
+ <TextBlock x:Name="FirmText" TextWrapping="Wrap" Margin="0,6,0,14"/>
+ <TextBlock Text="Firma bilgileri Dönem Sabitleri → Banka Sabitleri alanından değiştirilir." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,0,0,14"/>
+ <TextBlock Text="Bu bölüme ait orijinal Halkbank .xls şablonu" Style="{StaticResource FieldLabel}"/>
+ <DockPanel Margin="0,6,0,14"><Button DockPanel.Dock="Right" Content="Şablon seç" Style="{StaticResource SecondaryAction}" Click="Template_Click"/><TextBox x:Name="TemplateText" IsReadOnly="True" Style="{StaticResource FormText}"/></DockPanel>
+ <TextBlock Text="Bankanın ödemeyi yapacağı tarih (zorunlu)" Style="{StaticResource FieldLabel}"/>
+ <DatePicker x:Name="PaymentDate" Width="210" HorizontalAlignment="Left" Margin="0,6,0,16"/>
+ <TextBlock Text="Seçilen hakedişin kayıtlı IBAN, kimlik, ad soyad ve net ödeme tutarları aktarılır. Kullanılmayan personel satırları boş bırakılır." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap"/>
+ <TextBlock x:Name="ErrorText" Style="{StaticResource ValidationText}" TextWrapping="Wrap" Margin="0,14,0,0"/>
+ </StackPanel></ScrollViewer>
+ <Button Grid.Row="1" Content="Banka Excel oluştur" Style="{StaticResource GoldAction}" HorizontalAlignment="Right" Margin="0,16,0,0" Click="Export_Click"/>
+ </Grid>
+</Window>
