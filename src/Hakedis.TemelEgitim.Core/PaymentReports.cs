@@ -34,10 +34,23 @@ public static class PaymentReports
             Money(r.Result.StampTax),Money(r.Result.EmployeePremium),Money(r.Result.EmployerPremium),Money(r.Input.Garnishment),Money(r.Result.Deductions),Money(r.Result.Net)}).ToArray();
         var total2=new[]{"TOPLAM","","",Money(rows.Sum(r=>r.Result.IncomeBase)),"0,00","",Money(rows.Sum(r=>r.Result.IncomeTax)),"",Money(rows.Sum(r=>r.Result.StampTax)),Money(rows.Sum(r=>r.Result.EmployeePremium)),
             Money(rows.Sum(r=>r.Result.EmployerPremium)),Money(rows.Sum(r=>r.Input.Garnishment)),Money(rows.Sum(r=>r.Result.Deductions)),Money(rows.Sum(r=>r.Result.Net))};
-        var payroll=new PaymentReport("Bordro.pdf",ModuleLabels.PayrollTitle(selectedModule),true,info,
-            [new("Ders, ücret ve tahakkuk",h1,[40,108,52,66,42,42,43,47,47,53,53,38,58,58,58],a,total1),
-             new("Vergi, kesinti ve net ödeme",h2,[40,108,66,58,53,55,57,55,53,54,54,52,55,58],b,total2)],
-            ["Bordroda yazılı alacaklar kayıtlara uygundur.","SÜRE GELEN VERGİ MATRAHI kaynak hesapta kullanılmadığından 0,00 gösterilir."]);
+        // Yalnız rapor gösterimi: arşivdeki vergi, kesinti ve net tutarları değiştirilmez.
+        h1[12]="SGK'ya Esas Brüt Ücret";
+        // Matrah ayrı sütun olarak korunur; kalan istisna yalnız istenen rapor formülüdür.
+        h2=h2.Append("Kalan Gelir Vergisi İstisnası").ToArray();
+        for(var i=0;i<rows.Length;i++)b[i]=b[i].Append(Money(Math.Max(0,p.IncomeExemption-rows[i].Result.IncomeBase))).ToArray();
+        total2=total2.Append(Money(rows.Sum(r=>Math.Max(0,p.IncomeExemption-r.Result.IncomeBase)))).ToArray();
+        var hasDyk=rows.Any(r=>r.Input.DykHours>0);
+        var hasGarnishment=rows.Any(r=>r.Input.Garnishment>0);
+        var first=Enumerable.Range(0,h1.Length).Where(i=>i!=7 && (hasDyk || i is not (4 or 5 or 8 or 10))).ToArray();
+        var second=new[]{3,14}.Concat(Enumerable.Range(5,9)).Where(i=>hasGarnishment || i!=11).ToArray();
+        string[] Combine(string[] left,string[] right)=>first.Select(i=>left[i]).Concat(second.Select(i=>right[i])).ToArray();
+        double[] firstWidths=[24,100,43,58,30,30,32,43,43,46,46,25,48,48,50];
+        double[] secondWidths=[24,100,58,50,45,45,44,45,44,45,45,44,48,50,50];
+        var widths=first.Select(i=>firstWidths[i]).Concat(second.Select(i=>secondWidths[i])).ToArray();
+        var payroll=new PaymentReport("Bordro.pdf",ModuleLabels.PayrollTitle(selectedModule),true,info.Take(2).ToArray(),
+            [new("",Combine(h1,h2),widths,a.Select((r,i)=>Combine(r,b[i])).ToArray(),Combine(total1,total2))],
+            ["Bordroda yazılı alacaklar kayıtlara uygundur."]);
         var bankRows=rows.Select((r,i)=>new[]{(i+1).ToString(),r.Teacher.FullName,r.Teacher.IdentityNumber,r.Teacher.Iban,Money(r.Result.Net)}).ToArray();
         var bank=new PaymentReport("Banka Listesi.pdf","B  A  N  K  A       L  İ  S  T  E  S  İ",false,
             ["DAİRENİN ADI               "+details.Institution,"BANKANIN ADI              "+details.Bank,"AİT OLDUĞU AY             "+period],

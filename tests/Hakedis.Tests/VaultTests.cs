@@ -10,6 +10,15 @@ public sealed class VaultTests : IDisposable
     private string FilePath => Path.Combine(root, "first.edhskasa");
     private const string Password = "Yalnız-bana-özel-uzun-parola-2026";
 
+    [Fact] public void Regenerating_recovery_keeps_password_and_data_and_rejects_old_code()
+    {
+        var store=new VaultStore(FilePath);using var session=store.Create(Password,out var oldCode);
+        var data=VaultData.Empty();data.Groups[0]=new("Deneme","Şifre","İşyeri","Kod","Sicil");session.Save(data);
+        var code=session.RegenerateRecoveryCode();Assert.Equal(64,code.Length);Assert.NotEqual(oldCode,code);
+        Assert.ThrowsAny<CryptographicException>(()=>store.Recover(oldCode));
+        using var recovered=store.Recover(code);Assert.Equal("Deneme",recovered.Read().Groups[0].UserCode);
+        using var opened=store.Unlock(Password);Assert.Equal("Sicil",opened.Read().Groups[0].RegistrationNumber);
+    }
     [Theory]
     [InlineData("Abcde12!?")]
     [InlineData("Abcdefgh12")]

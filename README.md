@@ -8,6 +8,15 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
+## 1.0.10 kararlı sürüm
+
+- Tek satırlı bordro: kullanılmayan DYK/icra/gündüz saat sütunları gizlenir. GV matrahı ve pozitif kalan istisna ayrı sütunlardır; kayıtlı mali sonuçlar korunur.
+- İşe başlama ve ayrılış tarihleri yan yana; hakediş Detay penceresinde özetler ve salt okunur liste korunarak gereksiz iki kart kaldırıldı.
+- Kasa başka uygulamaya geçince kilitlenmez; gösterilen şifre maskelenir. Beş dakika hareketsizlik ve Windows kilidi koruması sürer.
+- Kurtarma kodu onaya kadar görünür. Açık kasada onayla yeni kurtarma kodu üretilebilir; işyeri bilgileri ve ana parola korunur.
+- Doğrulama: 300 Release birim testi ve tam WPF/PDF/XML/kasa testleri geçti.
+- Kaynak ve dağıtım kişisel veri, kasa, kurtarma kodu veya çıktı içermez. Yerel güncelleme öncesi veri/kasa ve EXE yedeği alınır.
+
 ## 1.0.6 birleşik sürüm
 
 - İki bilgisayarda geliştirilen özellikler bir aradadır: şifre kasası, bordro ayrıntıları, modül filtreleme, güvenli aylık giriş ve okul geçişi saatleri.

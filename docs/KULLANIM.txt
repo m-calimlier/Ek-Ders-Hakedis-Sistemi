@@ -207,8 +207,8 @@ Sol menüden Şifre Kasası açılır. İlk kullanımda ana parola ve tekrarı
 belirlenir (en az 10 karakter; harf, rakam ve sembol zorunludur). Kurtarma
 anahtarı yalnız bir kez gösterilir; kasa dosyasından ayrı saklayın.
 Ücretli Öğretmenler ve Usta Öğreticiler için beşer alan bulunur.
-Bilgileri kaydet ile şifreli kayıt yapılır. Pencereden ayrılınca veya
-iki dakika işlem yapılmayınca kasa kilitlenir; kaydedilmemiş girişler silinir.
+Bilgileri kaydet ile şifreli kayıt yapılır. Başka uygulamaya geçince kasa açık kalır.
+Beş dakika işlem yapılmayınca, pencere kapatılınca veya Windows kilitlenince kasa kilitlenir; kaydedilmemiş girişler silinir.
 Şifreli kasayı dışa aktar ile yedek alın. Diğer bilgisayarda programı kurun,
 kasa ekranındaki ana parola alanına taşınan kasanın parolasını yazın ve
 Şifreli kasayı içe aktar seçeneğini kullanın. Bu işlem mevcut kasanın
@@ -232,3 +232,6 @@ kurulum paketine ve GitHub kaynaklarına dahil edilmez. Başka PC'ye
 taşırken bu özel dosyaları kendi veri yedeğinizle birlikte taşıyın.
 XLS okuma/yazma bileşeni NPOI Core, Apache-2.0 kaynaklarından yerel
 derlenmiştir. Lisans metni: NPOI-LICENSE.txt.
+
+1.0.10 KASA KULLANIMI
+Kurtarma anahtarı Kaydettim onayına kadar ekranda kalır. Kod kopyalama süresi 120 saniye; normal alanlarda 60 saniyedir. Ana parolayla açılmış kasada Yeni kurtarma anahtarı oluştur düğmesiyle eski kodun yerine yeni kod oluşturabilirsiniz. Bu işlem güncel kasanın eski kodunu geçersiz kılar; eski dışa aktarılmış kasaları değiştirmez.

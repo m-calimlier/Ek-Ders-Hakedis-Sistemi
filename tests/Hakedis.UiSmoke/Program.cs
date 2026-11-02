@@ -19,6 +19,8 @@ internal static class Program
         var app = new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
         foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault"})
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
+        if(args.Length==2 && args[1]=="--verify-single-row-payroll")
+        {SingleRowReportChecks.Run(output,Capture);return 0;}
         if(args.Length==4 && args[1]=="--verify-local-bank")
         {
             var record=new Hakedis.Storage.PaymentArchiveStore(args[2]).ReadAll().First();
@@ -335,6 +337,7 @@ internal static class Program
         SchoolHistoryChecks.Run(output,Capture);
         TransferHoursChecks.Run(output,Capture);
         OutputEntryChecks.Run(output,Capture);
+        SingleRowReportChecks.Run(output,Capture);
         VaultChecks.Run(output);
         if (listener.Errors.Count > 0) { foreach (var message in listener.Errors) Console.Error.WriteLine(message); return 1; }
         Console.WriteLine($"12 WPF panel görüntüsü, eşit yedi çıktı düğmesi, onaylı silme ve tek kayıtla düzenleme, SGK XML ekranı/onayı/şema testi, ortak sabit kilidi, yan yana öğretmen kartları, arşiv iptali, üç PDF ve çok sayfalı yazıcı işi doğrulandı; binding hatası yok. {output}"); return 0;
@@ -343,7 +346,14 @@ internal static class Program
     {
         var prepared=service.Prepare(record,details);
         if(prepared[0].Pages.Length!=1 || prepared[0].Pages[0].Width<prepared[0].Pages[0].Height)throw new InvalidOperationException("Bordro tek yatay A4 değil.");
+        var payroll=prepared[0].Pages[0];
+        var payrollRows=payroll.Cells.Where(c=>c.Border && !c.Header && !c.Bold).ToArray();
+        if(payrollRows.GroupBy(c=>c.Y).Count()!=record.Count || payrollRows.Any(c=>c.Lines.Length!=1))throw new InvalidOperationException("Her öğretmen bordroda tek satıra sığmadı.");
+        var info=payroll.Cells.Where(c=>c.Left && !c.Border).ToArray();
+        if(info.Length!=2 || !info[0].Lines[0].StartsWith("DAİRESİ") || !info[1].Lines[0].StartsWith("İLGİLİ AY"))throw new InvalidOperationException("Bordro başlık altında yalnız sola yaslı daire/ay olmalı.");
         if(prepared.Any(r=>r.FileName.Contains("Çıktı-")))throw new InvalidOperationException("Sıra etiketi kaldı.");
+        var expectedStatement=(record.Document.Data.Details??details).SickLeaveStatement;
+        if(!string.IsNullOrEmpty(expectedStatement) && !prepared[2].Pages.SelectMany(p=>p.Cells).Any(c=>string.Join(" ",c.Lines).Contains(expectedStatement)))throw new InvalidOperationException("Personel PDF hastalık beyanı korunmadı.");
         if(prepared[2].Pages.Length!=1)throw new InvalidOperationException("Personel bildirimi tek sayfa değil.");
         var digits=prepared[2].Pages[0].Cells.Where(c=>c.Y==141 && c.Width==49).ToArray();
         if(digits.Length!=4 || string.Concat(digits.Select(c=>c.Lines[0]))!=record.Document.Data.Year.ToString())throw new InvalidOperationException("Personel yılı ayrı hücrelerde değil.");

@@ -5,24 +5,43 @@ namespace Hakedis.App;
 
 public sealed partial class PaymentReportService
 {
-    // Bütün mali alanlar iki yatay bantta korunur. Tek sayfa şartı yüzünden satır atılmaz.
+    // Tek birleşik tablo; öğretmenler veya mali tutarlar sığdırma amacıyla kesilmez.
     private static LaidOutReport LayoutPayroll(PaymentReport report,ReportDetails details,DateTimeOffset date)
     {
         const double width=842,height=595,margin=7,available=width-margin*2;
         for(var font=8d;font>=6; font-=.25)
         {
-            var page=new ReportPage(width,height);var y=margin;
-            void Text(string text,double size,bool bold=false)
-            {
-                var lines=Wrap(text,available-6,size,bold);var h=lines.Length*size*1.22+3;
-                page.Cells.Add(new(margin,y,available,h,lines,size,bold));y+=h;
-            }
-            Text(report.Title,10,true);
-            foreach(var info in report.Information)Text(info,7);
+            // Her veri hücresinin tek metin satırına sığacağı asgari genişliği ölç.
+            var tableWidths=new List<double[]>();var fits=true;
             foreach(var table in report.Tables)
             {
-                Text(table.Title,8,true);
-                var widths=table.Widths.Select(w=>w/table.Widths.Sum()*available).ToArray();
+                var minimum=table.Headers.Select((_,i)=>Math.Max(12,
+                    table.Rows.Select(row=>Measure(row[i],font,false)+7)
+                    .Append(table.Total is null?0:Measure(table.Total[i],font+.3,true)+7).Max())).ToArray();
+                if(minimum.Sum()>available){fits=false;break;}
+                var spare=available-minimum.Sum();
+                // Önce başlıklardaki kelimelerin harf harf bölünmesini azalt.
+                var deficits=table.Headers.Select((header,i)=>Math.Max(0,
+                    header.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries).Select(word=>Measure(word,font,true)+7).DefaultIfEmpty(0).Max()-minimum[i])).ToArray();
+                var needed=deficits.Sum();var fraction=needed>0?Math.Min(1,spare/needed):0;
+                minimum=minimum.Select((w,i)=>w+deficits[i]*fraction).ToArray();
+                spare=available-minimum.Sum();var weight=table.Widths.Sum();
+                tableWidths.Add(minimum.Select((w,i)=>w+spare*table.Widths[i]/weight).ToArray());
+            }
+            if(!fits)continue;
+            var page=new ReportPage(width,height);var y=margin;
+            void Text(string text,double size,bool bold=false,bool left=false)
+            {
+                var lines=Wrap(text,available-6,size,bold);var h=lines.Length*size*1.22+3;
+                page.Cells.Add(new(margin,y,available,h,lines,size,bold,Left:left));y+=h;
+            }
+            Text(report.Title,10,true);
+            foreach(var info in report.Information)Text(info,7,left:true);
+            var tableIndex=0;
+            foreach(var table in report.Tables)
+            {
+                if(!string.IsNullOrWhiteSpace(table.Title))Text(table.Title,8,true);
+                var widths=tableWidths[tableIndex++];
                 void Draw(string[] values,bool header,bool total)
                 {
                     var size=total?font+.3:font;

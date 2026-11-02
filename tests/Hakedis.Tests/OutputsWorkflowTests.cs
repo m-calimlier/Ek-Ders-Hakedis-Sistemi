@@ -164,7 +164,7 @@ public sealed class OutputsWorkflowTests : IDisposable
         var reports=Hakedis.TemelEgitim.Core.PaymentReports.Build(data,new("Kurum","Banka","Görevli","Ünvan","Yetkili"));
         Assert.Equal(3,reports.Length);Assert.Equal("Bordro.pdf",reports[0].FileName);
         Assert.Equal("22.193,93",reports[1].Tables[0].Rows[0][4]);
-        Assert.Equal(reports[0].Tables[1].Rows[0][13],reports[1].Tables[0].Rows[0][4]);
+        Assert.Equal(reports[0].Tables[0].Rows[0][Array.IndexOf(reports[0].Tables[0].Headers,Hakedis.Contracts.ExcelHeadings.BordroAA5)],reports[1].Tables[0].Rows[0][4]);
         Assert.Contains("Eylül-2026",string.Join(" ",reports[2].Information));
         Assert.DoesNotContain("#REF!",string.Join(" ",reports.SelectMany(x=>x.Information)));
     }

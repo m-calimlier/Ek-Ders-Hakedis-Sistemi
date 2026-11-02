@@ -229,6 +229,17 @@ public sealed class VaultSession : IDisposable
         }
         finally { CryptographicOperations.ZeroMemory(wrapping); }
     }
+    public string RegenerateRecoveryCode()
+    {
+        var recovery=RandomNumberGenerator.GetBytes(32);
+        try
+        {
+            var updated=envelope with {RecoveryKey=VaultStore.Encrypt(Key,recovery,"recovery")};
+            revision=store.Commit(updated,revision);envelope=updated;
+            return Convert.ToHexString(recovery);
+        }
+        finally {CryptographicOperations.ZeroMemory(recovery);}
+    }
     public void Export(string target) { _ = Key; store.Export(target, revision); }
     public void Dispose() { if (key is not null) { CryptographicOperations.ZeroMemory(key); key = null; } }
 }

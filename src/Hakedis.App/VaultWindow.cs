@@ -23,11 +23,15 @@ public sealed class VaultWindow : Window
     private string? clipboardValue;
     private DateTime clipboardExpiry;
     private bool internalDialog;
+    private readonly Func<string,bool>? confirmation;
     private bool dirty;
+    private bool showingRecovery;
+    private static readonly TimeSpan InactivityTimeout=TimeSpan.FromMinutes(5);
 
     public VaultWindow() : this(VaultStore.DefaultPath) { }
-    public VaultWindow(string filePath)
+    public VaultWindow(string filePath,Func<string,bool>? confirmation=null)
     {
+        this.confirmation=confirmation;
         store = new VaultStore(filePath);
         Title = "İşyeri Bilgileri • Şifre Kasası";
         Width = 860; Height = 620; MinWidth = 720; MinHeight = 500;
@@ -44,14 +48,22 @@ public sealed class VaultWindow : Window
         DockPanel.SetDock(header, Dock.Top); layout.Children.Add(header);
         var footer = new StackPanel();
         footer.Children.Add(status);
-        footer.Children.Add(Text("Kasa 2 dakika hareketsizlikte, bu pencereden ayrılınca ve Windows kilitlenince kilitlenir.\nKaydedilmemiş değişiklikler kilitlenirken silinir. Kasa, normal veri yedeklerine dahil değildir.", 11));
+        footer.Children.Add(Text("Kasa başka uygulamaya geçince açık kalır; 5 dakika hareketsizlikte, kapatılınca veya Windows kilitlenince kilitlenir.\nKaydedilmemiş değişiklikler kilitlenirken silinir. Kasa, normal veri yedeklerine dahil değildir.", 11));
         DockPanel.SetDock(footer, Dock.Bottom); layout.Children.Add(footer);
         layout.Children.Add(new ScrollViewer { Content = body, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
         Content = layout;
         PreviewKeyDown += (_, _) => lastInput = DateTime.UtcNow;
         PreviewMouseDown += (_, _) => lastInput = DateTime.UtcNow;
         PreviewMouseMove += (_, _) => lastInput = DateTime.UtcNow;
-        Deactivated += (_, _) => { if (!internalDialog) Lock(); };
+        Deactivated += (_, _) => { foreach(var field in fields)field.Conceal(); };
+        Closing += (_, e) =>
+        {
+            if(dirty || showingRecovery)
+            {
+                var message=showingRecovery?"Kurtarma anahtarını kaydetmeden çıkmak üzeresiniz. Ana parolanızla kasayı açıp daha sonra yeni kurtarma anahtarı oluşturabilirsiniz. Yine de kapatılsın mı?":"Kaydedilmemiş kasa değişiklikleri var. Kapatırsanız bu girişler kaybolur. Yine de kapatılsın mı?";
+                if(!Confirm(message))e.Cancel=true;
+            }
+        };
         SystemEvents.SessionSwitch += SessionSwitch;
         timer.Tick += Tick; timer.Start();
         Closed += (_, _) => { timer.Stop(); SystemEvents.SessionSwitch -= SessionSwitch; Lock(); ClearClipboard(); };
@@ -90,7 +102,7 @@ public sealed class VaultWindow : Window
 
     private void ShowLocked()
     {
-        body.Children.Clear(); fields.Clear();
+        showingRecovery=false;body.Children.Clear(); fields.Clear();
         body.Children.Add(Text(store.Exists ? "Kasanız kilitli" : "Kendi kasanızı oluşturun", 17, true));
         body.Children.Add(Text(store.Exists ? "Ana parolanız bu bilgisayarda saklanmaz. Açmak için parolanızı girin." : "İki işyerinin bilgileri başlangıçta boştur. " + VaultStore.PasswordRequirements));
         body.Children.Add(Text("Ana parola"));
@@ -133,19 +145,20 @@ public sealed class VaultWindow : Window
 
     private void ShowRecovery(string code)
     {
-        body.Children.Clear();
-        body.Children.Add(Text("Kasanız oluşturuldu • Kurtarma anahtarınızı saklayın", 17, true));
+        ClearSecrets(body);fields.Clear();dirty=false;body.Children.Clear();showingRecovery=true;
+        body.Children.Add(Text("Kurtarma anahtarınızı saklayın", 17, true));
+        body.Children.Add(Text("Bu ekran siz Kaydettim onayını verene kadar kapanmaz; başka uygulamaya geçebilirsiniz. Windows kilidi ve pencereyi kapatmanız ekranı temizler.",11));
         body.Children.Add(Text("Bu anahtar yalnızca şimdi gösterilir. Ana parolanızı unutursanız kasayı açabilir. Kağıda yazarak veya ayrı ve güvenli bir yerde saklayın; kasa dosyasıyla birlikte tutmayın."));
         var recovery = new TextBox { Style = (Style)FindResource("VaultReveal"), Height = double.NaN, Text = code, IsReadOnly = true, TextWrapping = TextWrapping.Wrap, FontFamily = new FontFamily("Consolas"), FontSize = 17, Padding = new Thickness(10), Margin = new Thickness(0, 8, 0, 8) };
-        recovery.CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (_, e) => { Copy(recovery.SelectedText.Length > 0 ? recovery.SelectedText : recovery.Text); e.Handled = true; }));
+        recovery.CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (_, e) => { Copy(recovery.SelectedText.Length > 0 ? recovery.SelectedText : recovery.Text,120); e.Handled = true; }));
         body.Children.Add(recovery);
-        body.Children.Add(ActionButton("Kurtarma anahtarını kopyala", () => Copy(recovery.Text)));
+        body.Children.Add(ActionButton("Kurtarma anahtarını kopyala", () => Copy(recovery.Text,120)));
         var acknowledge = new CheckBox { Content = "Kurtarma anahtarını ayrı, güvenli bir yere kaydettim.", Foreground = Brushes.White, Margin = new Thickness(0, 10, 0, 8) };
         body.Children.Add(acknowledge);
         body.Children.Add(ActionButton("Kasaya devam et", () =>
         {
             if (acknowledge.IsChecked != true) throw new ArgumentException("Önce kurtarma anahtarınızı saklayın ve kutucuğu işaretleyin.");
-            recovery.Clear(); ClearClipboard(); ShowEditor();
+            recovery.Clear(); ClearClipboard(); showingRecovery=false;ShowEditor();
         }));
         WrapBody(); lastInput = DateTime.UtcNow;
     }
@@ -165,12 +178,19 @@ public sealed class VaultWindow : Window
     private void ShowEditor()
     {
         if (session is null) return;
-        var data = session.Read();
+        showingRecovery=false;var data = session.Read();
         body.Children.Clear(); fields.Clear(); dirty = false;
         var toolbar = new WrapPanel();
         toolbar.Children.Add(ActionButton("Bilgileri kaydet", Save));
         toolbar.Children.Add(ActionButton("Şimdi kilitle", Lock));
         toolbar.Children.Add(ActionButton("Şifreli kasayı dışa aktar…", Export));
+        toolbar.Children.Add(ActionButton("Yeni kurtarma anahtarı oluştur", () =>
+        {
+            if(dirty)throw new ArgumentException("Önce işyeri bilgilerini kaydedin.");
+            if(!Confirm("Yeni kurtarma anahtarı oluşturulacak. Mevcut kasa için eski anahtar geçersiz olur; ana parolanız ve kayıtlı bilgileriniz korunur. Yeni anahtarı ayrı, güvenli bir yere kaydedin. Devam edilsin mi?"))return;
+            var current=session??throw new ArgumentException("Kasa kilitlendi. Ana parolanızla tekrar açıp yeni kurtarma anahtarı oluşturun.");
+            ShowRecovery(current.RegenerateRecoveryCode());
+        }));
         body.Children.Add(toolbar);
         var grid = new Grid { Margin = new Thickness(0, 8, 0, 8) };
         grid.ColumnDefinitions.Add(new ColumnDefinition()); grid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -184,7 +204,7 @@ public sealed class VaultWindow : Window
             var values = new[] { item.UserCode, item.SystemPassword, item.WorkplacePassword, item.WorkplaceCode, item.RegistrationNumber };
             for (var field = 0; field < 5; field++)
             {
-                var input = new SecretField(labels[field], values[field], Copy, () => { dirty = true; status.Text = "Kaydedilmemiş değişiklikler var. Ayrılmadan önce Bilgileri kaydet düğmesini kullanın."; });
+                var input = new SecretField(labels[field], values[field], value=>Copy(value), () => { dirty = true; status.Text = "Kaydedilmemiş değişiklikler var. Ayrılmadan önce Bilgileri kaydet düğmesini kullanın."; });
                 fields.Add(input); panel.Children.Add(input);
             }
             var card = new Border { Style = (Style)FindResource("CardCompact"), Padding = new Thickness(12), Margin = new Thickness(group == 0 ? 0 : 6, 0, group == 0 ? 6 : 0, 0), Child = panel };
@@ -226,9 +246,9 @@ public sealed class VaultWindow : Window
     {
         internalDialog = true;
         try { return action(); }
-        finally { internalDialog = false; if (DateTime.UtcNow - lastInput >= TimeSpan.FromMinutes(2)) Lock(); }
+        finally { internalDialog = false; if (!showingRecovery && DateTime.UtcNow - lastInput >= InactivityTimeout) Lock(); }
     }
-    private bool Confirm(string message) => Dialog(() => MessageBox.Show(this, message, "Kasa değiştirilecek", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes);
+    private bool Confirm(string message) => Dialog(() => confirmation?.Invoke(message) ?? MessageBox.Show(this, message, "Kasa onayı", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes);
     private void Lock()
     {
         session?.Dispose(); session = null;
@@ -250,16 +270,16 @@ public sealed class VaultWindow : Window
     {
         foreach (var field in fields) field.HideIfExpired();
         if (clipboardValue is not null && DateTime.UtcNow >= clipboardExpiry) ClearClipboard();
-        if (session is not null && DateTime.UtcNow - lastInput >= TimeSpan.FromMinutes(2)) Lock();
+        if (session is not null && !showingRecovery && !internalDialog && DateTime.UtcNow - lastInput >= InactivityTimeout) Lock();
     }
-    private void Copy(string value)
+    private void Copy(string value,int seconds=60)
     {
         if (value.Length == 0) return;
         var data = new DataObject(); data.SetText(value);
         data.SetData("CanIncludeInClipboardHistory", new MemoryStream(BitConverter.GetBytes(0)));
         data.SetData("CanUploadToCloudClipboard", new MemoryStream(BitConverter.GetBytes(0)));
-        Clipboard.SetDataObject(data, true); clipboardValue = value; clipboardExpiry = DateTime.UtcNow.AddSeconds(20);
-        status.Text = "Kopyalandı. Pano 20 saniye sonra, içeriği değişmemişse temizlenir.";
+        Clipboard.SetDataObject(data, true); clipboardValue = value; clipboardExpiry = DateTime.UtcNow.AddSeconds(seconds);
+        status.Text = $"Kopyalandı. Pano {seconds} saniye sonra, içeriği değişmemişse temizlenir.";
     }
     private void ClearClipboard()
     {
@@ -296,6 +316,7 @@ public sealed class VaultWindow : Window
             Children.Add(row);
         }
         private void Hide() { revealed.Clear(); revealed.Visibility = Visibility.Collapsed; input.Visibility = Visibility.Visible; }
+        public void Conceal()=>Hide();
         public void HideIfExpired() { if (revealed.Visibility == Visibility.Visible && DateTime.UtcNow >= hideAt) Hide(); }
         public void Clear() { input.Clear(); Hide(); }
     }

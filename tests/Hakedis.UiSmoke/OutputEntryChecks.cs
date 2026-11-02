@@ -14,6 +14,12 @@ internal static class OutputEntryChecks
         var root=Path.Combine(output,"output-entry-data");var path=Path.Combine(root,"ogretmenler.json");var model=new ShellViewModel(path);var notices=new List<string>();
         model.Registration.Editor.FullName="IBAN Bekleyen Öğretmen";model.Registration.Editor.OccupationCode="2341.04";model.SaveNewTeacher();
         var window=new MainWindow(model,notices.Add,(_,_)=>true){ShowActivated=false,ShowInTaskbar=false};window.Show();Idle(window);
+        var form=Descendants<TeacherForm>(window).Single(f=>ReferenceEquals(f.DataContext,model.Registration));
+        var dates=Descendants<DatePicker>(form).Where(d=>d.GetBindingExpression(DatePicker.SelectedDateProperty)?.ParentBinding.Path.Path is "Editor.StartDate" or "Editor.EndDate").ToArray();
+        if(dates.Length!=2 || ((FrameworkElement)dates[0].Parent).Parent!=((FrameworkElement)dates[1].Parent).Parent)throw new Exception("Başlama/ayrılış tarihleri aynı satırda değil.");
+        model.Navigate("Details");Idle(window);
+        if(Descendants<TextBox>(window).Any(t=>t.IsVisible && t.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path.Path=="SickLeaveStatement"))throw new Exception("Hastalık beyanı giriş alanı kaldırılmadı.");
+        model.Navigate("Entry");Idle(window);
         var module=(ComboBox)window.FindName("EntryModuleCombo");
         if(module.SelectedItem is not null || model.Monthly.EntryTeacher is not null)throw new Exception("Aylık giriş seçimsiz açılmadı.");
         var hours=Descendants<TextBox>(window).Single(t=>t.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path?.Path=="EntryDayHours");
@@ -48,6 +54,7 @@ internal static class OutputEntryChecks
         {
             var detail=Application.Current.Windows.OfType<PaymentDetailsWindow>().Single();var grid=(DataGrid)detail.FindName("DetailGrid");
             if(!grid.IsReadOnly || grid.Items.Count!=1 || grid.Columns.Count<25)throw new Exception("Detay salt okunur tam bordro listesini göstermiyor.");
+            if(Descendants<TextBlock>(detail).Any(t=>t.Text is "Kurum ve İmza Bilgileri" or "Hesaplama Sabitleri"))throw new Exception("Gereksiz detay kartları kaldırılmadı.");
             capture(detail,Path.Combine(output,"Output-details.png"));detailSeen=true;
             ((Button)detail.FindName("CloseDetailsButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         }));
