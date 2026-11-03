@@ -21,6 +21,8 @@ internal static class Program
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
         if(args.Length==2 && args[1]=="--verify-single-row-payroll")
         {SingleRowReportChecks.Run(output,Capture);return 0;}
+        if(args.Length==2 && args[1]=="--verify-month-marker")
+        {MonthMarkerChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-payroll-revision")
         {SingleRowReportChecks.Run(output,Capture);PayrollRevisionChecks.Run(output,Capture);return 0;}
         if(args.Length==4 && args[1]=="--verify-local-bank")
@@ -179,7 +181,7 @@ internal static class Program
         var expectedHeaders=new[]{Hakedis.Contracts.ExcelHeadings.Sequence,Hakedis.Contracts.ExcelHeadings.FullName,
             Hakedis.Contracts.ExcelHeadings.IdentityNumber,Hakedis.Contracts.ExcelHeadings.Iban,Hakedis.Contracts.ExcelHeadings.StartDate,
             Hakedis.Contracts.ExcelHeadings.EndDate,
-            Hakedis.Contracts.ExcelHeadings.Occupation,Hakedis.Contracts.ExcelHeadings.School,Hakedis.Contracts.ExcelHeadings.IbanCheck,
+            Hakedis.Contracts.ExcelHeadings.Occupation,Hakedis.Contracts.ExcelHeadings.School,
             "GÜNDÜZ SAAT TOPLAMI","ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI",Hakedis.Contracts.ExcelHeadings.DykHours,Hakedis.Contracts.ExcelHeadings.Hours,
             Hakedis.Contracts.ExcelHeadings.Garnishment};
         if(!grid.Columns.Select(c=>c.Header as string).SequenceEqual(expectedHeaders))throw new InvalidOperationException("VERİ GİRİŞİ sütunları ve sırası uyuşmuyor.");

@@ -48,6 +48,7 @@ public sealed class PayrollRow : INotifyPropertyChanged
 Recalculate();
     }
     public bool HasInput { get; private set; }
+    public bool StartedInSelectedMonth=>Teacher.StartDate is DateTime start && period is not null && start.Month==period().Month;
     public TeacherResult? Result { get; private set; }
     public string Error { get; private set; } = "";
     public CalendarResult? SgkInformation { get; private set; }
@@ -109,6 +110,13 @@ Recalculate();
         if(input.DayHours<0 || input.DykHours<0 || input.Garnishment<0) throw new ArgumentException("Ders saati ve kesinti negatif olamaz.");
         return input;
     }
+    public void CopySchoolHoursPreview(PayrollRow source)
+    {
+        if(source.Teacher.Id!=Teacher.Id)throw new InvalidOperationException("Öğretmen uyuşmuyor.");
+        previousSchoolHours=source.previousSchoolHours;newSchoolHours=source.newSchoolHours;day=source.day;
+        if(SavedInput is null){acceptedPrevious=source.acceptedPrevious;acceptedNew=source.acceptedNew;acceptedDay=source.acceptedDay;}
+        HasInput|=source.HasInput;Recalculate();
+    }
     public void Recalculate()
     {
         Result=null; Error="";SgkInformation=null;SgkError="";
@@ -131,7 +139,7 @@ Recalculate();
             }
             catch(Exception ex) when(ex is ArgumentException or OverflowException) { SgkError=ex.Message; }
         }
-        foreach(var name in new[]{nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(SchoolHoursWarning),nameof(Teacher),nameof(FullName),nameof(IdentityNumber),nameof(Iban),nameof(School),nameof(OccupationCode),nameof(StartDate),nameof(EndDate),nameof(IbanCheck),nameof(HasChanges),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(HasInput),nameof(Result),nameof(Error),nameof(MissingDays),nameof(TotalHours),nameof(SgkInformation),nameof(SgkError),nameof(MaximumDaysText),nameof(WorkingDaysText)})
+        foreach(var name in new[]{nameof(StartedInSelectedMonth),nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(SchoolHoursWarning),nameof(Teacher),nameof(FullName),nameof(IdentityNumber),nameof(Iban),nameof(School),nameof(OccupationCode),nameof(StartDate),nameof(EndDate),nameof(IbanCheck),nameof(HasChanges),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(HasInput),nameof(Result),nameof(Error),nameof(MissingDays),nameof(TotalHours),nameof(SgkInformation),nameof(SgkError),nameof(MaximumDaysText),nameof(WorkingDaysText)})
             PropertyChanged?.Invoke(this,new(name));
     }
     private static string Text(decimal number)=>number.ToString(CultureInfo.GetCultureInfo("tr-TR"));

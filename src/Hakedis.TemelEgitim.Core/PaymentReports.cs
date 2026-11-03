@@ -49,7 +49,7 @@ public static class PaymentReports
         ValueColumn(ExcelHeadings.BordroP6,50,r=>r.Result.Accrual);
         ValueColumn(ModuleLabels.EmployeeHeader(p.EmployeeRate),45,r=>r.Result.EmployeePremium);
         ValueColumn(ExcelHeadings.BordroQ5,50,r=>r.Result.IncomeBase);
-        ValueColumn("Kalan Gelir Vergisi İstisnası",50,r=>Math.Max(0,p.IncomeExemption-r.Result.IncomeBase));
+        TextColumn("Kalan Gelir Vergisi İstisnası",50,r=>Money(Math.Max(0,p.IncomeExemption-r.Result.IncomeBase)));
         ValueColumn(ExcelHeadings.BordroT6,44,r=>r.Result.IncomeTax);
         TextColumn("Damga Vergisi İstisna Kalan",50,r=>Money(p.RemainingStampExemption(r.Result.Gross)));
         ValueColumn(ModuleLabels.StampTaxHeader(p.StampRate),44,r=>r.Result.StampTax);

@@ -25,7 +25,7 @@ public sealed class SingleRowPayrollReportTests
         Assert.Contains(ExcelHeadings.BordroN6,table.Headers);
         var excess=Array.IndexOf(table.Headers,"Kalan Gelir Vergisi İstisnası");Assert.True(excess>=0);
         Assert.Equal(Math.Max(0,data.Constants.IncomeExemption-data.Rows[0].Result.IncomeBase).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Rows[0][excess]);Assert.Equal(Math.Max(0,data.Constants.IncomeExemption-data.Rows[1].Result.IncomeBase).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Rows[1][excess]);
-        Assert.Equal(data.Rows.Sum(r=>Math.Max(0,data.Constants.IncomeExemption-r.Result.IncomeBase)).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Total![excess]);
+        Assert.Empty(table.Total![excess]);
         var income=Array.IndexOf(table.Headers,ExcelHeadings.BordroQ5);Assert.Equal(data.Rows[0].Result.IncomeBase.ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Rows[0][income]);
         Assert.All(table.Rows,r=>Assert.Equal(table.Headers.Length,r.Length));Assert.Equal(table.Headers.Length,table.Widths.Length);Assert.Equal(table.Headers.Length,table.Total.Length);
         var net=Array.IndexOf(table.Headers,ExcelHeadings.BordroAA5);Assert.Equal(data.Rows.Sum(r=>r.Result.Net).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Total[net]);

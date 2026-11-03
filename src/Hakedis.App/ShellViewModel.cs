@@ -65,7 +65,13 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     }
     private static bool SamePeriod(PeriodWorkspace a,PeriodWorkspace b)=>a.SelectedModule.Id==b.SelectedModule.Id && a.Year==b.Year && a.Month==b.Month;
     private PeriodWorkspace Other(PeriodWorkspace source)=>ReferenceEquals(source,Monthly)?Calculation:Monthly;
-    private void SyncRow(PeriodWorkspace source,PayrollRow row) {if(source.IsArchiveEditing)return;var other=Other(source);if(!other.IsArchiveEditing && SamePeriod(source,other))other.ApplyPreview(row);}
+    private void SyncRow(PeriodWorkspace source,PayrollRow row)
+    {
+        if(source.IsArchiveEditing)return;var other=Other(source);if(other.IsArchiveEditing)return;
+        if(SamePeriod(source,other))other.ApplyPreview(row);
+        else if(source.Year==other.Year && source.Month==other.Month && row.HasInput && row.HasSchoolHourSplit &&
+            TeacherRouting.Candidates(row.Teacher,source.Year,source.Month).Contains(other.SelectedModule.Id))other.ApplySchoolHoursPreview(row);
+    }
     private void PeriodChanged(object? sender,PropertyChangedEventArgs e)
     {
         if(e.PropertyName==nameof(PeriodWorkspace.Constants) && sender is PeriodWorkspace source && !source.IsArchiveEditing)

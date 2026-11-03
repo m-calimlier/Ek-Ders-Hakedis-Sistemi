@@ -219,6 +219,13 @@ public sealed class PeriodWorkspace : INotifyPropertyChanged
     {
         InstallConstants(new(values));
     }
+    public void ApplySchoolHoursPreview(PayrollRow source)
+    {
+        var target=Rows.SingleOrDefault(r=>r.Teacher.Id==source.Teacher.Id);
+        if(target is null || !target.HasSchoolHourSplit)return;
+        target.CopySchoolHoursPreview(source);
+        Status="Önceki ve yeni kurum saatleri ilgili öğretmenin önizlemesine yansıdı.";Notify();
+    }
     private void InstallConstants(PeriodConstantsEditor editor)
     {
         if(constantsHandler is not null)Constants.Changed-=constantsHandler;

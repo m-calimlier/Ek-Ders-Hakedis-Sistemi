@@ -188,7 +188,8 @@ Bordro tek tablodur; mali başlıklar düşeydir ve her kişi tek satırdadır. 
 alan uygunsa yönleri korunarak iki satıra bölünür.
 Gündüz brüt/birim ücret ve sabit istisna sütunları yazdırılmaz.
 Damga Vergisi İstisna Kalan = en büyük(0, kayıtlı Brüt Asgari Ücret -
-Brüt Ücret Tutarı). Bu sütunun toplam hücresi boş bırakılır.
+Brüt Ücret Tutarı). Kalan Gelir Vergisi İstisnası ve Damga Vergisi İstisna Kalan
+sütunlarının toplam hücreleri boş bırakılır.
 Kayıtlı net/vergi/prim tutarları yeniden hesaplanmaz.
 A4 yatay bordro, A4 dikey banka
 ve personel bildirimi üretilir. Yazdır aynı sayfaları tek yazıcı işiyle,
@@ -246,3 +247,13 @@ derlenmiştir. Lisans metni: NPOI-LICENSE.txt.
 
 1.0.10 KASA KULLANIMI
 Kurtarma anahtarı Kaydettim onayına kadar ekranda kalır. Kod kopyalama süresi 120 saniye; normal alanlarda 60 saniyedir. Ana parolayla açılmış kasada Yeni kurtarma anahtarı oluştur düğmesiyle eski kodun yerine yeni kod oluşturabilirsiniz. Bu işlem güncel kasanın eski kodunu geçersiz kılar; eski dışa aktarılmış kasaları değiştirmez.
+
+HİBRİT TABLODA AYLIK İŞARETLEME
+İşe başlama tarihinin ayı seçili ayla aynı olan öğretmen satırları açık
+yeşildir. Yıl ve ders/kesinti girişi bu işaretlemeyi etkilemez. Örneğin
+Eylül başlangıcı Eylül'de yeşil, Ekim'de normal görünür. Bu yalnız ekran
+renklendirmesidir; bordro çıktısına taşınmaz.
+IBAN kontrol sütunu bu tabloda gösterilmez; IBAN doğrulaması devam eder.
+Kurum geçişinde, aynı ödeme dönemindeki uygun modüller arasında önceki
+ve yeni kurum gündüz saatleri önizlemeye birlikte yansır. Hedef modülün
+öğretmen bilgisi ve kayıt sürümü korunur; önizleme çift ödeme oluşturmaz.
