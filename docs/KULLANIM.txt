@@ -184,10 +184,12 @@ Bordro (Çıktı-1), Banka Listesi (Çıktı-2), Personel Bildirimi (Çıktı-3)
 Masaüstü/Ek Ders Hakediş Sistemi/Çıktılar altında modül,
 dönem ve kayıt sürümüne göre yeni klasör açılır; eski PDF'ler ezilmez.
 Başarı bildirimini kapattığınızda ilgili çıktı klasörü otomatik açılır.
-Bordro tek tablodur; mali başlıklar düşeydir ve her kişi tek satırdadır.
+Bordro tek tablodur; mali başlıklar düşeydir ve her kişi tek satırdadır. Uzun başlıklar,
+alan uygunsa yönleri korunarak iki satıra bölünür.
 Gündüz brüt/birim ücret ve sabit istisna sütunları yazdırılmaz.
 Damga Vergisi İstisna Kalan = en büyük(0, kayıtlı Brüt Asgari Ücret -
-Brüt Ücret Tutarı). Kayıtlı net/vergi/prim tutarları yeniden hesaplanmaz.
+Brüt Ücret Tutarı). Bu sütunun toplam hücresi boş bırakılır.
+Kayıtlı net/vergi/prim tutarları yeniden hesaplanmaz.
 A4 yatay bordro, A4 dikey banka
 ve personel bildirimi üretilir. Yazdır aynı sayfaları tek yazıcı işiyle,
 yazıcı seçimi sonrası gönderir; kağıda sığdırma ve yön ayarı uygulanır.

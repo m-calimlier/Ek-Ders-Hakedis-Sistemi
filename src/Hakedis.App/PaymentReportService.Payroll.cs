@@ -5,6 +5,21 @@ namespace Hakedis.App;
 
 public sealed partial class PaymentReportService
 {
+    private static string[] PayrollHeaderLines(string text,double columnWidth,double font)
+    {
+        const double maximumLength=180;
+        var fallback=Wrap(text,maximumLength,font,true);
+        var words=text.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries);
+        if(columnWidth<2*font*1.22+6 || words.Length<2 || Measure(string.Join(" ",words),font,true)<=90)return fallback;
+        string[]? best=null;var shortest=double.MaxValue;
+        for(var split=1;split<words.Length;split++)
+        {
+            var lines=new[]{string.Join(" ",words.Take(split)),string.Join(" ",words.Skip(split))};
+            var length=lines.Max(line=>Measure(line,font,true));
+            if(length<=maximumLength && length<shortest){shortest=length;best=lines;}
+        }
+        return best??fallback;
+    }
     // Tek birleşik tablo; öğretmenler veya mali tutarlar sığdırma amacıyla kesilmez.
     private static LaidOutReport LayoutPayroll(PaymentReport report,ReportDetails details,DateTimeOffset date)
     {
@@ -47,7 +62,7 @@ public sealed partial class PaymentReportService
                 void Draw(string[] values,bool header,bool total)
                 {
                     var size=total?font+.3:font;
-                    var wrapped=values.Select((v,i)=>Wrap(v,header && RotateHeader(i)?rotatedTextWidth:widths[i]-6,size,header||total)).ToArray();
+                    var wrapped=values.Select((v,i)=>header && RotateHeader(i)?PayrollHeaderLines(v,widths[i],size):Wrap(v,widths[i]-6,size,header||total)).ToArray();
                     var h=Math.Max(size*1.22+3,wrapped.Select((lines,i)=>header && RotateHeader(i)?lines.Max(line=>Measure(line,size,true))+8:lines.Length*size*1.22+3).Max());
                     var x=margin;
                     for(var i=0;i<widths.Length;i++)

@@ -27,6 +27,8 @@ internal static class SingleRowReportChecks
             if(body.GroupBy(c=>c.Y).Count()!=rows.Length || body.Any(c=>c.Lines.Length!=1))throw new Exception("Tek satır koşulu sağlanmadı.");
             if(page.Cells.Any(c=>c.X<0 || c.Y<0 || c.X+c.Width>page.Width+.1 || c.Y+c.Height>page.Height+.1))throw new Exception("Bordro sayfa sınırını aştı.");
             if(!page.Cells.Any(c=>c.RotateText && c.Lines.Contains("Brüt Ücret Tutarı")) || page.Cells.Any(c=>c.RotateText && !c.Header))throw new Exception("Düşey başlıklar yalnız başlık satırına uygulanmalı.");
+            var employer=page.Cells.Single(c=>c.RotateText && string.Join(" ",c.Lines)==ModuleLabels.EmployerContributionHeader(p.EmployerRate));
+            if(employer.Lines.Length!=2 || employer.Lines.Length*employer.FontSize*1.22+6>employer.Width)throw new Exception("Uzun başlık iki düşey satıra taşmadan sığmalı.");
             var doc=service.PrintDocument(report);var visual=doc.Pages[0].GetPageRoot(false);visual.Measure(new Size(visual.Width,visual.Height));visual.Arrange(new Rect(0,0,visual.Width,visual.Height));visual.UpdateLayout();
             capture(visual,Path.Combine(output,$"single-row-dyk-{dyk}-icra-{icra}.png"));
             service.Export(record,details,Path.Combine(output,$"pdf-dyk-{dyk}-icra-{icra}"));

@@ -33,7 +33,7 @@ public sealed class PayrollRevisionTests : IDisposable
         var data=Data();data=data with {Rows=[data.Rows[0] with {Result=data.Rows[0].Result with {Gross=data.Constants.StampExemption+delta}}]};
         var original=JsonSerializer.Serialize(data);var table=PaymentReports.Build(data,new())[0].Tables.Single();
         var column=Array.IndexOf(table.Headers,"Damga Vergisi İstisna Kalan");Assert.True(column>=0);
-        Assert.Equal(expected.ToString("N2",CultureInfo.GetCultureInfo("tr-TR")),table.Rows[0][column]);Assert.Equal(table.Rows[0][column],table.Total![column]);
+        Assert.Equal(expected.ToString("N2",CultureInfo.GetCultureInfo("tr-TR")),table.Rows[0][column]);Assert.Empty(table.Total![column]);
         Assert.Equal(original,JsonSerializer.Serialize(data));
     }
     [Fact] public void Exemptions_are_shared_with_retired_module_and_reloaded_live_without_changing_archive()

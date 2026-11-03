@@ -51,7 +51,7 @@ public static class PaymentReports
         ValueColumn(ExcelHeadings.BordroQ5,50,r=>r.Result.IncomeBase);
         ValueColumn("Kalan Gelir Vergisi İstisnası",50,r=>Math.Max(0,p.IncomeExemption-r.Result.IncomeBase));
         ValueColumn(ExcelHeadings.BordroT6,44,r=>r.Result.IncomeTax);
-        ValueColumn("Damga Vergisi İstisna Kalan",50,r=>p.RemainingStampExemption(r.Result.Gross));
+        TextColumn("Damga Vergisi İstisna Kalan",50,r=>Money(p.RemainingStampExemption(r.Result.Gross)));
         ValueColumn(ModuleLabels.StampTaxHeader(p.StampRate),44,r=>r.Result.StampTax);
         if(rows.Any(r=>r.Input.Garnishment>0))ValueColumn(ExcelHeadings.BordroY6,44,r=>r.Input.Garnishment);
         ValueColumn(ExcelHeadings.BordroZ6,48,r=>r.Result.Deductions);
