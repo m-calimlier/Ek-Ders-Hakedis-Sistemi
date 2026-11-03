@@ -54,7 +54,8 @@ internal static class RetiredHalkChecks
         var fields=(UniformGrid)window.FindName("RetiredConstantsFields");fields.BringIntoView();Idle(window);
         var boxes=Descendants<TextBox>(fields).ToArray();if(boxes.Length!=9 || boxes.Any(b=>!b.IsReadOnly))throw new Exception("Emekli sabit alanları kilitli değil.");
         var update=(Button)window.FindName("RetiredConstantsUpdateButton");update.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
-        if(boxes.Any(b=>b.IsReadOnly))throw new Exception("Emekli sabit güncelleme açılmadı.");
+        var shared=boxes.Where(b=>b.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path?.Path is "DataContext.CommonConstants.Editor.IncomeExemption" or "DataContext.CommonConstants.Editor.StampExemption").ToArray();
+        if(shared.Length!=2 || shared.Any(b=>!b.IsReadOnly) || boxes.Except(shared).Any(b=>b.IsReadOnly))throw new Exception("Emekli oranları düzenlenebilir, iki ortak istisna ise ortak karttan yönetilir olmalı.");
         boxes.Single(b=>b.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path.Path=="EmployeeRate").Text="0,08";Idle(window);
         update.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(boxes.Any(b=>!b.IsReadOnly) || model.CommonConstants.Editor.EmployeeRate!="0,14" || model.Calculation.Constants.Read().EmployeeRate!=.08m)

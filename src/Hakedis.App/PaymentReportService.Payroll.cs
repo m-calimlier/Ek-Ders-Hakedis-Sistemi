@@ -9,19 +9,21 @@ public sealed partial class PaymentReportService
     private static LaidOutReport LayoutPayroll(PaymentReport report,ReportDetails details,DateTimeOffset date)
     {
         const double width=842,height=595,margin=7,available=width-margin*2;
+        static bool RotateHeader(int column)=>column is not (1 or 2 or 3);
+        const double rotatedTextWidth=180;
         for(var font=8d;font>=6; font-=.25)
         {
             // Her veri hücresinin tek metin satırına sığacağı asgari genişliği ölç.
             var tableWidths=new List<double[]>();var fits=true;
             foreach(var table in report.Tables)
             {
-                var minimum=table.Headers.Select((_,i)=>Math.Max(12,
+                var minimum=table.Headers.Select((header,i)=>Math.Max(RotateHeader(i)?Wrap(header,rotatedTextWidth,font,true).Length*font*1.22+6:12,
                     table.Rows.Select(row=>Measure(row[i],font,false)+7)
                     .Append(table.Total is null?0:Measure(table.Total[i],font+.3,true)+7).Max())).ToArray();
                 if(minimum.Sum()>available){fits=false;break;}
                 var spare=available-minimum.Sum();
                 // Önce başlıklardaki kelimelerin harf harf bölünmesini azalt.
-                var deficits=table.Headers.Select((header,i)=>Math.Max(0,
+                var deficits=table.Headers.Select((header,i)=>RotateHeader(i)?0:Math.Max(0,
                     header.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries).Select(word=>Measure(word,font,true)+7).DefaultIfEmpty(0).Max()-minimum[i])).ToArray();
                 var needed=deficits.Sum();var fraction=needed>0?Math.Min(1,spare/needed):0;
                 minimum=minimum.Select((w,i)=>w+deficits[i]*fraction).ToArray();
@@ -45,11 +47,11 @@ public sealed partial class PaymentReportService
                 void Draw(string[] values,bool header,bool total)
                 {
                     var size=total?font+.3:font;
-                    var wrapped=values.Select((v,i)=>Wrap(v,widths[i]-6,size,header||total)).ToArray();
-                    var h=Math.Max(size*1.22+3,wrapped.Max(l=>l.Length)*size*1.22+3);
+                    var wrapped=values.Select((v,i)=>Wrap(v,header && RotateHeader(i)?rotatedTextWidth:widths[i]-6,size,header||total)).ToArray();
+                    var h=Math.Max(size*1.22+3,wrapped.Select((lines,i)=>header && RotateHeader(i)?lines.Max(line=>Measure(line,size,true))+8:lines.Length*size*1.22+3).Max());
                     var x=margin;
                     for(var i=0;i<widths.Length;i++)
-                    {page.Cells.Add(new(x,y,widths[i],h,wrapped[i],size,header||total,header||total,true));x+=widths[i];}
+                    {page.Cells.Add(new(x,y,widths[i],h,wrapped[i],size,header||total,header||total,true,RotateText:header && RotateHeader(i)));x+=widths[i];}
                     y+=h;
                 }
                 Draw(table.Headers,true,false);

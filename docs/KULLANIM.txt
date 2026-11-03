@@ -77,8 +77,8 @@ emekli usta öğreticilerin farklı belge türü ve hesabı bu modülde kullanı
 Emekliler için Halk Eğitim Merkezi Emekli Usta Öğretici modülünü seçin.
 Bu modül Dönem Sabitleri panelindeki ayrı Emekli Usta Öğretici kartını
 kullanır; ilk prim oranları 0,075 ve 0,2475'tir. SGK belge türü 02 ve
-profil dosyası ayrıdır. Ortak sabitler normal personel içindir; eski
-hakedişler kendi kayıtlı sabitleriyle korunur.
+profil dosyası ayrıdır. Gelir vergisi istisnası ve Brüt Asgari Ücret
+tüm modüller için ortaktır; eski hakedişler kendi sabitleriyle korunur.
 Listeden o modülün öğretmenini çağırın; saatleri ve kesintiyi girin.
 Kaydet kalıcı kayıt yapar. Mevcut aylık
 kayıt seçildiğinde Düzenle ile alanları açın, sonra Kaydet'e basın.
@@ -99,7 +99,10 @@ Düğme Dönem sabitlerini değiştir olur; kaydedince yeniden kilitlenir.
 Düzenlenen değerler aktif önizlemeye, kaydedilen değerler sonraki
 hesaplara uygulanır. Eski aylık dosyalar ve kayıtlı hakedişler bu işlemde
 üzerine yazılmaz. Geçmiş hakedişler kendi sabitleriyle açılır.
-Emekli modülleri bu sürümde henüz eklenmemiştir.
+Gelir vergisi istisnası (başlangıç 28.075,50 TL) ve Brüt Asgari Ücret /
+Damga Vergisi İstisnası (başlangıç 33.030 TL) tüm modüllerde ortaktır.
+Bu iki alan ortak karttan değiştirilir; emekli kartında salt okunur görünür.
+Emekli usta öğreticilerin SGK oranları kendi kartından değiştirilir.
 
 HAKEDİŞ HESAPLA
 Modül, DÖNEM ve YIL seçin; birleşik dönem Eylül-2026 gibi gösterilir.
@@ -176,14 +179,20 @@ negatif sayı yerine ayrı SGK uyarısı gösterilir; para hesabı iptal edilmez
 ÇIKTI
 Hakediş Hesapla'da Hakediş oluştur ile kaydettiğiniz hakedişler burada
 listelenir. Aylık ders girdisi kaydetmek tek başına çıktı kaydı oluşturmaz.
-PDF oluştur üç belgeyi Excel gerektirmeden üretir:
+PDF düğmesi üç belgeyi Excel gerektirmeden üretir:
 Bordro (Çıktı-1), Banka Listesi (Çıktı-2), Personel Bildirimi (Çıktı-3).
 Masaüstü/Ek Ders Hakediş Sistemi/Çıktılar altında modül,
 dönem ve kayıt sürümüne göre yeni klasör açılır; eski PDF'ler ezilmez.
-Bordro uzun başlıkları korumak için iki tablo halindedir; satır sayısına
-göre bir belge birden fazla sayfa olabilir. A4 yatay bordro, A4 dikey banka
+Başarı bildirimini kapattığınızda ilgili çıktı klasörü otomatik açılır.
+Bordro tek tablodur; mali başlıklar düşeydir ve her kişi tek satırdadır.
+Gündüz brüt/birim ücret ve sabit istisna sütunları yazdırılmaz.
+Damga Vergisi İstisna Kalan = en büyük(0, kayıtlı Brüt Asgari Ücret -
+Brüt Ücret Tutarı). Kayıtlı net/vergi/prim tutarları yeniden hesaplanmaz.
+A4 yatay bordro, A4 dikey banka
 ve personel bildirimi üretilir. Yazdır aynı sayfaları tek yazıcı işiyle,
 yazıcı seçimi sonrası gönderir; kağıda sığdırma ve yön ayarı uygulanır.
+Detay penceresindeki Talep Edilecek Ödenekler kartı, kayıtlı brüt kişi
+ücretini (01.04), işveren SGK payını (02.04) ve toplam talebi gösterir.
 Kurum, banka, imzacı ve ünvanlar alt karttan düzenlenip kaydedilebilir.
 Yeni hakediş bu bilgileri kendi içine alır. Eski kayıtta belge bilgileri
 yoksa çıktı panelindeki bilgiler kullanılır.

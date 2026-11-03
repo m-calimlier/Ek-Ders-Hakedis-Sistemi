@@ -22,7 +22,7 @@ public sealed class SingleRowPayrollReportTests
         Assert.Equal(hasDyk,table.Headers.Contains(ExcelHeadings.BordroG5));Assert.Equal(hasDyk,table.Headers.Contains(ExcelHeadings.BordroL5));Assert.Equal(hasDyk,table.Headers.Contains(ExcelHeadings.BordroI5));
         Assert.DoesNotContain(ExcelHeadings.BordroM5,table.Headers);Assert.Equal(hasDyk,table.Headers.Contains(ExcelHeadings.BordroF5));Assert.Contains(ExcelHeadings.BordroQ5,table.Headers);
         Assert.Equal(hasIcra,table.Headers.Contains(ExcelHeadings.BordroY6));Assert.DoesNotContain(ExcelHeadings.BordroR5,table.Headers);
-        Assert.Contains("SGK'ya Esas Brüt Ücret",table.Headers);
+        Assert.Contains(ExcelHeadings.BordroN6,table.Headers);
         var excess=Array.IndexOf(table.Headers,"Kalan Gelir Vergisi İstisnası");Assert.True(excess>=0);
         Assert.Equal(Math.Max(0,data.Constants.IncomeExemption-data.Rows[0].Result.IncomeBase).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Rows[0][excess]);Assert.Equal(Math.Max(0,data.Constants.IncomeExemption-data.Rows[1].Result.IncomeBase).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Rows[1][excess]);
         Assert.Equal(data.Rows.Sum(r=>Math.Max(0,data.Constants.IncomeExemption-r.Result.IncomeBase)).ToString("N2",System.Globalization.CultureInfo.GetCultureInfo("tr-TR")),table.Total![excess]);

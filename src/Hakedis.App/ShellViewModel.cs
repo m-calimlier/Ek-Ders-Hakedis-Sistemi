@@ -49,7 +49,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         Monthly.PropertyChanged += PeriodChanged; Calculation.PropertyChanged += PeriodChanged;
         Monthly.AdoptConstants(CommonConstants.Editor);Calculation.AdoptConstants(CommonConstants.Editor);
         Calculation.PaymentCreated+=Outputs.Reload;
-        CommonConstants.Saved+=ApplyConstantEditors;RetiredConstants.Saved+=ApplyConstantEditors;
+        CommonConstants.Saved+=()=>{RetiredConstants.AdoptSharedExemptions(CommonConstants.Editor.Read());ApplyConstantEditors();};RetiredConstants.Saved+=ApplyConstantEditors;
         Workspace.PropertyChanged += WorkspaceChanged;
         // A saved payroll is the user's last completed work, not an empty default module.
         if(Outputs.Records.FirstOrDefault() is { } latest)

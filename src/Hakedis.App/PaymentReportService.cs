@@ -12,7 +12,7 @@ using Hakedis.TemelEgitim.Core;
 
 namespace Hakedis.App;
 
-public sealed record ReportCell(double X,double Y,double Width,double Height,string[] Lines,double FontSize,bool Bold=false,bool Header=false,bool Border=false,bool Left=false,double BorderWidth=.4,bool NeutralGray=false);
+public sealed record ReportCell(double X,double Y,double Width,double Height,string[] Lines,double FontSize,bool Bold=false,bool Header=false,bool Border=false,bool Left=false,double BorderWidth=.4,bool NeutralGray=false,bool RotateText=false);
 public sealed class ReportPage(double width,double height)
 {
     public double Width {get;}=width;
@@ -81,6 +81,13 @@ public sealed partial class PaymentReportService
                         if(cell.Header)g.DrawRectangle(new XSolidBrush(cell.NeutralGray?XColor.FromArgb(192,192,192):XColor.FromArgb(235,239,244)),rect);
                         if(cell.Border)g.DrawRectangle(new XPen(XColors.Black,cell.BorderWidth),rect);
                         var font=new XFont("Arial",cell.FontSize,cell.Bold?XFontStyleEx.Bold:XFontStyleEx.Regular);
+                        if(cell.RotateText)
+                        {
+                            var state=g.Save();g.TranslateTransform(cell.X+cell.Width/2,cell.Y+cell.Height/2);g.RotateTransform(-90);
+                            var rotatedLineHeight=cell.FontSize*1.22;var rotatedTop=-cell.Lines.Length*rotatedLineHeight/2;
+                            for(var i=0;i<cell.Lines.Length;i++)g.DrawString(cell.Lines[i],font,XBrushes.Black,new XRect(-cell.Height/2+3,rotatedTop+i*rotatedLineHeight,cell.Height-6,rotatedLineHeight),XStringFormats.TopCenter);
+                            g.Restore(state);continue;
+                        }
                         var lineHeight=cell.FontSize*1.22;var top=cell.Y+(cell.Height-cell.Lines.Length*lineHeight)/2;
                         for(var i=0;i<cell.Lines.Length;i++)g.DrawString(cell.Lines[i],font,XBrushes.Black,
                             new XRect(cell.X+3,top+i*lineHeight,cell.Width-6,lineHeight),cell.Left?XStringFormats.TopLeft:XStringFormats.TopCenter);
@@ -108,8 +115,10 @@ public sealed partial class PaymentReportService
             {
                 var border=new Border{Width=cell.Width*96/72,Height=cell.Height*96/72,BorderBrush=Brushes.Black,
                     BorderThickness=new Thickness(cell.Border?cell.BorderWidth*96/72:0),Background=cell.Header?new SolidColorBrush(cell.NeutralGray?Color.FromRgb(192,192,192):Color.FromRgb(235,239,244)):Brushes.Transparent};
-                border.Child=new TextBlock{Text=string.Join("\n",cell.Lines),FontFamily=new FontFamily("Arial"),FontSize=cell.FontSize*96/72,
+                var text=new TextBlock{Text=string.Join("\n",cell.Lines),FontFamily=new FontFamily("Arial"),FontSize=cell.FontSize*96/72,
                     FontWeight=cell.Bold?FontWeights.Bold:FontWeights.Normal,TextAlignment=cell.Left?TextAlignment.Left:TextAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(3,0,3,0),Foreground=Brushes.Black};
+                if(cell.RotateText){text.LayoutTransform=new RotateTransform(-90);text.HorizontalAlignment=HorizontalAlignment.Center;text.Margin=new Thickness(0,3,0,3);}
+                border.Child=text;
                 FixedPage.SetLeft(border,cell.X*96/72);FixedPage.SetTop(border,cell.Y*96/72);page.Children.Add(border);
             }
             var content=new PageContent();((System.Windows.Markup.IAddChild)content).AddChild(page);document.Pages.Add(content);

@@ -50,7 +50,8 @@ public static class ModuleLabels
         ?"DERS ÜCRETİ KARŞILIĞINDA GÖREVLENDİRİLENLER BORDROSU (USTA ÖĞRETİCİ)"
         :"DERS ÜCRETİ KARŞILIĞINDA GÖREVLENDİRİLENLER BORDROSU (ÜCRETLİ ÖĞRETMEN)";
     private static string Percent(decimal rate)=>(rate*100).ToString("0.####",System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
-    public static string EmployeeHeader(decimal rate)=>rate==.14m?ExcelHeadings.BordroW6:rate==.075m?"S G K \n(% 7,5)\nİŞTİRAKÇİ":$"S G K \n(%{Percent(rate)})\nİŞTİRAKÇİ";
-    public static string EmployerHeader(decimal rate)=>rate==.2175m?ExcelHeadings.BordroX6:$"S G K (%{Percent(rate)})\nİŞVEREN\n";
-    public static string EmployerContributionHeader(decimal rate)=>rate==.2175m?ExcelHeadings.BordroO6:$"Devlet Sigorta Katk.%{Percent(rate)}";
+    public static string EmployeeHeader(decimal rate)=>$"SGK Kişi Primi (% {Percent(rate)})";
+    public static string EmployerHeader(decimal rate)=>EmployerContributionHeader(rate);
+    public static string EmployerContributionHeader(decimal rate)=>$"SGK İşveren Devlet Katkısı (% {Percent(rate)})";
+    public static string StampTaxHeader(decimal rate)=>$"Damga Vergisi Tutarı (% {Percent(rate)})";
 }

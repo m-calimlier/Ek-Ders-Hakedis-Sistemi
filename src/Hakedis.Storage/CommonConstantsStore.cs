@@ -8,9 +8,21 @@ public sealed class CommonConstantsStore(string root,ModuleId module=ModuleId.Te
     private ModuleId Group=>module==ModuleId.HalkEgitimEmekliUstaOgretici?module:ModuleId.TemelEgitim;
     private string PathName=>Path.Combine(root,Group==ModuleId.TemelEgitim?"OrtakSabitler.json":"EmekliUstaSabitleri.json");
     private const string Rule="ortak-sabitler.v1";
-    public PeriodValues Read()=>File.Exists(PathName)?new JsonDraftStore().Load<PeriodValues>(PathName,Group,Rule).Data:PeriodValues.ForModule(Group);
+    private PeriodValues ReadGroup()=>File.Exists(PathName)?new JsonDraftStore().Load<PeriodValues>(PathName,Group,Rule).Data:PeriodValues.ForModule(Group);
+    public PeriodValues Read()
+    {
+        var values=ReadGroup();
+        if(Group==ModuleId.TemelEgitim)return values;
+        var shared=new CommonConstantsStore(root).ReadGroup();
+        return values with {IncomeExemption=shared.IncomeExemption,StampExemption=shared.StampExemption};
+    }
     public void Save(PeriodValues values)
     {
+        if(Group!=ModuleId.TemelEgitim)
+        {
+            var shared=new CommonConstantsStore(root).ReadGroup();
+            values=values with {IncomeExemption=shared.IncomeExemption,StampExemption=shared.StampExemption};
+        }
         try
         {
             _=PayrollCores.Calculate(Group,new(0,0,0),new(values.Coefficient,values.Indicator,values.DykMultiplier,

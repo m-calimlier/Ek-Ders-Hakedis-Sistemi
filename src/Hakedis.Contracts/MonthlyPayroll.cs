@@ -14,6 +14,7 @@ public sealed record PeriodValues(decimal Coefficient, decimal Indicator, decima
     decimal EmployeeRate = .14m, decimal EmployerRate = .2175m, decimal IncomeRate = .15m,
     decimal StampRate = .00759m, decimal DykMultiplier = 2m)
 {
+    public decimal RemainingStampExemption(decimal gross)=>Math.Max(0,StampExemption-gross);
     public static PeriodValues Source => new(1.575512m,140m,28075.5m,33030m);
     public static PeriodValues ForModule(ModuleId module)=>module==ModuleId.HalkEgitimEmekliUstaOgretici?Source with {EmployeeRate=.075m,EmployerRate=.2475m}:Source;
 }

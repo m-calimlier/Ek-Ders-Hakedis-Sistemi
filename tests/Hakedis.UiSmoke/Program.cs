@@ -21,6 +21,8 @@ internal static class Program
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
         if(args.Length==2 && args[1]=="--verify-single-row-payroll")
         {SingleRowReportChecks.Run(output,Capture);return 0;}
+        if(args.Length==2 && args[1]=="--verify-payroll-revision")
+        {SingleRowReportChecks.Run(output,Capture);PayrollRevisionChecks.Run(output,Capture);return 0;}
         if(args.Length==4 && args[1]=="--verify-local-bank")
         {
             var record=new Hakedis.Storage.PaymentArchiveStore(args[2]).ReadAll().First();

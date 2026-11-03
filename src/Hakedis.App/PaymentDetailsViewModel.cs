@@ -11,6 +11,7 @@ public sealed class PaymentDetailsViewModel
     public string Heading=>$"{Archive.Module} · {Archive.Period}";
     public string People=>$"{Rows.Count} kişi · {Rows.Sum(r=>r.Input.DayHours+r.Input.DykHours):N2} saat";
     public string Gross=>$"{Rows.Sum(r=>r.Result.Gross):N2} TL";
+    public string EmployerContribution=>$"{Rows.Sum(r=>r.Result.EmployerPremium):N2} TL";
     public string Accrual=>$"{Rows.Sum(r=>r.Result.Accrual):N2} TL";
     public string Deductions=>$"{Rows.Sum(r=>r.Result.Deductions):N2} TL";
     public string NetText=>$"{Net:N2} TL";

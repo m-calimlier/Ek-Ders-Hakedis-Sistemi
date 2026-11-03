@@ -10,13 +10,14 @@ public partial class MainWindow : Window
     private readonly Func<string,string,bool>? confirmation;
     private readonly Action<string> openFolder;
     private readonly string? personalOutputRoot;
+    private readonly string? reportOutputRoot;
     private readonly Func<BillingChoiceViewModel,bool>? billingChoicePrompt;
     private WorkspaceViewModel model => shell.Workspace;
     public MainWindow() : this(new ShellViewModel(Hakedis.Storage.ApplicationPaths.Default.TeacherFilePath)) { }
     public MainWindow(ShellViewModel viewModel,Action<string>? notification=null,Func<string,string,bool>? confirmation=null,
-        Action<string>? folderOpener=null,string? personalOutputRoot=null,Func<BillingChoiceViewModel,bool>? billingChoicePrompt=null)
+        Action<string>? folderOpener=null,string? personalOutputRoot=null,Func<BillingChoiceViewModel,bool>? billingChoicePrompt=null,string? reportOutputRoot=null)
     {
-        shell=viewModel;notify=notification;this.confirmation=confirmation;this.personalOutputRoot=personalOutputRoot;this.billingChoicePrompt=billingChoicePrompt;
+        shell=viewModel;this.reportOutputRoot=reportOutputRoot;notify=notification;this.confirmation=confirmation;this.personalOutputRoot=personalOutputRoot;this.billingChoicePrompt=billingChoicePrompt;
         openFolder=folderOpener??(folder=>{_=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(folder){UseShellExecute=true});});
         InitializeComponent();DataContext=shell;shell.Settings.Applied+=ApplyWindowPreference;
     }
@@ -160,7 +161,7 @@ public partial class MainWindow : Window
     }
     private void CancelArchive_Click(object sender,RoutedEventArgs e)=>shell.CancelArchiveEdit();
     private void ExportOutputs_Click(object sender,RoutedEventArgs e)
-    {SelectOutput(sender);RunOutput(()=>{var folder=new PaymentReportService().Export(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read());shell.Outputs.ShowStatus("Üç PDF kaydedildi: "+folder);MessageBox.Show(this,"Üç PDF kaydedildi:\n"+folder,"Çıktı",MessageBoxButton.OK,MessageBoxImage.Information);});}
+    {SelectOutput(sender);RunOutput(()=>{var folder=new PaymentReportService().Export(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read(),reportOutputRoot);shell.Outputs.ShowStatus("Üç PDF kaydedildi: "+folder);Inform("Üç PDF kaydedildi:\n"+folder);openFolder(folder);});}
     private void PrintOutputs_Click(object sender,RoutedEventArgs e)
     {SelectOutput(sender);RunOutput(()=>{if(new PaymentReportService().Print(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read()))shell.Outputs.ShowStatus("Üç belge yazıcıya gönderildi.");});}
     private void BankOutput_Click(object sender,RoutedEventArgs e)

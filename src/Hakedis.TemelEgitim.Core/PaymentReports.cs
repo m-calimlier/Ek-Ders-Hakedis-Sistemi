@@ -20,36 +20,45 @@ public static class PaymentReports
         var info=new[]{"DAİRESİ            : "+details.Institution,"İLGİLİ AY           : "+period,
             $"KATSAYI: {Number(p.Coefficient)}    GÜNDÜZ GÖSTERGE: {Number(p.Indicator)}    DYK çarpanı: {Number(p.DykMultiplier)}    GV İstinası: {Money(p.IncomeExemption)}    DV İstisnası: {Money(p.StampExemption)}",
             $"Uygulanan oranlar · SGK iştirakçi: {Number(p.EmployeeRate*100)}% · İşveren: {Number(p.EmployerRate*100)}% · Gelir: {Number(p.IncomeRate*100)}% · Damga: {Number(p.StampRate*100)}%"};
-        var h1=new[]{ExcelHeadings.Sequence,ExcelHeadings.BordroB6,ExcelHeadings.BordroC6,ExcelHeadings.BordroE6,
-            ExcelHeadings.BordroF5,ExcelHeadings.BordroG5,ExcelHeadings.BordroH5,ExcelHeadings.BordroM5,ExcelHeadings.BordroL5,
-            ExcelHeadings.BordroJ5,ExcelHeadings.BordroI5,ExcelHeadings.BordroK5,ExcelHeadings.BordroN6,ModuleLabels.EmployerContributionHeader(p.EmployerRate),ExcelHeadings.BordroP6};
-        var a=rows.Select((r,i)=>new[]{(i+1).ToString(),r.Teacher.FullName,ModuleLabels.Role(selectedModule),r.Teacher.IdentityNumber,
-            Number(r.Input.DayHours),Number(r.Input.DykHours),Number(r.Input.DayHours+r.Input.DykHours),Number(r.Result.DayRate),Number(r.Result.DykRate),
-            Money(r.Result.DayGross),Money(r.Result.DykGross),r.Result.PremiumDays.ToString(),Money(r.Result.Gross),Money(r.Result.EmployerPremium),Money(r.Result.Accrual)}).ToArray();
-        var total1=new[]{"TOPLAM","","","",Number(rows.Sum(r=>r.Input.DayHours)),Number(rows.Sum(r=>r.Input.DykHours)),Number(rows.Sum(r=>r.Input.DayHours+r.Input.DykHours)),"","",
-            Money(rows.Sum(r=>r.Result.DayGross)),Money(rows.Sum(r=>r.Result.DykGross)),rows.Sum(r=>r.Result.PremiumDays).ToString(),Money(rows.Sum(r=>r.Result.Gross)),Money(rows.Sum(r=>r.Result.EmployerPremium)),Money(rows.Sum(r=>r.Result.Accrual))};
-        var h2=new[]{ExcelHeadings.Sequence,ExcelHeadings.BordroB6,ExcelHeadings.BordroE6,ExcelHeadings.BordroQ5,ExcelHeadings.BordroR5,
-            ExcelHeadings.BordroS6,ExcelHeadings.BordroT6,ExcelHeadings.BordroU6,ExcelHeadings.BordroV6,ModuleLabels.EmployeeHeader(p.EmployeeRate),ModuleLabels.EmployerHeader(p.EmployerRate),ExcelHeadings.BordroY6,ExcelHeadings.BordroZ6,ExcelHeadings.BordroAA5};
-        var b=rows.Select((r,i)=>new[]{(i+1).ToString(),r.Teacher.FullName,r.Teacher.IdentityNumber,Money(r.Result.IncomeBase),"0,00",Money(p.IncomeExemption),Money(r.Result.IncomeTax),Money(p.StampExemption),
-            Money(r.Result.StampTax),Money(r.Result.EmployeePremium),Money(r.Result.EmployerPremium),Money(r.Input.Garnishment),Money(r.Result.Deductions),Money(r.Result.Net)}).ToArray();
-        var total2=new[]{"TOPLAM","","",Money(rows.Sum(r=>r.Result.IncomeBase)),"0,00","",Money(rows.Sum(r=>r.Result.IncomeTax)),"",Money(rows.Sum(r=>r.Result.StampTax)),Money(rows.Sum(r=>r.Result.EmployeePremium)),
-            Money(rows.Sum(r=>r.Result.EmployerPremium)),Money(rows.Sum(r=>r.Input.Garnishment)),Money(rows.Sum(r=>r.Result.Deductions)),Money(rows.Sum(r=>r.Result.Net))};
-        // Yalnız rapor gösterimi: arşivdeki vergi, kesinti ve net tutarları değiştirilmez.
-        h1[12]="SGK'ya Esas Brüt Ücret";
-        // Matrah ayrı sütun olarak korunur; kalan istisna yalnız istenen rapor formülüdür.
-        h2=h2.Append("Kalan Gelir Vergisi İstisnası").ToArray();
-        for(var i=0;i<rows.Length;i++)b[i]=b[i].Append(Money(Math.Max(0,p.IncomeExemption-rows[i].Result.IncomeBase))).ToArray();
-        total2=total2.Append(Money(rows.Sum(r=>Math.Max(0,p.IncomeExemption-r.Result.IncomeBase)))).ToArray();
+        var columns=new List<(string Header,double Width,Func<PaymentRow,string> Read,string Total)>();
+        void TextColumn(string heading,double width,Func<PaymentRow,string> read,string total="")=>columns.Add((heading,width,read,total));
+        void ValueColumn(string heading,double width,Func<PaymentRow,decimal> read,bool money=true)
+        {
+            string Format(decimal value)=>money?Money(value):Number(value);
+            columns.Add((heading,width,r=>Format(read(r)),Format(rows.Sum(read))));
+        }
+        TextColumn(ExcelHeadings.Sequence,24,_=>"","TOPLAM");
+        TextColumn(ExcelHeadings.BordroB6,100,r=>r.Teacher.FullName);
+        TextColumn(ExcelHeadings.BordroC6,43,_=>ModuleLabels.Role(selectedModule));
+        TextColumn(ExcelHeadings.BordroE6,58,r=>r.Teacher.IdentityNumber);
         var hasDyk=rows.Any(r=>r.Input.DykHours>0);
-        var hasGarnishment=rows.Any(r=>r.Input.Garnishment>0);
-        var first=Enumerable.Range(0,h1.Length).Where(i=>i!=7 && (hasDyk || i is not (4 or 5 or 8 or 10))).ToArray();
-        var second=new[]{3,14}.Concat(Enumerable.Range(5,9)).Where(i=>hasGarnishment || i!=11).ToArray();
-        string[] Combine(string[] left,string[] right)=>first.Select(i=>left[i]).Concat(second.Select(i=>right[i])).ToArray();
-        double[] firstWidths=[24,100,43,58,30,30,32,43,43,46,46,25,48,48,50];
-        double[] secondWidths=[24,100,58,50,45,45,44,45,44,45,45,44,48,50,50];
-        var widths=first.Select(i=>firstWidths[i]).Concat(second.Select(i=>secondWidths[i])).ToArray();
+        if(hasDyk)
+        {
+            ValueColumn(ExcelHeadings.BordroF5,30,r=>r.Input.DayHours,false);
+            ValueColumn(ExcelHeadings.BordroG5,30,r=>r.Input.DykHours,false);
+        }
+        ValueColumn(ExcelHeadings.BordroH5,32,r=>r.Input.DayHours+r.Input.DykHours,false);
+        if(hasDyk)
+        {
+            TextColumn(ExcelHeadings.BordroL5,43,r=>Number(r.Result.DykRate));
+            ValueColumn(ExcelHeadings.BordroI5,46,r=>r.Result.DykGross);
+        }
+        ValueColumn(ExcelHeadings.BordroK5,25,r=>r.Result.PremiumDays,false);
+        ValueColumn(ExcelHeadings.BordroN6,48,r=>r.Result.Gross);
+        ValueColumn(ModuleLabels.EmployerContributionHeader(p.EmployerRate),48,r=>r.Result.EmployerPremium);
+        ValueColumn(ExcelHeadings.BordroP6,50,r=>r.Result.Accrual);
+        ValueColumn(ModuleLabels.EmployeeHeader(p.EmployeeRate),45,r=>r.Result.EmployeePremium);
+        ValueColumn(ExcelHeadings.BordroQ5,50,r=>r.Result.IncomeBase);
+        ValueColumn("Kalan Gelir Vergisi İstisnası",50,r=>Math.Max(0,p.IncomeExemption-r.Result.IncomeBase));
+        ValueColumn(ExcelHeadings.BordroT6,44,r=>r.Result.IncomeTax);
+        ValueColumn("Damga Vergisi İstisna Kalan",50,r=>p.RemainingStampExemption(r.Result.Gross));
+        ValueColumn(ModuleLabels.StampTaxHeader(p.StampRate),44,r=>r.Result.StampTax);
+        if(rows.Any(r=>r.Input.Garnishment>0))ValueColumn(ExcelHeadings.BordroY6,44,r=>r.Input.Garnishment);
+        ValueColumn(ExcelHeadings.BordroZ6,48,r=>r.Result.Deductions);
+        ValueColumn(ExcelHeadings.BordroAA5,50,r=>r.Result.Net);
+        var payrollRows=rows.Select((row,i)=>{var values=columns.Select(c=>c.Read(row)).ToArray();values[0]=(i+1).ToString();return values;}).ToArray();
         var payroll=new PaymentReport("Bordro.pdf",ModuleLabels.PayrollTitle(selectedModule),true,info.Take(2).ToArray(),
-            [new("",Combine(h1,h2),widths,a.Select((r,i)=>Combine(r,b[i])).ToArray(),Combine(total1,total2))],
+            [new("",columns.Select(c=>c.Header).ToArray(),columns.Select(c=>c.Width).ToArray(),payrollRows,columns.Select(c=>c.Total).ToArray())],
             ["Bordroda yazılı alacaklar kayıtlara uygundur."]);
         var bankRows=rows.Select((r,i)=>new[]{(i+1).ToString(),r.Teacher.FullName,r.Teacher.IdentityNumber,r.Teacher.Iban,Money(r.Result.Net)}).ToArray();
         var bank=new PaymentReport("Banka Listesi.pdf","B  A  N  K  A       L  İ  S  T  E  S  İ",false,

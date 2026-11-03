@@ -59,14 +59,14 @@ public sealed partial class PaymentReportService
         Cell(left,414,width,20,"HAKEDİŞ VE KESİNTİLER",10,true,true);
         (string Label,string Value)[] earnings=
         [
-            (ExcelHeadings.BordroN6,Money(r.Gross)),(ExcelHeadings.BordroX6,Money(r.EmployerPremium)),
+            (ExcelHeadings.BordroN6,Money(r.Gross)),(ModuleLabels.EmployerHeader(data.Constants.EmployerRate),Money(r.EmployerPremium)),
             (ExcelHeadings.BordroP6,Money(r.Accrual)),(ExcelHeadings.BordroQ5,Money(r.IncomeBase)),
             (ExcelHeadings.Hours,Number(item.Input.DayHours+item.Input.DykHours))
         ];
         (string Label,string Value)[] deductions=
         [
-            (ExcelHeadings.BordroW6,Money(r.EmployeePremium)),(ExcelHeadings.BordroT6,Money(r.IncomeTax)),
-            (ExcelHeadings.BordroV6,Money(r.StampTax)),(ExcelHeadings.BordroY6,Money(r.Garnishment)),
+            (ModuleLabels.EmployeeHeader(data.Constants.EmployeeRate),Money(r.EmployeePremium)),(ExcelHeadings.BordroT6,Money(r.IncomeTax)),
+            (ModuleLabels.StampTaxHeader(data.Constants.StampRate),Money(r.StampTax)),(ExcelHeadings.BordroY6,Money(r.Garnishment)),
             (ExcelHeadings.BordroZ6,Money(r.Deductions))
         ];
         for(var i=0;i<5;i++)for(var side=0;side<2;side++)
