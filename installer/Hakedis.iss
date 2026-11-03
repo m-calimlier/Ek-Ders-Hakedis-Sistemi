@@ -44,6 +44,7 @@ Name: "desktopicon"; Description: "Masaüstünde program kısayolu oluştur"; Gr
 ; Explicit allowlist: never distribute user databases, exports, or backups.
 Source: "{#PayloadDir}\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#PayloadDir}\KULLANIM.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PayloadDir}\NPOI-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\{#AppExeName}"

@@ -16,9 +16,15 @@ jobs:
       - name: Test and package Windows x64
         shell: pwsh
         run: ./scripts/Publish-Windows.ps1
+      - name: Build clean portable and installer release assets
+        shell: pwsh
+        run: ./scripts/Build-ReleaseAssets.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: Ucretli-Ek-Ders-Windows-x64
-          path: dist/*.zip
+          path: |
+            dist/Ek-Ders-Hakedis-Sistemi-*-win-x64.zip
+            dist/installer/*.exe
+            dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 7

@@ -8,7 +8,18 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.10 kararlı sürüm
+## 1.0.12 kararlı sürüm
+
+- Bordroda mali başlıklar düşeydir; uzun başlıklar uygun genişlikte iki satıra bölünür. Sütun adları ve sırası düzenlendi, gereksiz sabit/birim ücret sütunları kaldırıldı.
+- Kalan gelir ve damga vergisi istisnalarının kişi değerleri gösterilir; toplam hücreleri boş bırakılır. Damga istisna kalanı sıfırın altına düşmez. GV istisnası ve brüt asgari ücret bütün modüllerde ortak düzenlenir.
+- PDF başarı bildirimi kapatılınca oluşturulan klasör açılır. Detay penceresinde talep edilecek ödenekler kartı bulunur.
+- Hibrit tabloda işe başlama ayı seçili ayla eşleşen satır açık yeşildir; yıl ve saat girişi koşul değildir. Ay değişince renk yeniden değerlendirilir; bu işaret bordroya taşınmaz.
+- IBAN Kontrol sütunu kaldırıldı; doğrulama sürer. Kurum geçişindeki iki gündüz saati uygun modüller arasında önizlemeye birlikte yansır; ödeme modülü ve kayıt sürümü korunur.
+- Doğrulama: 314 birim testi, tüm WPF akışları ve PDF/XML kontrolleri geçti.
+- Dağıtım yalnız program, kullanım belgesi ve lisansı içerir. Öğretmenler, hakedişler, banka sabitleri/şablonları, kişisel kasa ve kurtarma anahtarları dağıtılmaz.
+- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.12)
+
+## 1.0.10 sürümü
 
 - Tek satırlı bordro: kullanılmayan DYK/icra/gündüz saat sütunları gizlenir. GV matrahı ve pozitif kalan istisna ayrı sütunlardır; kayıtlı mali sonuçlar korunur.
 - İşe başlama ve ayrılış tarihleri yan yana; hakediş Detay penceresinde özetler ve salt okunur liste korunarak gereksiz iki kart kaldırıldı.

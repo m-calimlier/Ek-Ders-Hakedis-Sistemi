@@ -8,7 +8,7 @@ if ($Version -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') {
     throw 'Version must contain three or four numeric components.'
 }
 $payloadDir = Join-Path $repoRoot "dist\v$Version"
-$requiredFiles = @('Ek Ders Hakediş Sistemi.exe', 'KULLANIM.txt')
+$requiredFiles = @('Ek Ders Hakediş Sistemi.exe', 'KULLANIM.txt', 'NPOI-LICENSE.txt')
 foreach ($name in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $payloadDir $name) -PathType Leaf)) {
         throw "Publish the application first. Missing: $payloadDir\$name"
@@ -17,7 +17,7 @@ foreach ($name in $requiredFiles) {
 # Reject unexpected contents so personal data cannot accidentally enter a release.
 $unexpected = @(Get-ChildItem -LiteralPath $payloadDir -Force | Where-Object { $_.Name -notin $requiredFiles -or $_.PSIsContainer })
 if ($unexpected.Count -gt 0) {
-    throw "Payload must contain only the executable and KULLANIM.txt. Unexpected: $($unexpected.Name -join ', ')"
+    throw "Payload must contain only the executable, usage notes and NPOI license. Unexpected: $($unexpected.Name -join ', ')"
 }
 if (-not $CompilerPath) {
     $candidates = @(
