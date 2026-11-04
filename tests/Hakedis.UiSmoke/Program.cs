@@ -23,6 +23,8 @@ internal static class Program
         {SingleRowReportChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-month-marker")
         {MonthMarkerChecks.Run(output,Capture);return 0;}
+        if(args.Length==2 && args[1]=="--verify-embedded-bank")
+        {EmbeddedBankChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-payroll-revision")
         {SingleRowReportChecks.Run(output,Capture);PayrollRevisionChecks.Run(output,Capture);return 0;}
         if(args.Length==4 && args[1]=="--verify-local-bank")

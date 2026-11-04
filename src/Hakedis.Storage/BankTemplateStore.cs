@@ -4,6 +4,12 @@ namespace Hakedis.Storage;
 
 public sealed class BankTemplateStore(string root)
 {
+    public static byte[] ReadEmbedded()
+    {
+        using var stream=typeof(BankTemplateStore).Assembly.GetManifestResourceStream("Hakedis.Storage.Templates.Halkbank.xls")
+            ??throw new InvalidOperationException("Programın Halkbank şablonu bulunamadı.");
+        using var buffer=new MemoryStream();stream.CopyTo(buffer);return buffer.ToArray();
+    }
     public string FilePath(ModuleId module)
     {if(!PayrollCores.IsAvailable(module))throw new ArgumentException("Banka modülü geçersiz.");return Path.Combine(root,"BankaSablonlari",module+".xls");}
     public void Import(ModuleId module,string source)

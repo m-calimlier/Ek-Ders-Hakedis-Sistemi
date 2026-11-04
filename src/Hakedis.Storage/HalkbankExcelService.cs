@@ -145,7 +145,17 @@ public static class HalkbankExcelService
         var target=Path.GetFullPath(outputPath);
         if(!target.EndsWith(".xls",StringComparison.OrdinalIgnoreCase))throw new ArgumentException("Banka dosyası .xls uzantısıyla kaydedilmelidir.");
         if(string.Equals(target,Path.GetFullPath(templatePath),StringComparison.OrdinalIgnoreCase))throw new ArgumentException("Orijinal banka şablonunun üzerine yazılamaz; farklı dosya adı seçin.");
-        var bytes=Build(ReadTemplate(templatePath),record,date,firm);
+        ExportCore(ReadTemplate(templatePath),record,date,outputPath,firm);
+    }
+    public static void Export(byte[] template,ArchivedPayment record,DateOnly date,string outputPath,BankFirmSettings firm)
+    {
+        ExportCore(template,record,date,outputPath,firm.Validate());
+    }
+    private static void ExportCore(byte[] template,ArchivedPayment record,DateOnly date,string outputPath,BankFirmSettings? firm)
+    {
+        var target=Path.GetFullPath(outputPath);
+        if(!target.EndsWith(".xls",StringComparison.OrdinalIgnoreCase))throw new ArgumentException("Banka dosyası .xls uzantısıyla kaydedilmelidir.");
+        var bytes=Build(template,record,date,firm);
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         var temp=target+"."+Guid.NewGuid().ToString("N")+".tmp";
         try{using(var stream=new FileStream(temp,FileMode.CreateNew,FileAccess.Write,FileShare.None)){stream.Write(bytes);stream.Flush(true);}File.Move(temp,target,true);}

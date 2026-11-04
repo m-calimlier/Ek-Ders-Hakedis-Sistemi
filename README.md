@@ -8,7 +8,16 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.12 kararlı sürüm
+## 1.0.13 kararlı sürüm
+
+- Boş Halkbank Excel şablonu programa gömülüdür; kullanıcıdan şablon dosyası seçmesi istenmez.
+- Banka çıktısı, ödeme tarihi seçildikten sonra bölüm/dönem klasörüne otomatik kaydedilir; başarı bildiriminden sonra klasör açılır.
+- Şablonun düzeni ve sabit hücreleri korunur. Firma bilgileri bölümün banka sabitlerinden, personel bilgileri seçilen kayıtlı hakedişten alınır.
+- Kişisel kayıtlar, banka sabitleri, kasa ve kurtarma anahtarları dağıtılmaz. Gömülü şablon boş ve kişisel verilerden temizlenmiştir.
+- Doğrulama: 315 birim testi ve şablon dosyası bulunmayan temiz kurulumda banka çıktı akışı.
+- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.13)
+
+## 1.0.12 sürümü
 
 - Bordroda mali başlıklar düşeydir; uzun başlıklar uygun genişlikte iki satıra bölünür. Sütun adları ve sırası düzenlendi, gereksiz sabit/birim ücret sütunları kaldırıldı.
 - Kalan gelir ve damga vergisi istisnalarının kişi değerleri gösterilir; toplam hücreleri boş bırakılır. Damga istisna kalanı sıfırın altına düşmez. GV istisnası ve brüt asgari ücret bütün modüllerde ortak düzenlenir.

@@ -7,8 +7,7 @@
  <TextBlock Text="Seçilen bölümün firma bilgileri" Style="{StaticResource FieldLabel}"/>
  <TextBlock x:Name="FirmText" TextWrapping="Wrap" Margin="0,6,0,14"/>
  <TextBlock Text="Firma bilgileri Dönem Sabitleri → Banka Sabitleri alanından değiştirilir." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,0,0,14"/>
- <TextBlock Text="Bu bölüme ait orijinal Halkbank .xls şablonu" Style="{StaticResource FieldLabel}"/>
- <DockPanel Margin="0,6,0,14"><Button DockPanel.Dock="Right" Content="Şablon seç" Style="{StaticResource SecondaryAction}" Click="Template_Click"/><TextBox x:Name="TemplateText" IsReadOnly="True" Style="{StaticResource FormText}"/></DockPanel>
+ <TextBlock Text="Halkbank şablonu programın içindedir. Dosya oluşturulduğunda Çıktılar klasörüne kaydedilir ve bulunduğu klasör açılır." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,6,0,14"/>
  <TextBlock Text="Bankanın ödemeyi yapacağı tarih (zorunlu)" Style="{StaticResource FieldLabel}"/>
  <DatePicker x:Name="PaymentDate" Width="210" HorizontalAlignment="Left" Margin="0,6,0,16"/>
  <TextBlock Text="Seçilen hakedişin kayıtlı IBAN, kimlik, ad soyad ve net ödeme tutarları aktarılır. Kullanılmayan personel satırları boş bırakılır." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap"/>

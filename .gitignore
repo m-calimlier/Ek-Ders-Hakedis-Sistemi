@@ -18,6 +18,7 @@ Ciktilar/
 inceleme/
 *.xlsx
 *.xls
+!src/Hakedis.Storage/Templates/Halkbank.xls
 *.xlsm
 *.rar
 *.zip

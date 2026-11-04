@@ -236,12 +236,14 @@ Dönem Sabitleri > Banka Sabitleri alanında bölümü seçin. Güncelle ile
 o bölümün firma müşteri numarasını, şube kodunu ve firma IBAN/hesap
 bilgisini girip kaydedin. Her bölümün bilgisi ayrıdır.
 Çıktı panelinde ilgili hakediş satırındaki Banka düğmesini açın.
-O bölüme ait orijinal Halkbank .xls şablonunu seçin ve ödeme tarihini
-belirleyin. Banka Excel oluştur ile .xls dosyasını kaydedin. Veriler
+Boş Halkbank şablonu programın içindedir; şablon seçmeniz gerekmez.
+Ödeme tarihini belirleyin. Banka Excel oluştur ile .xls dosyası Çıktılar
+altında bölüm ve dönem klasörüne kaydedilir; bildirimden sonra klasör
+otomatik açılır. Veriler
 seçilen kayıtlı hakedişten alınır. Program bankaya yükleme yapmaz.
-Kişisel banka sabitleri ve şablonları Veriler klasöründe tutulur;
+Kişisel banka sabitleri Veriler klasöründe tutulur;
 kurulum paketine ve GitHub kaynaklarına dahil edilmez. Başka PC'ye
-taşırken bu özel dosyaları kendi veri yedeğinizle birlikte taşıyın.
+taşırken banka sabitlerini kendi veri yedeğinizle birlikte taşıyın.
 XLS okuma/yazma bileşeni NPOI Core, Apache-2.0 kaynaklarından yerel
 derlenmiştir. Lisans metni: NPOI-LICENSE.txt.
 

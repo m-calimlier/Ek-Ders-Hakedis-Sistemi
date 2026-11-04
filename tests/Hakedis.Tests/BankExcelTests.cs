@@ -43,6 +43,23 @@ public sealed class BankExcelTests : IDisposable
         for(var i=0;i<shell.Calculation.Rows.Count;i++)shell.Calculation.Rows[i].DayHours=(40+i*20).ToString();
         shell.Calculation.CreatePayment();return shell.Outputs.Records.Single();
     }
+    [Fact] public void Embedded_template_works_on_a_fresh_install_without_private_template_files()
+    {
+        var template=BankTemplateStore.ReadEmbedded();
+        using(var blank=new HSSFWorkbook(new MemoryStream(template)))
+        {
+            var sheet=blank.GetSheetAt(0);
+            foreach(var r in new[]{0,1,2,3,4,8})Assert.Equal(CellType.Blank,sheet.GetRow(r).GetCell(1).CellType);
+            for(var r=12;r<=sheet.LastRowNum;r++)for(var c=0;c<5;c++)
+                Assert.True(sheet.GetRow(r)?.GetCell(c) is null || sheet.GetRow(r).GetCell(c).CellType==CellType.Blank);
+        }
+        var record=Archive();var path=Path.Combine(root,"embedded.xls");
+        HalkbankExcelService.Export(template,record,new DateOnly(2026,11,5),path,new("87654321","782","TR330006100519786457841327"));
+        using var output=new HSSFWorkbook(new MemoryStream(File.ReadAllBytes(path)));
+        Assert.Equal(record.Document.Data.Rows[0].Teacher.FullName,output.GetSheetAt(0).GetRow(12).GetCell(4).StringCellValue);
+        Assert.Equal(87654321,output.GetSheetAt(0).GetRow(1).GetCell(1).NumericCellValue);
+        Assert.False(Directory.Exists(Path.Combine(root,"BankaSablonlari")));
+    }
     [Fact] public void Selected_archive_populates_only_expected_cells_and_preserves_blanks_styles_and_formulas()
     {
         var template=Template();var original=template.ToArray();var record=Archive();var archiveBytes=File.ReadAllBytes(record.Path);

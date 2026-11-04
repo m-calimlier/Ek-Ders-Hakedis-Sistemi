@@ -165,7 +165,7 @@ public partial class MainWindow : Window
     private void PrintOutputs_Click(object sender,RoutedEventArgs e)
     {SelectOutput(sender);RunOutput(()=>{if(new PaymentReportService().Print(shell.Outputs.ReadSelected(),shell.Outputs.Details.Read()))shell.Outputs.ShowStatus("Üç belge yazıcıya gönderildi.");});}
     private void BankOutput_Click(object sender,RoutedEventArgs e)
-    {SelectOutput(sender);RunOutput(()=>{var dialog=new BankExcelWindow(shell.Outputs.ReadSelected(),shell.Outputs.DataRoot,()=>shell.Outputs.ReadSelected()){Owner=this};if(dialog.ShowDialog()==true)shell.Outputs.ShowStatus("Banka Excel kaydedildi: "+dialog.OutputPath);});}
+    {SelectOutput(sender);RunOutput(()=>{var dialog=new BankExcelWindow(shell.Outputs.ReadSelected(),shell.Outputs.DataRoot,()=>shell.Outputs.ReadSelected(),reportOutputRoot){Owner=this};if(dialog.ShowDialog()==true){shell.Outputs.ShowStatus("Banka Excel kaydedildi: "+dialog.OutputPath);Inform("Banka Excel kaydedildi:\n"+dialog.OutputPath);openFolder(System.IO.Path.GetDirectoryName(dialog.OutputPath!)!);}});}
     private void XmlOutput_Click(object sender,RoutedEventArgs e)
     {
         SelectOutput(sender);RunOutput(()=>{
