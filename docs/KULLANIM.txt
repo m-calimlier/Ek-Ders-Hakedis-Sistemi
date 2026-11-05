@@ -1,5 +1,10 @@
 Ek Ders Hakediş Sistemi
 
+GÖRÜNÜM
+Gece Mavisi görünüm; koyu mavi çalışma alanları, açık mavi işlem düğmeleri,
+okunaklı tablolar ve Türkçe kurulum ekranıyla kullanılır. Menülerin görevleri,
+hesaplamalar ve kayıt konumları korunur.
+
 KURULUM VE ÇALIŞTIRMA
 Kurulum EXE dosyasını açıp Türkçe kurulum adımlarını izleyin.
 Yönetici yetkisi veya ayrıca Excel/.NET kurulumu gerekmez.

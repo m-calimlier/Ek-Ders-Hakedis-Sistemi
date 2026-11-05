@@ -23,9 +23,9 @@ internal static class LayoutSettingsChecks
         if(model.Workspace.Modules.Any(m=>m.Id==ModuleId.ImamHatipLisesi))throw new Exception("İmam Hatip listede kaldı.");
         model.Navigate("Constants");Idle(window);
         var fields=Descendants<TextBox>((FrameworkElement)window.FindName("ConstantsFields")).ToArray();
-        if(fields.Any(t=>!t.IsReadOnly || ((SolidColorBrush)t.Background).Color!=Color.FromRgb(220,227,235)))throw new Exception("Sabitler kilitliyken gri değil.");
+        if(fields.Any(t=>!t.IsReadOnly || ((SolidColorBrush)t.Background).Color!=Color.FromRgb(21,56,79)))throw new Exception("Sabitler kilitliyken koyu pasif yüzeyde değil.");
         ((Button)window.FindName("ConstantsUpdateButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
-        if(fields.Any(t=>t.IsReadOnly || ((SolidColorBrush)t.Background).Color!=Colors.White))throw new Exception("Güncelle beyaz düzenlemeyi açmadı.");
+        if(fields.Any(t=>t.IsReadOnly || t.Background is not LinearGradientBrush))throw new Exception("Güncelle ortak giriş yüzeyiyle düzenlemeyi açmadı.");
         ((Button)window.FindName("ConstantsUpdateButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         var grid=(DataGrid)window.FindName("HybridGrid");
         var transferHeaders=new[]{"ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI"};
@@ -85,7 +85,8 @@ internal static class LayoutSettingsChecks
         XNamespace wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         XNamespace x="http://schemas.microsoft.com/winfx/2006/xaml";
         var root=document.Root!;root.Name=wpf+"UserControl";root.Attribute(x+"Class")!.Remove();
-        foreach(var key in new[]{"Title","Icon","MinWidth","MinHeight","WindowStartupLocation","WindowStyle","ResizeMode"})root.Attribute(key)?.Remove();
+        foreach(var key in new[]{"Title","Icon","MinWidth","MinHeight","WindowStartupLocation","WindowStyle","ResizeMode","Style"})root.Attribute(key)?.Remove();
+        root.SetAttributeValue("Foreground","{StaticResource NightTextBrush}");
         root.Element(wpf+"WindowChrome.WindowChrome")!.Remove();root.Element(wpf+"Window.Resources")!.Name=wpf+"UserControl.Resources";
         root.SetAttributeValue(XNamespace.Xmlns+"local","clr-namespace:Hakedis.App;assembly=Ek Ders Hakediş Sistemi");
         foreach(var element in root.DescendantsAndSelf())

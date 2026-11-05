@@ -19,6 +19,8 @@ internal static class Program
         var app = new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
         foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault"})
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
+        if(args.Length==2 && args[1]=="--verify-midnight")
+        {MidnightChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-single-row-payroll")
         {SingleRowReportChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-month-marker")

@@ -33,6 +33,7 @@ public sealed class VaultWindow : Window
     {
         this.confirmation=confirmation;
         store = new VaultStore(filePath);
+        Style = (Style)FindResource(typeof(Window));
         Title = "İşyeri Bilgileri • Şifre Kasası";
         Width = 860; Height = 620; MinWidth = 720; MinHeight = 500;
         MaxHeight = SystemParameters.WorkArea.Height; MaxWidth = SystemParameters.WorkArea.Width;

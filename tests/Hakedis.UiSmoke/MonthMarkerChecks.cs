@@ -24,11 +24,21 @@ internal static class MonthMarkerChecks
         if(grid.Columns.Any(c=>c.Header as string==ExcelHeadings.IbanCheck))throw new Exception("IBAN kontrol sütunu kaldırılmadı.");
         DataGridRow Container(PayrollRow row){grid.ScrollIntoView(row);Idle(window);return (DataGridRow)grid.ItemContainerGenerator.ContainerFromItem(row);}
         var starter=shell.Calculation.Rows.Single(r=>r.StartDate!.Value.Month==9);var colored=Container(starter);
-        if(starter.HasInput || ((SolidColorBrush)colored.Background).Color!=Color.FromRgb(232,245,233))throw new Exception("Eski yılda Eylül başlangıcı, ders girişi olmadan Eylül'de yeşil olmalı.");
-        if(((SolidColorBrush)Container(other).Background).Color==Color.FromRgb(232,245,233))throw new Exception("Saat girilmiş olması satırı yeşil yapmamalı.");
+        if(starter.HasInput || ((SolidColorBrush)colored.Background).Color!=Color.FromRgb(23,71,55))throw new Exception("Eski yılda Eylül başlangıcı, ders girişi olmadan Eylül'de yeşil olmalı.");
+        if(((SolidColorBrush)Container(other).Background).Color==Color.FromRgb(23,71,55))throw new Exception("Saat girilmiş olması satırı yeşil yapmamalı.");
+        foreach(var entry in new[]{starter,other})
+        {
+            foreach(var selected in new[]{false,true})
+            {
+                grid.SelectedItem=selected?entry:null;Idle(window);var row=Container(entry);
+                var cells=Descendants<DataGridCell>(row).Where(c=>c.IsVisible).ToArray();
+                if(cells.Length==0 || cells.Any(c=>MidnightChecks.Contrast(c.Foreground,row.Background)<4.5))throw new Exception("Hibrit tablo hücre yazısı normal/yeşil/seçili satırda okunaklı değil.");
+            }
+        }
+        grid.SelectedItem=null;Idle(window);
         capture(window,Path.Combine(output,"september-starter-green.png"));
         shell.Calculation.Month=10;Idle(window);
-        if(shell.Calculation.Rows.Any(r=>r.StartedInSelectedMonth) || shell.Calculation.Rows.Any(r=>((SolidColorBrush)Container(r).Background).Color==Color.FromRgb(232,245,233)))throw new Exception("Ekim'e geçince Eylül başlangıcının rengi normale dönmedi.");
+        if(shell.Calculation.Rows.Any(r=>r.StartedInSelectedMonth) || shell.Calculation.Rows.Any(r=>((SolidColorBrush)Container(r).Background).Color==Color.FromRgb(23,71,55)))throw new Exception("Ekim'e geçince Eylül başlangıcının rengi normale dönmedi.");
         capture(window,Path.Combine(output,"october-starter-normal.png"));
         shell.ClearCurrentWork();window.Close();
         Console.WriteLine("Satır rengi: yalnız işe başlama ayı; farklı yıl ve saat girişinden bağımsız; sonraki ay normal. IBAN kontrol sütunu yok.");

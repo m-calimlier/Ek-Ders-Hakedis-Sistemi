@@ -36,7 +36,7 @@ internal static class OutputEntryChecks
         if(!notices.Any(n=>n.Contains("IBAN") && n.Contains("güncelle")) || model.Outputs.Records.Count!=0)throw new Exception("IBAN eksikliği açıklayan popup/hakediş engeli yok.");
         model.Navigate("Teachers");Idle(window);var teacherGrid=(DataGrid)window.FindName("TeacherListGrid");teacherGrid.ScrollIntoView(model.Teachers.Records.Single(),teacherGrid.Columns.Last());Idle(window);
         var missing=Descendants<TextBlock>(teacherGrid).SingleOrDefault(t=>t.Text=="IBAN GİRİLMEDİ");
-        if(missing is null || missing.Foreground is not SolidColorBrush color || color.Color!=Color.FromRgb(198,40,40))throw new Exception("Eksik IBAN kırmızı görünmüyor.");
+        if(missing is null || missing.Foreground is not SolidColorBrush color || color.Color!=Color.FromRgb(255,175,173))throw new Exception("Eksik IBAN koyu zeminde okunaklı kırmızı görünmüyor.");
         capture(window,Path.Combine(output,"Teachers-missing-iban.png"));
         model.Teachers.Selected=model.Teachers.Records.Single();model.UseSelectedTeacher();Idle(window);
         if(model.Monthly.EntryTeacher?.Id!=model.Teachers.Selected.Id)throw new Exception("Veri Girişine Al seçimi aylık karta taşımadı.");
