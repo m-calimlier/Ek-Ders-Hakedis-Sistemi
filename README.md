@@ -8,7 +8,17 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.13 kararlı sürüm
+## 1.0.14 kararlı sürüm — Gece Mavisi
+
+- Ana ekranlar, giriş alanları, tablolar, açılır listeler, takvim ve yardımcı pencereler ortak Gece Mavisi tasarımındadır.
+- Programa özel simgelerle Türkçe koyu mavi kurulum ekranı; açık mavi işlem düğmeleri ve altın menü vurguları.
+- Hesaplamalar, kayıt biçimi, kurum geçişi mantığı, kasa davranışı ve resmî çıktı düzenleri korunur.
+- İşe başlama ayı yeşil işaretlenir; normal ve seçili satırlarda metin kontrastı doğrulanmıştır. Eksik IBAN uyarısı korunur.
+- Doğrulama: 315 birim testi, tam WPF/PDF/XML akışları, gerçek tablo hücreleri ve takvim gün/ay/yıl/klavye testleri.
+- Dağıtımda yalnız program, kullanım belgesi ve lisans vardır; kişisel kayıtlar, banka bilgileri, kasa, yedek ve çıktılar bulunmaz.
+- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.14)
+
+## 1.0.13 sürümü
 
 - Boş Halkbank Excel şablonu programa gömülüdür; kullanıcıdan şablon dosyası seçmesi istenmez.
 - Banka çıktısı, ödeme tarihi seçildikten sonra bölüm/dönem klasörüne otomatik kaydedilir; başarı bildiriminden sonra klasör açılır.
