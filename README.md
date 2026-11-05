@@ -8,7 +8,14 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.14 kararlı sürüm — Gece Mavisi
+## 1.0.15 kararlı sürüm — Tarih okunabilirliği
+
+- Banka ödeme tarihi ve hibrit tablonun tarih düzenleme alanları ortak Gece Mavisi tarih stilini kullanır. Koyu zemindeki tarih metni açık renkle gösterilir.
+- Sağ üstteki küçültme, büyütme/geri yükleme ve kapatma simgeleri beyazdır; düğme zeminleri değiştirilmez.
+- Ödeme tarihi zorunluluğu, hesaplamalar ve kayıtlar korunur. Dağıtım kişisel veri içermez.
+- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.15)
+
+## 1.0.14 sürümü — Gece Mavisi
 
 - Ana ekranlar, giriş alanları, tablolar, açılır listeler, takvim ve yardımcı pencereler ortak Gece Mavisi tasarımındadır.
 - Programa özel simgelerle Türkçe koyu mavi kurulum ekranı; açık mavi işlem düğmeleri ve altın menü vurguları.

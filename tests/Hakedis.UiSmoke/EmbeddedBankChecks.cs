@@ -31,6 +31,9 @@ internal static class EmbeddedBankChecks
                 if(string.IsNullOrWhiteSpace(((TextBlock)dialog.FindName("ErrorText")).Text) || dialog.OutputPath is not null)throw new Exception("Ödeme tarihi zorunlu olmalı.");
                 ((DatePicker)dialog.FindName("PaymentDate")).SelectedDate=new DateTime(2026,11,5);
                 dialog.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+                var picker=(DatePicker)dialog.FindName("PaymentDate");
+                var text=(System.Windows.Controls.Primitives.DatePickerTextBox)picker.Template.FindName("PART_TextBox",picker);
+                if(text.Foreground is not SolidColorBrush ink || ink.Color!=Color.FromRgb(240,246,252) || picker.CalendarStyle is null)throw new Exception("Banka ödeme tarihi koyu zeminde okunaklı değil.");
                 capture(dialog,Path.Combine(output,"embedded-bank.png"));
                 button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 if(dialog.OutputPath is null)throw new Exception(((TextBlock)dialog.FindName("ErrorText")).Text);

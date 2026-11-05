@@ -765,6 +765,8 @@
             <Setter Property="Background" Value="#14374F"/><Setter Property="Foreground" Value="#F0F6FC"/>
             <Setter Property="BorderBrush" Value="#5A7B94"/><Setter Property="Padding" Value="10,7"/>
         </Style>
+        <!-- Raw date pickers in bank export and editable grid cells share the same readable template. -->
+        <Style TargetType="DatePicker" BasedOn="{StaticResource FieldDatePicker}"/>
         <Style TargetType="DatePickerTextBox">
             <Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="#F0F6FC"/>
             <Setter Property="BorderThickness" Value="0"/>

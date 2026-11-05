@@ -15,10 +15,15 @@ internal static class MidnightChecks
         var list=new ListBox {Style=(Style)resources["ModernListBox"],ItemsSource=new[]{"Birinci öğretmen","İkinci öğretmen"},SelectedIndex=0,Height=100};
         var table=new DataGrid {Style=(Style)resources["ModernDataGrid"],ItemsSource=new[]{new {Ogretmen="Örnek öğretmen",Saat=80}},AutoGenerateColumns=true,Height=100};
         var date=new DatePicker {Style=(Style)resources["FormDate"],SelectedDate=new DateTime(2026,11,5)};
+        var defaultDate=new DatePicker {SelectedDate=new DateTime(2026,11,6)};
+        var windowButton=new Button {Style=(Style)resources["WindowButton"],Content="×"};
         var stack=new StackPanel {Margin=new Thickness(24)};
-        foreach(var child in new FrameworkElement[]{combo,list,table,date,new TextBox{Style=(Style)resources["FormText"],Text="80"}})stack.Children.Add(child);
+        foreach(var child in new FrameworkElement[]{combo,list,table,date,defaultDate,windowButton,new TextBox{Style=(Style)resources["FormText"],Text="80"}})stack.Children.Add(child);
         var window=new Window {Title="Gece Mavisi kontrolü",Width=650,Height=540,Content=stack};
         window.Show();Idle(window);
+        if(!Light(windowButton.Foreground) || windowButton.Background is not SolidColorBrush transparent || transparent.Color.A!=0)throw new Exception("Pencere kontrol simgeleri açık renk ve zemini şeffaf olmalı.");
+        var defaultDateText=(System.Windows.Controls.Primitives.DatePickerTextBox)defaultDate.Template.FindName("PART_TextBox",defaultDate);
+        if(!Light(defaultDate.Foreground) || !Light(defaultDateText.Foreground) || defaultDate.CalendarStyle is null)throw new Exception("Stil belirtilmeyen banka/tablo tarih alanında tarih okunamıyor.");
         if(!Dark(window.Background) || !Light(combo.Foreground) || !Dark(list.Background) || !Dark(table.Background))throw new Exception("Pencere, seçim veya tablo yüzeyleri ortak koyu temaya uymuyor.");
         table.SelectedIndex=0;table.UpdateLayout();
         var row=(DataGridRow)table.ItemContainerGenerator.ContainerFromIndex(0);
@@ -41,7 +46,7 @@ internal static class MidnightChecks
         var previous=calendar.DisplayDate;((Button)calendarItem.Template.FindName("PART_NextButton",calendarItem)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(calendar.DisplayDate.Month==previous.Month)throw new Exception("Takvimde sonraki ay düğmesi çalışmıyor.");
         ((Button)calendarItem.Template.FindName("PART_HeaderButton",calendarItem)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
-        if(calendar.DisplayMode!=CalendarMode.Year || !((Grid)calendarItem.Template.FindName("PART_YearView",calendarItem)).IsVisible)throw new Exception("Takvimde ay/yıl seçimi açılmıyor.");
+        if(calendar.DisplayMode!=CalendarMode.Year || ((Grid)calendarItem.Template.FindName("PART_YearView",calendarItem)).Visibility!=Visibility.Visible)throw new Exception("Takvimde ay/yıl seçimi açılmıyor.");
         ((Button)calendarItem.Template.FindName("PART_HeaderButton",calendarItem)).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(calendar.DisplayMode!=CalendarMode.Decade)throw new Exception("Takvimde yıl seçimine geçilemiyor.");
         calendar.DisplayMode=CalendarMode.Month;calendar.DisplayDate=new DateTime(2026,11,5);Idle(window);
