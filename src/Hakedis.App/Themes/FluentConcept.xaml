@@ -1,0 +1,89 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Gece Mavisi + WPF UI Fluent konsepti. Var olan veri bağlamları ve kontroller korunur. -->
+    <SolidColorBrush x:Key="ConceptSidebarBrush" Color="#061D33"/>
+    <SolidColorBrush x:Key="ConceptHeaderBrush" Color="#061A2D"/>
+    <SolidColorBrush x:Key="ConceptCanvasBrush" Color="#071E34"/>
+    <SolidColorBrush x:Key="ConceptCardBrush" Color="#102D45"/>
+    <SolidColorBrush x:Key="ConceptCardBorderBrush" Color="#284C66"/>
+    <SolidColorBrush x:Key="ConceptGoldBrush" Color="#F6C45F"/>
+    <SolidColorBrush x:Key="ConceptMutedBrush" Color="#A4BCCF"/>
+    <SolidColorBrush x:Key="ConceptTableHeaderBrush" Color="#153752"/>
+
+    <Style x:Key="ConceptNavButton" TargetType="Button" BasedOn="{StaticResource NavButton}">
+        <Setter Property="Height" Value="46"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="#B5C9DB"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Margin="9,2">
+                        <Border x:Name="Surface" CornerRadius="9"
+                                BorderBrush="Transparent" BorderThickness="1"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter Margin="12,0,8,0"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <Border x:Name="Accent" Width="3" CornerRadius="3"
+                                HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                Margin="0,7,0,7" Background="Transparent"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Uid" Value="Active">
+                            <Setter TargetName="Surface" Property="Background" Value="#173C59"/>
+                            <Setter TargetName="Surface" Property="BorderBrush" Value="#887137"/>
+                            <Setter TargetName="Accent" Property="Background" Value="#F6C45F"/>
+                            <Setter Property="Foreground" Value="#F6D17B"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Surface" Property="Background" Value="#19425E"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Surface" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ConceptWorkspaceCard" TargetType="Border" BasedOn="{StaticResource WorkspaceCard}">
+        <Setter Property="Background" Value="{StaticResource ConceptCardBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ConceptCardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="15"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="0,0,0,16"/>
+    </Style>
+
+    <Style x:Key="ConceptSummaryCard" TargetType="Border" BasedOn="{StaticResource ConceptWorkspaceCard}">
+        <Setter Property="MinHeight" Value="126"/>
+        <Setter Property="Padding" Value="19,16"/>
+        <Setter Property="Background" Value="#102E48"/>
+    </Style>
+
+    <Style x:Key="ConceptPageTitle" TargetType="TextBlock" BasedOn="{StaticResource PageTitle}">
+        <Setter Property="FontSize" Value="27"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="#F3F7FD"/>
+    </Style>
+
+    <Style x:Key="ConceptPageSubtitle" TargetType="TextBlock" BasedOn="{StaticResource PageSubtitle}">
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Foreground" Value="{StaticResource ConceptMutedBrush}"/>
+    </Style>
+
+    <Style x:Key="ConceptOutputButton" TargetType="Button" BasedOn="{StaticResource SecondaryAction}">
+        <Setter Property="MinHeight" Value="44"/>
+        <Setter Property="Height" Value="44"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="Background" Value="#163852"/>
+    </Style>
+</ResourceDictionary>
