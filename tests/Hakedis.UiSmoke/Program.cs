@@ -45,6 +45,15 @@ internal static class Program
                 Console.WriteLine("Gerçek WPF görüntüsü: "+panel);
             }
             previewWindow.Close();
+            // Ninth main navigation choice opens the separate production WPF VaultWindow.
+            // The image contains only its unconfigured first-run screen, never secrets.
+            var vaultPath=Path.Combine(output,"vault-sample","demo.edhskasa");
+            var vaultPreview=new VaultWindow(vaultPath,_=>true){ShowActivated=false,ShowInTaskbar=false};
+            vaultPreview.Show();
+            vaultPreview.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+            vaultPreview.UpdateLayout();
+            Capture(vaultPreview,Path.Combine(output,"Gercek-WPF-Vault.png"));
+            vaultPreview.Close();
             File.WriteAllText(Path.Combine(output,"Goruntu_Bilgisi.txt"),
                 "Gerçek WPF/XAML RenderTargetBitmap çıktıları. Eğitim ve ödeme alanları tamamen örnek verilerden oluşur. "+Environment.NewLine+
                 "Üretim verisi veya kullanıcı kişisel bilgisi içermez. İkon, uygulamada kullanılan repo Hakedis.ico dosyasından gelir.");
