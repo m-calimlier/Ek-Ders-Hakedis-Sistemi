@@ -13,6 +13,17 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      - name: Capture real WPF panel screenshots (fictional sample records)
+        shell: pwsh
+        run: dotnet run --project tests/Hakedis.UiSmoke -c Release -- dist/ui-screenshots --capture-screenshots
+      - name: Upload real WPF panel screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gercek-WPF-Ekran-Goruntuleri
+          path: dist/ui-screenshots/Gercek-WPF-*.png
+          if-no-files-found: warn
+          retention-days: 7
       - name: Test and package Windows x64
         shell: pwsh
         run: ./scripts/Publish-Windows.ps1

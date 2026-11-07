@@ -17,8 +17,48 @@ internal static class Program
         var listener = new BindingErrors(); PresentationTraceSources.DataBindingSource.Listeners.Add(listener);
         // Load only UI resources: production App.OnStartup opens the real desktop data.
         var app = new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
-        foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault"})
+        foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault","FluentConcept"})
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
+        // Real WPF visual snapshots with fictional sample data, separate from production storage.
+        if (args.Length==2 && args[1]=="--capture-screenshots")
+        {
+            var sampleRoot=Path.Combine(output,"screenshots-test-data");
+            var sample=new ShellViewModel(Path.Combine(sampleRoot,"ogretmenler.json"));
+            sample.Registration.Editor.FullName="Örnek Öğretmen 01";
+            sample.Registration.Editor.School="Örnek Eğitim Kurumu";
+            sample.Registration.Editor.IdentityNumber="10000000146";
+            sample.Registration.Editor.Iban="TR330006100519786457841326";
+            sample.Registration.Editor.OccupationCode="2341.04";
+            sample.SaveNewTeacher();
+            var previewWindow=new MainWindow(sample,_=>{},(_,_)=>true)
+            {ShowActivated=false,ShowInTaskbar=false,Width=1366,Height=768};
+            previewWindow.Show();
+            var panels=new[]{"Entry","Details","Calculation","Teachers","Outputs","Personal","Constants","Settings"};
+            foreach(var panel in panels)
+            {
+                sample.Navigate(panel);
+                previewWindow.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+                previewWindow.UpdateLayout();
+                if(previewWindow.ActualWidth<600 || previewWindow.ActualHeight<400)
+                    throw new InvalidOperationException("WPF penceresi render edilemedi: "+panel);
+                Capture(previewWindow,Path.Combine(output,$"Gercek-WPF-{panel}.png"));
+                Console.WriteLine("Gerçek WPF görüntüsü: "+panel);
+            }
+            previewWindow.Close();
+            // Ninth main navigation choice opens the separate production WPF VaultWindow.
+            // The image contains only its unconfigured first-run screen, never secrets.
+            var vaultPath=Path.Combine(output,"vault-sample","demo.edhskasa");
+            var vaultPreview=new VaultWindow(vaultPath,_=>true){ShowActivated=false,ShowInTaskbar=false};
+            vaultPreview.Show();
+            vaultPreview.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+            vaultPreview.UpdateLayout();
+            Capture(vaultPreview,Path.Combine(output,"Gercek-WPF-Vault.png"));
+            vaultPreview.Close();
+            File.WriteAllText(Path.Combine(output,"Goruntu_Bilgisi.txt"),
+                "Gerçek WPF/XAML RenderTargetBitmap çıktıları. Eğitim ve ödeme alanları tamamen örnek verilerden oluşur. "+Environment.NewLine+
+                "Üretim verisi veya kullanıcı kişisel bilgisi içermez. İkon, uygulamada kullanılan repo Hakedis.ico dosyasından gelir.");
+            return 0;
+        }
         if(args.Length==2 && args[1]=="--verify-midnight")
         {MidnightChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-single-row-payroll")
