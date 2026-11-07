@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="PDFsharp-WPF" Version="6.2.4" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
   </ItemGroup>
 
   <PropertyGroup>
