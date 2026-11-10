@@ -28,9 +28,10 @@ public partial class BankExcelWindow : Window
     private void Export_Click(object sender,RoutedEventArgs e)=>Try(()=>
     {
         if(PaymentDate.SelectedDate is not DateTime date)throw new ArgumentException("Bankanın ödeme yapacağı tarihi seçin.");
-        _=settings.Read(record.Document.ModuleId).Validate();
-        var folder=Path.Combine(outputRoot,record.Document.ModuleId.ToString(),$"{record.Document.Data.Year:D4}-{record.Document.Data.Month:D2}");
-        var path=Path.Combine(folder,$"Halkbank-{record.Document.Data.Year:D4}-{record.Document.Data.Month:D2}-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}.xls");
+        var firm=settings.Read(record.Document.ModuleId).Validate();
+        // Keep each export in its own folder so the bank-required filename never overwrites an earlier output.
+        var folder=Path.Combine(outputRoot,record.Document.ModuleId.ToString(),$"{record.Document.Data.Year:D4}-{record.Document.Data.Month:D2}",$"Banka-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}");
+        var path=Path.Combine(folder,firm.CustomerNumber+".xls");
         ExportTo(path,DateOnly.FromDateTime(date));DialogResult=true;
     });
     private void Try(Action action)

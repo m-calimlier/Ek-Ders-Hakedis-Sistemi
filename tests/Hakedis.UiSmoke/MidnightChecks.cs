@@ -56,7 +56,16 @@ internal static class MidnightChecks
         window.Close();
         var vault=new Hakedis.App.VaultWindow(Path.Combine(output,"style-vault.edhskasa"));vault.Show();Idle(vault);
         if(!Hakedis.App.NightTheme.GetEnabled(vault))throw new Exception("Yardımcı pencerelerde yerel başlık çubuğu teması etkin değil.");
-        vault.Close();Console.WriteLine("Gece Mavisi: ortak pencere/giriş/liste/tablo renkleri, seçili satır kontrastı, tarih/seçim açılır alanları ve yardımcı pencere teması doğrulandı.");
+        vault.Close();
+        var shell=new Hakedis.App.ShellViewModel(Path.Combine(output,"caption-data","ogretmenler.json"));
+        var main=new Hakedis.App.MainWindow(shell,_=>{},(_,_)=>true){ShowActivated=false,ShowInTaskbar=false};main.Show();Idle(main);
+        var icons=new[]{"MinimizeGlyph","MaximizeGlyph","CloseGlyph"}.Select(name=>main.FindName(name) as System.Windows.Shapes.Path).ToArray();
+        if(icons.Any(p=>p is null || p.Width!=12 || p.Height!=12 || p.StrokeThickness!=1.2 || p.Stroke is not SolidColorBrush b || b.Color!=Colors.White))throw new Exception("Pencere simgeleri ortak boyut ve çizgi stili kullanmıyor.");
+        var maximize=icons[1]!;var normal=maximize.Data.ToString();capture(main,Path.Combine(output,"Window-icons.png"));
+        main.WindowState=WindowState.Maximized;Idle(main);
+        if(maximize.Data.ToString()==normal)throw new Exception("Büyütülmüş pencerede geri yükleme simgesi gösterilmiyor.");
+        shell.ClearCurrentWork();main.Close();
+        Console.WriteLine("Gece Mavisi: giriş/liste/tablo/takvim kontrastı; ortak 12×12 beyaz pencere simgeleri ve büyüt/geri yükle durumu doğrulandı.");
     }
     private static bool Dark(Brush b)=>b is SolidColorBrush s && Luminance(s.Color)<.15;
     private static bool Light(Brush b)=>b is SolidColorBrush s && Luminance(s.Color)>.5;
