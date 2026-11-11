@@ -13,7 +13,7 @@ biçim kontrolü banka doğrulaması anlamına gelmez.
 - Banka ödeme tarihi ve hibrit tablonun tarih düzenleme alanları ortak Gece Mavisi tarih stilini kullanır. Koyu zemindeki tarih metni açık renkle gösterilir.
 - Sağ üstteki küçültme, büyütme/geri yükleme ve kapatma simgeleri beyazdır; düğme zeminleri değiştirilmez.
 - Ödeme tarihi zorunluluğu, hesaplamalar ve kayıtlar korunur. Dağıtım kişisel veri içermez.
-- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.15)
+- [Güncel kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.15)
 
 ## 1.0.14 sürümü — Gece Mavisi
 
@@ -23,7 +23,7 @@ biçim kontrolü banka doğrulaması anlamına gelmez.
 - İşe başlama ayı yeşil işaretlenir; normal ve seçili satırlarda metin kontrastı doğrulanmıştır. Eksik IBAN uyarısı korunur.
 - Doğrulama: 315 birim testi, tam WPF/PDF/XML akışları, gerçek tablo hücreleri ve takvim gün/ay/yıl/klavye testleri.
 - Dağıtımda yalnız program, kullanım belgesi ve lisans vardır; kişisel kayıtlar, banka bilgileri, kasa, yedek ve çıktılar bulunmaz.
-- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.14)
+- [Güncel kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.14)
 
 ## 1.0.13 sürümü
 
@@ -32,7 +32,7 @@ biçim kontrolü banka doğrulaması anlamına gelmez.
 - Şablonun düzeni ve sabit hücreleri korunur. Firma bilgileri bölümün banka sabitlerinden, personel bilgileri seçilen kayıtlı hakedişten alınır.
 - Kişisel kayıtlar, banka sabitleri, kasa ve kurtarma anahtarları dağıtılmaz. Gömülü şablon boş ve kişisel verilerden temizlenmiştir.
 - Doğrulama: 315 birim testi ve şablon dosyası bulunmayan temiz kurulumda banka çıktı akışı.
-- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.13)
+- [Güncel kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.13)
 
 ## 1.0.12 sürümü
 
@@ -43,7 +43,7 @@ biçim kontrolü banka doğrulaması anlamına gelmez.
 - IBAN Kontrol sütunu kaldırıldı; doğrulama sürer. Kurum geçişindeki iki gündüz saati uygun modüller arasında önizlemeye birlikte yansır; ödeme modülü ve kayıt sürümü korunur.
 - Doğrulama: 314 birim testi, tüm WPF akışları ve PDF/XML kontrolleri geçti.
 - Dağıtım yalnız program, kullanım belgesi ve lisansı içerir. Öğretmenler, hakedişler, banka sabitleri/şablonları, kişisel kasa ve kurtarma anahtarları dağıtılmaz.
-- [Güncel kurulum ve taşınabilir paket](https://github.com/mcalimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.12)
+- [Güncel kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.12)
 
 ## 1.0.10 sürümü
 
