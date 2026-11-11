@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows;
@@ -237,7 +237,7 @@ public sealed class VaultWindow : Window
     private void Export()
     {
         if (dirty) throw new ArgumentException("Önce değişikliklerinizi kaydedin.");
-        var dialog = new SaveFileDialog { Filter = "Şifreli kasa (*.edhskasa)|*.edhskasa", FileName = "isyeri-kasa-yedek.edhskasa", DefaultExt = ".edhskasa", AddExtension = true };
+        var dialog = new WorkspaceSaveFileDialog { Filter = "Şifreli kasa (*.edhskasa)|*.edhskasa", FileName = "isyeri-kasa-yedek.edhskasa", DefaultExt = ".edhskasa", AddExtension = true };
         if (Dialog(() => dialog.ShowDialog(this)) != true) return;
         if (session is null) throw new ArgumentException("Kasa kilitlendi. Yeniden açıp dışa aktarın.");
         session.Export(dialog.FileName); status.Text = "Şifreli kopya kaydedildi. Diğer bilgisayarda aynı ana parolayla içe aktarabilirsiniz.";

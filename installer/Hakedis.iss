@@ -1,3 +1,4 @@
+﻿#define DataFolderName "Ek Ders Hakediş Sistemi"
 #ifndef AppVersion
   #define AppVersion "1.0.15"
 #endif
@@ -24,7 +25,7 @@ PrivilegesRequired=lowest
 DisableProgramGroupPage=yes
 DisableWelcomePage=no
 UsePreviousAppDir=yes
-UsePreviousTasks=yes
+UsePreviousTasks=no
 OutputDir=..\dist\installer
 OutputBaseFilename=Ek-Ders-Hakedis-Sistemi-Kurulum-{#AppVersion}
 SetupIconFile=..\src\Hakedis.App\Assets\Hakedis.ico
@@ -38,8 +39,13 @@ WizardImageBackColor=#10263d
 WizardSmallImageBackColor=#10263d
 WizardImageStretch=yes
 ShowLanguageDialog=no
+#ifdef FastBuild
+Compression=zip/1
+SolidCompression=no
+#else
 Compression=lzma2
 SolidCompression=yes
+#endif
 CloseApplications=yes
 CloseApplicationsFilter=*.exe
 RestartApplications=no
@@ -73,3 +79,5 @@ WelcomeLabel1=Ek Ders Hakediş Sistemi'ne hoş geldiniz
 WelcomeLabel2=Bu sihirbaz {#AppName} programını bilgisayarınıza kuracaktır.%n%nÖğretmen kayıtları, aylık ders bilgileri ve bordrolarınızı aynı çalışma ortamında yönetin.%n%nVerileriniz, çıktılarınız, yedekleriniz ve şifre kasanız masaüstünüzdeki "Ek Ders Hakediş Sistemi" klasöründe korunur. Güncelleme ve kaldırma işlemleri bu klasörleri silmez.%n%nDevam etmeden önce açık programda çalışmalarınızı kaydedin.
 FinishedHeadingLabel=Ek Ders Hakediş Sistemi kullanıma hazır
 FinishedLabel=Kurulum tamamlandı.%n%nProgramı Başlat menüsünden veya oluşturduysanız masaüstü kısayolundan açabilirsiniz. Kayıtlarınız ve şifre kasanız mevcut konumunda korunur.%n%nCreated by Murat ÇALIMLIER
+
+#include "CommonWizard.iss"

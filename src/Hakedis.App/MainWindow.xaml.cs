@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using Microsoft.Win32;
 
 namespace Hakedis.App;
@@ -239,7 +239,7 @@ public partial class MainWindow : Window
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         System.IO.Directory.CreateDirectory(Hakedis.Storage.ApplicationPaths.Default.DraftDirectory);
-        var dialog = new SaveFileDialog { Filter = "Hakediş taslağı (*.json)|*.json", FileName = "hakediş-taslağı.json", InitialDirectory=Hakedis.Storage.ApplicationPaths.Default.DraftDirectory };
+        var dialog = new WorkspaceSaveFileDialog { Filter = "Hakediş taslağı (*.json)|*.json", FileName = "hakediş-taslağı.json", InitialDirectory=Hakedis.Storage.ApplicationPaths.Default.DraftDirectory };
         if (dialog.ShowDialog() == true) Run(() => {model.Save(dialog.FileName);Inform("Hakediş taslağı kaydedildi:\n"+dialog.FileName);});
     }
     private void Open_Click(object sender, RoutedEventArgs e)
