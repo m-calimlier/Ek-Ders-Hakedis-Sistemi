@@ -1,41 +1,45 @@
-# Recreates the application icon without external artwork or conversion tools.
-Add-Type -AssemblyName System.Drawing
-$frames = @()
-foreach ($size in @(16, 24, 32, 48, 64, 128, 256)) {
-    $bitmap = [Drawing.Bitmap]::new($size, $size)
-    $graphics = [Drawing.Graphics]::FromImage($bitmap)
-    $graphics.SmoothingMode = [Drawing.Drawing2D.SmoothingMode]::AntiAlias
-    $graphics.ScaleTransform(($size / 256.0), ($size / 256.0))
-    $navy = [Drawing.SolidBrush]::new([Drawing.ColorTranslator]::FromHtml('#102F50'))
-    $gold = [Drawing.SolidBrush]::new([Drawing.ColorTranslator]::FromHtml('#E3BA61'))
-    $paper = [Drawing.SolidBrush]::new([Drawing.ColorTranslator]::FromHtml('#F4F7FC'))
-    $ink = [Drawing.Pen]::new([Drawing.ColorTranslator]::FromHtml('#53728E'), 10)
-    $edge = [Drawing.Pen]::new([Drawing.ColorTranslator]::FromHtml('#E3BA61'), 7)
-    $check = [Drawing.Pen]::new([Drawing.ColorTranslator]::FromHtml('#102F50'), 12)
-    $check.StartCap = $check.EndCap = [Drawing.Drawing2D.LineCap]::Round
-    $path = [Drawing.Drawing2D.GraphicsPath]::new()
-    $path.AddArc(8, 8, 52, 52, 180, 90)
-    $path.AddArc(196, 8, 52, 52, 270, 90)
-    $path.AddArc(196, 196, 52, 52, 0, 90)
-    $path.AddArc(8, 196, 52, 52, 90, 90)
-    $path.CloseFigure()
-    $graphics.FillPath($navy, $path)
-    $graphics.DrawPath($edge, $path)
-    $graphics.FillRectangle($paper, 53, 43, 132, 166)
-    $graphics.FillRectangle($gold, 53, 43, 19, 166)
-    $graphics.DrawLine($ink, 89, 78, 159, 78)
-    $graphics.DrawLine($ink, 89, 106, 159, 106)
-    $graphics.DrawLine($ink, 89, 134, 134, 134)
-    $graphics.FillEllipse($gold, 134, 142, 89, 89)
-    $graphics.DrawLines($check, [Drawing.PointF[]]@([Drawing.PointF]::new(155, 186), [Drawing.PointF]::new(172, 202), [Drawing.PointF]::new(204, 168)))
-    $stream = [IO.MemoryStream]::new()
-    $bitmap.Save($stream, [Drawing.Imaging.ImageFormat]::Png)
-    $frames += ,@($size, $stream.ToArray())
-    if ($size -eq 256) { $bitmap.Save((Join-Path $PSScriptRoot 'Hakedis.png'), [Drawing.Imaging.ImageFormat]::Png) }
-    $stream.Dispose()
-    $graphics.Dispose()
-    $bitmap.Dispose()
-    foreach ($resource in @($navy, $gold, $paper, $ink, $edge, $check, $path)) { $resource.Dispose() }
+# Renders the approved gold teacher-group icon at every Windows icon size.
+$ErrorActionPreference='Stop'
+Add-Type -AssemblyName PresentationFramework
+[xml]$art=@"
+<DrawingImage xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ <DrawingImage.Drawing><DrawingGroup>
+  <GeometryDrawing>
+   <GeometryDrawing.Brush><LinearGradientBrush StartPoint="0,0" EndPoint="0.88,0.83"><GradientStop Color="#F6D999" Offset="0"/><GradientStop Color="#C99942" Offset="1"/></LinearGradientBrush></GeometryDrawing.Brush>
+   <GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,80,80" RadiusX="18" RadiusY="18"/></GeometryDrawing.Geometry>
+  </GeometryDrawing>
+  <GeometryDrawing Brush="#0B243A" Geometry="M9,19 L40,8 L71,19 L40,31 Z M24,27 L40,33 L56,27 V33 Q40,41 24,33 Z"/>
+  <GeometryDrawing Geometry="M65,22 V33"><GeometryDrawing.Pen><Pen Brush="#0B243A" Thickness="3.2" StartLineCap="Round" EndLineCap="Round"/></GeometryDrawing.Pen></GeometryDrawing>
+  <GeometryDrawing Brush="#34566E"><GeometryDrawing.Geometry><GeometryGroup><EllipseGeometry Center="20,48" RadiusX="5.5" RadiusY="5.5"/><EllipseGeometry Center="60,48" RadiusX="5.5" RadiusY="5.5"/></GeometryGroup></GeometryDrawing.Geometry></GeometryDrawing>
+  <GeometryDrawing Brush="#34566E" Geometry="M9,67 V64 Q9,55 20,55 Q31,55 31,64 V67 Z M49,67 V64 Q49,55 60,55 Q71,55 71,64 V67 Z"/>
+  <GeometryDrawing Brush="#0B243A"><GeometryDrawing.Geometry><EllipseGeometry Center="40,45" RadiusX="7.5" RadiusY="7.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+  <GeometryDrawing Brush="#0B243A" Geometry="M23,69 V65 Q23,54 40,54 Q57,54 57,65 V69 Z"><GeometryDrawing.Pen><Pen Brush="#E8C778" Thickness="2"/></GeometryDrawing.Pen></GeometryDrawing>
+  <GeometryDrawing Brush="#E8C778"><GeometryDrawing.Pen><Pen Brush="#0B243A" Thickness="2.6"/></GeometryDrawing.Pen><GeometryDrawing.Geometry><EllipseGeometry Center="63,65" RadiusX="10.5" RadiusY="10.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+  <GeometryDrawing Geometry="M58,65 L61.5,68.5 L68,61.5"><GeometryDrawing.Pen><Pen Brush="#0B243A" Thickness="3.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/></GeometryDrawing.Pen></GeometryDrawing>
+ </DrawingGroup></DrawingImage.Drawing>
+</DrawingImage>
+"@
+$image=[Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::new($art))
+$frames=@()
+foreach($size in @(16,24,32,48,64,128,256))
+{
+    $visual=[Windows.Media.DrawingVisual]::new()
+    $context=$visual.RenderOpen()
+    $context.DrawImage($image,[Windows.Rect]::new(0,0,$size,$size))
+    $context.Close()
+    $bitmap=[Windows.Media.Imaging.RenderTargetBitmap]::new($size,$size,96,96,[Windows.Media.PixelFormats]::Pbgra32)
+    $bitmap.Render($visual)
+    $encoder=[Windows.Media.Imaging.PngBitmapEncoder]::new()
+    $encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bitmap))
+    $stream=[IO.MemoryStream]::new()
+    try
+    {
+        $encoder.Save($stream)
+        $bytes=$stream.ToArray()
+        $frames+=,@($size,$bytes)
+        if($size -eq 256){[IO.File]::WriteAllBytes((Join-Path $PSScriptRoot 'Hakedis.png'),$bytes)}
+    }
+    finally{$stream.Dispose()}
 }
 $output = [IO.File]::Create((Join-Path $PSScriptRoot 'Hakedis.ico'))
 $writer = [IO.BinaryWriter]::new($output)

@@ -1,5 +1,38 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <SolidColorBrush x:Key="MetricGold" Color="#E8C778"/>
+ <Style x:Key="CalculationCaption" TargetType="TextBlock" BasedOn="{StaticResource CardSubtitle}">
+  <Setter Property="Foreground" Value="{StaticResource MetricGold}"/>
+ </Style>
+ <Style x:Key="CalculationPrimaryAction" TargetType="Button" BasedOn="{StaticResource GoldAction}">
+  <Setter Property="Background" Value="{StaticResource MetricGold}"/>
+  <Setter Property="Foreground" Value="#0B243A"/>
+  <Setter Property="BorderBrush" Value="#F1D59A"/>
+ </Style>
+ <Style x:Key="CalculationOverviewCard" TargetType="HeaderedContentControl">
+  <Setter Property="Margin" Value="0,0,12,0"/>
+  <Setter Property="Foreground" Value="#F0F6FC"/>
+  <Setter Property="BorderBrush" Value="#2C4B60"/>
+  <Setter Property="Template">
+   <Setter.Value>
+    <ControlTemplate TargetType="HeaderedContentControl">
+     <Border CornerRadius="12" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" ClipToBounds="True">
+      <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#112B3D" Offset="0"/><GradientStop Color="#0C2131" Offset="1"/></LinearGradientBrush></Border.Background>
+      <Grid Height="94" ClipToBounds="True">
+       <Image Source="{TemplateBinding Tag}" Width="104" Height="104" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,7,-14" Opacity=".17" IsHitTestVisible="False">
+        <Image.OpacityMask><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="Transparent" Offset="0"/><GradientStop Color="White" Offset=".65"/><GradientStop Color="White" Offset="1"/></LinearGradientBrush></Image.OpacityMask>
+       </Image>
+       <StackPanel Margin="15,15,12,10">
+        <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource CalculationCaption}" FontWeight="SemiBold" FontSize="11"/>
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" Margin="0,9,0,0">
+         <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" FontSize="23" FontWeight="SemiBold" TextWrapping="NoWrap"/>
+        </Viewbox>
+       </StackPanel>
+      </Grid>
+     </Border>
+    </ControlTemplate>
+   </Setter.Value>
+  </Setter>
+ </Style>
  <Style x:Key="PaymentMetricCard" TargetType="Border" BasedOn="{StaticResource MetricCard}">
   <Setter Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#133F60" Offset="0"/><GradientStop Color="#0A2946" Offset="0.55"/><GradientStop Color="#061D35" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
   <Setter Property="BorderBrush"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#F4D99A" Offset="0"/><GradientStop Color="#B78B42" Offset="0.35"/><GradientStop Color="#3E5361" Offset="0.72"/><GradientStop Color="#CAAA64" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>

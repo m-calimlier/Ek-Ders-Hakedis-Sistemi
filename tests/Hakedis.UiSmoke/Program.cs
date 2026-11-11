@@ -125,6 +125,8 @@ internal static class Program
                 using var file = File.Create(Path.Combine(output, $"{panel}-{width}.png")); encoder.Save(file);
                 if(panel=="Calculation")
                 {
+                    var overview=(HeaderedContentControl)window.FindName("CalculationPeopleCard");
+                    if(!Equals(overview.Content,"1 kişi · 117,00 saat"))throw new InvalidOperationException("Öğretmen ve saat özeti görünmüyor.");
                     var scroll=(ScrollViewer)window.FindName("CalculationScroll");scroll.ScrollToEnd();
                     window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
                     Capture(window,Path.Combine(output,$"Calculation-cards-{width}.png"));
@@ -183,10 +185,10 @@ internal static class Program
         model.Navigate("Calculation");window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         if(!model.Calculation.Status.Contains("oluşturuldu"))throw new InvalidOperationException("Hakediş oluştur düğmesi kalıcı kayıt yapmadı: "+model.Calculation.Status);
         var expectedHeaders=new[]{Hakedis.Contracts.ExcelHeadings.Sequence,Hakedis.Contracts.ExcelHeadings.FullName,
+            Hakedis.Contracts.ExcelHeadings.School,"GÜNDÜZ SAAT TOPLAMI","DYK","PRİM GÜNÜ","EKSİK GÜN","BRÜT ÜCRET","NET ÖDEME",
             Hakedis.Contracts.ExcelHeadings.IdentityNumber,Hakedis.Contracts.ExcelHeadings.Iban,Hakedis.Contracts.ExcelHeadings.StartDate,
-            Hakedis.Contracts.ExcelHeadings.EndDate,
-            Hakedis.Contracts.ExcelHeadings.Occupation,Hakedis.Contracts.ExcelHeadings.School,
-            "GÜNDÜZ SAAT TOPLAMI","ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI",Hakedis.Contracts.ExcelHeadings.DykHours,Hakedis.Contracts.ExcelHeadings.Hours,
+            Hakedis.Contracts.ExcelHeadings.EndDate,Hakedis.Contracts.ExcelHeadings.Occupation,
+            "ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI",Hakedis.Contracts.ExcelHeadings.Hours,
             Hakedis.Contracts.ExcelHeadings.Garnishment};
         if(!grid.Columns.Select(c=>c.Header as string).SequenceEqual(expectedHeaders))throw new InvalidOperationException("VERİ GİRİŞİ sütunları ve sırası uyuşmuyor.");
         if(grid.RowHeight!=30)throw new InvalidOperationException("Hibrit satır yüksekliği 30 değil.");

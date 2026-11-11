@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\Hakedis.ico" />
+    <Resource Include="Assets\Hakedis.png" />
     <EmbeddedResource Include="../../third_party/NPOI/LICENSE" Link="Licenses/NPOI-LICENSE.txt" />
   </ItemGroup>
 </Project>
