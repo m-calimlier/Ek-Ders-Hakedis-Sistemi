@@ -13,7 +13,7 @@ biçim kontrolü banka doğrulaması anlamına gelmez.
 - Banka ödeme tarihi ve hibrit tablonun tarih düzenleme alanları ortak Gece Mavisi tarih stilini kullanır. Koyu zemindeki tarih metni açık renkle gösterilir.
 - Sağ üstteki küçültme, büyütme/geri yükleme ve kapatma simgeleri beyazdır; düğme zeminleri değiştirilmez.
 - Ödeme tarihi zorunluluğu, hesaplamalar ve kayıtlar korunur. Dağıtım kişisel veri içermez.
-- [Güncel kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/tag/v1.0.15)
+- [Güncel verisiz kurulum paketi](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/latest)
 
 ## 1.0.14 sürümü — Gece Mavisi
 
