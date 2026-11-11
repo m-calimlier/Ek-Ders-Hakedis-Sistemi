@@ -66,13 +66,13 @@ internal static class LayoutSettingsChecks
             }
             model.Navigate("Calculation");Idle(window);
             var metrics=(System.Windows.Controls.Primitives.UniformGrid)window.FindName("PaymentMetrics");
-            var cards=metrics.Children.OfType<Border>().ToArray();PersonalPayrollChecks.VerifyMetricRegions(cards);
-            if(cards.SelectMany(c=>Descendants<Image>(c)).Count(i=>i.Width>=40)!=6)throw new Exception("Büyük altın simgeler geri gelmedi.");
+            var cards=metrics.Children.OfType<HeaderedContentControl>().ToArray();PersonalPayrollChecks.VerifyMetricRegions(cards);
+            if(cards.Length!=4 || cards.SelectMany(c=>Descendants<Image>(c)).Count(i=>i.Width>=40)!=4)throw new Exception("Alt sırada dört ayrı simge alanı bulunamadı.");
             metrics.BringIntoView();Idle(window);
             var metricPreview=(UserControl)PreviewSurface(window,size);
             var previewMetrics=(System.Windows.Controls.Primitives.UniformGrid)metricPreview.FindName("PaymentMetrics");
             previewMetrics.BringIntoView();metricPreview.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);metricPreview.UpdateLayout();
-            PersonalPayrollChecks.VerifyMetricRegions(previewMetrics.Children.OfType<Border>());
+            PersonalPayrollChecks.VerifyMetricRegions(previewMetrics.Children.OfType<HeaderedContentControl>());
             capture(metricPreview,Path.Combine(output,$"Metrics-{size.Width}.png"));
         }
         model.ClearCurrentWork();window.Close();

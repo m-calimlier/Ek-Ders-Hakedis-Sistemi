@@ -112,6 +112,28 @@ public sealed class SgkXmlTests
         }
         finally{if(Directory.Exists(root))Directory.Delete(root,true);}
     }
+    [Fact] public void Explicit_two_part_surname_survives_json_and_takes_precedence_in_xml()
+    {
+        var snapshot=Snapshot();
+        var original=snapshot.Rows.Single().Teacher;
+        var teacher=Hakedis.Storage.TeacherDirectory.Normalize(original with
+        {
+            GivenName=" Ali Mehmet ",
+            FamilyName=" Demir Ağaç "
+        });
+        var json=System.Text.Json.JsonSerializer.Serialize(teacher);
+        teacher=System.Text.Json.JsonSerializer.Deserialize<TeacherRecord>(json)!;
+        Assert.Equal("Ali Mehmet Demir Ağaç",teacher.FullName);
+        var archived=snapshot with {Rows=[snapshot.Rows.Single() with {Teacher=teacher}]};
+        var record=new Hakedis.Storage.ArchivedPayment("unused","version",new(1,ModuleId.TemelEgitim,"rule",DateTimeOffset.UtcNow,archived));
+        var editor=new Hakedis.App.SgkXmlEditor(record,new(Workplace,[new(teacher.Id,"Ali Mehmet Demir","Ağaç")])){Confirmed=true};
+        var person=editor.People.Single();
+        person.MissingReason="13";
+        person.ExitReason="22";
+        var insured=XDocument.Parse(Encoding.UTF8.GetString(editor.Build())).Descendants("SIGORTALI").Single();
+        Assert.Equal("Ali Mehmet",insured.Attribute("AD")?.Value);
+        Assert.Equal("Demir Ağaç",insured.Attribute("SOYAD")?.Value);
+    }
     [Fact] public void Changed_teacher_name_does_not_restore_an_old_xml_name()
     {
         var record=new Hakedis.Storage.ArchivedPayment("unused","version",new(1,ModuleId.TemelEgitim,"rule",DateTimeOffset.UtcNow,Snapshot()));

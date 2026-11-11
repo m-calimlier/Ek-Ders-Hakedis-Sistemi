@@ -8,7 +8,7 @@ using Hakedis.Storage;
 
 internal static class PersonalPayrollChecks
 {
-    internal static void VerifyMetricRegions(IEnumerable<Border> cards)
+    internal static void VerifyMetricRegions(IEnumerable<FrameworkElement> cards)
     {
         foreach(var card in cards)
         {

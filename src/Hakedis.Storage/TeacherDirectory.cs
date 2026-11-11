@@ -126,6 +126,14 @@ public sealed class TeacherDirectory
     {
         ArgumentNullException.ThrowIfNull(teacher);
         if (!Enum.IsDefined(teacher.ModuleId)) throw new ArgumentException("Öğretmenin modül bilgisi geçersiz.");
+        if(teacher.GivenName is not null || teacher.FamilyName is not null)
+        {
+            if(string.IsNullOrWhiteSpace(teacher.GivenName) || string.IsNullOrWhiteSpace(teacher.FamilyName))
+                throw new ArgumentException("Ad ve soyadı ayrı alanlara girin.");
+            var given=teacher.GivenName.Trim();
+            var family=teacher.FamilyName.Trim();
+            teacher=teacher with {GivenName=given,FamilyName=family,FullName=given+" "+family};
+        }
         if (teacher.Id == Guid.Empty || string.IsNullOrWhiteSpace(teacher.FullName))
             throw new ArgumentException("Öğretmenin adını ve soyadını girin.");
         if (teacher.IdentityNumber is null || teacher.Iban is null ||

@@ -38,7 +38,22 @@ public sealed class TeacherEditor : INotifyPropertyChanged
     }
     private void NotifyTransfer(){foreach(var name in new[]{nameof(HasSchoolTransfer),nameof(TransferSchool),nameof(TransferDate),nameof(TransferModule),nameof(TransferModeText),nameof(HasAssignmentHistory),nameof(HistoryText)})PropertyChanged?.Invoke(this,new(name));}
     public Guid Id { get; set; } = Guid.NewGuid();
-    public string FullName { get; set; } = "";
+    private string legacyName="";
+    public string GivenName { get; set; } = "";
+    public string FamilyName { get; set; } = "";
+    public string LegacyName=>legacyName;
+    public string FullName
+    {
+        get=>GivenName.Length==0 && FamilyName.Length==0?legacyName:(GivenName.Trim()+" "+FamilyName.Trim()).Trim();
+        set
+        {
+            if(value==FullName)return;
+            legacyName=value;
+            GivenName=FamilyName="";
+            foreach(var name in new[]{nameof(FullName),nameof(LegacyName),nameof(GivenName),nameof(FamilyName)})
+                PropertyChanged?.Invoke(this,new(name));
+        }
+    }
     public string IdentityNumber { get; set; } = "";
     public string Iban { get; set; } = "";
     public string School { get; set; } = "";
@@ -58,9 +73,13 @@ public sealed class TeacherEditor : INotifyPropertyChanged
             if(editTransfer>=0)changes[editTransfer]=item;else changes.Add(item);
             history=new(history?.HomeModuleId??module,history?.HomeSchool??School,changes.ToArray(),history?.Choices??[]);
         }
-        return new(Id,FullName,IdentityNumber,Iban,School,OccupationCode,StartDate,EndDate,module,history);
+        var record=new TeacherRecord(Id,FullName,IdentityNumber,Iban,School,OccupationCode,StartDate,EndDate,module,history);
+        if(GivenName.Length==0 && FamilyName.Length==0)return record;
+        return record with {GivenName=GivenName.Trim(),FamilyName=FamilyName.Trim()};
     }
-    public static TeacherEditor From(TeacherRecord r) => new(r.ModuleId) { Id = r.Id, FullName = r.FullName,
+    public static TeacherEditor From(TeacherRecord r) => new(r.ModuleId) { Id = r.Id,
+        legacyName=r.GivenName is null && r.FamilyName is null?r.FullName:"",
+        GivenName=r.GivenName??"",FamilyName=r.FamilyName??"",
         IdentityNumber = r.IdentityNumber, Iban = r.Iban,
         School = r.School, OccupationCode = r.OccupationCode, StartDate = r.StartDate, EndDate = r.EndDate,
         savedHistory=r.Assignments,originalSchool=r.School,originalModule=r.ModuleId };

@@ -21,6 +21,41 @@ internal static class Program
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
         if(args.Length==2 && args[1]=="--verify-midnight")
         {MidnightChecks.Run(output,Capture);return 0;}
+        if(args.Length==2 && args[1]=="--card-options")
+        {PaymentCardPreviews.Render(output,Capture);return 0;}
+        if(args.Length>=2 && args[1]=="--capture-sgk-cards")
+        {
+            var previewModel=new ShellViewModel(Path.Combine(output,"example-data","ogretmenler.json"));
+            previewModel.Registration.Editor.GivenName="Ali Mehmet";
+            previewModel.Registration.Editor.FamilyName="Demir Ağaç";
+            previewModel.Registration.Editor.School="Örnek İlkokulu";
+            previewModel.Registration.Editor.OccupationCode="2341.04";
+            previewModel.Registration.Editor.StartDate=new DateTime(2026,11,2);
+            previewModel.SaveNewTeacher();
+            previewModel.Calculation.Year=2026;
+            previewModel.Calculation.Month=11;
+            previewModel.Calculation.Rows.Single().DayHours="117";
+            previewModel.Navigate("Calculation");
+            var previewWindow=new MainWindow(previewModel,_=>{},(_,_)=>true){ShowActivated=false,ShowInTaskbar=false};
+            previewWindow.Show();
+            previewWindow.Width=args.Length==3?int.Parse(args[2]):1366;
+            previewWindow.Height=960;
+            previewWindow.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+            var previewGrid=(FrameworkElement)previewWindow.FindName("HybridGrid");
+            var previewOverview=(System.Windows.Controls.Primitives.UniformGrid)previewWindow.FindName("OverviewMetrics");
+            var previewDetails=(System.Windows.Controls.Primitives.UniformGrid)previewWindow.FindName("PaymentMetrics");
+            var previewCards=previewOverview.Children.OfType<HeaderedContentControl>().Concat(previewDetails.Children.OfType<HeaderedContentControl>()).ToArray();
+            if(previewCards.Length!=8 || previewCards.Select(card=>card.Tag).Distinct().Count()!=8)
+                throw new InvalidOperationException("Sekiz kartın sekiz ayrı simgesi olmalı.");
+            if(previewGrid.TranslatePoint(new Point(0,previewGrid.ActualHeight),previewWindow).Y>=previewOverview.TranslatePoint(new Point(),previewWindow).Y ||
+               previewOverview.TranslatePoint(new Point(0,previewOverview.ActualHeight),previewWindow).Y>previewDetails.TranslatePoint(new Point(),previewWindow).Y)
+                throw new InvalidOperationException("İki kart sırası tablonun altında olmalı.");
+            Capture(previewWindow,Path.Combine(output,"hakedis-son-hali.png"));
+            previewModel.ClearCurrentWork();
+            previewWindow.Close();
+            if(listener.Errors.Count>0)throw new Exception(string.Join("\n",listener.Errors));
+            return 0;
+        }
         if(args.Length==2 && args[1]=="--verify-single-row-payroll")
         {SingleRowReportChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--verify-month-marker")
@@ -131,13 +166,14 @@ internal static class Program
                     window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
                     Capture(window,Path.Combine(output,$"Calculation-cards-{width}.png"));
                     var metrics=(System.Windows.Controls.Primitives.UniformGrid)window.FindName("PaymentMetrics");
-                    var cards=metrics.Children.OfType<Border>().ToArray();
-                    if(cards.Length!=6 || cards.Select(c=>c.ActualHeight).Distinct().Count()!=1)throw new InvalidOperationException("Altı eş boyutlu kart korunmadı.");
-                    var baseline=new Border{Style=(Style)window.FindResource("MetricCard"),Padding=new Thickness(16),Margin=new Thickness(0,0,10,10)};
-                    var originalContent=new StackPanel();originalContent.Children.Add(new TextBlock{Text=Hakedis.Contracts.ExcelHeadings.BordroW6,Style=(Style)window.FindResource("CardSubtitle"),TextWrapping=TextWrapping.Wrap,MinHeight=45});
-                    originalContent.Children.Add(new TextBlock{Text="3.612,96 TL",Style=(Style)window.FindResource("MetricValue"),FontSize=23});baseline.Child=originalContent;
-                    baseline.Measure(new Size(cards[0].ActualWidth+10,double.PositiveInfinity));
-                    if(Math.Abs(baseline.DesiredSize.Height-cards[0].DesiredSize.Height)>1.5)throw new InvalidOperationException($"Kart boyutu değişti: {baseline.DesiredSize.Height} / {cards[0].DesiredSize.Height}");
+                    var top=(System.Windows.Controls.Primitives.UniformGrid)window.FindName("OverviewMetrics");
+                    var cards=top.Children.OfType<HeaderedContentControl>().Concat(metrics.Children.OfType<HeaderedContentControl>()).ToArray();
+                    if(top.Children.Count!=4 || metrics.Children.Count!=4 || cards.Length!=8 ||
+                       cards.Max(c=>c.ActualHeight)-cards.Min(c=>c.ActualHeight)>1)
+                        throw new InvalidOperationException("Üst ve alt sıralar dört eş boyutlu kart içermiyor.");
+                    var sgk=(HeaderedContentControl)window.FindName("SgkControlCard");
+                    if(!Equals(sgk.Content,"9.225,96 TL"))
+                        throw new InvalidOperationException("SGK Kontrol Tutarı iştirakçi ve işveren primlerinin toplamı değil: "+sgk.Content);
                     PersonalPayrollChecks.VerifyMetricRegions(cards);
                     var originalHours=model.Calculation.Rows[0].DayHours;
                     model.Calculation.Rows[0].DayHours="100000";window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);window.UpdateLayout();

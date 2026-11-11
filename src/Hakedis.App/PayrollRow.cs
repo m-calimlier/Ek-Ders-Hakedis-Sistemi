@@ -18,7 +18,15 @@ public sealed class PayrollRow : INotifyPropertyChanged
     private string acceptedDay="0", acceptedDyk="0", acceptedGarnishment="0";
     public bool HasChanges => Teacher!=SourceTeacher || day!=acceptedDay || dyk!=acceptedDyk ||
         garnishment!=acceptedGarnishment || previousSchoolHours!=acceptedPrevious || newSchoolHours!=acceptedNew;
-    public string FullName {get=>Teacher.FullName;set=>EditTeacher(Teacher with {FullName=value});}
+    public string FullName
+    {
+        get=>Teacher.FullName;
+        set
+        {
+            if(value!=Teacher.FullName)
+                EditTeacher(Teacher with {FullName=value,GivenName=null,FamilyName=null});
+        }
+    }
     public string IdentityNumber {get=>Teacher.IdentityNumber;set=>EditTeacher(Teacher with {IdentityNumber=value});}
     public string Iban {get=>Teacher.Iban;set=>EditTeacher(Teacher with {Iban=value});}
     public string School {get=>Teacher.School;set=>EditTeacher(Teacher with {School=value});}

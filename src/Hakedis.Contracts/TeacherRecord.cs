@@ -6,4 +6,11 @@ using System.Text.Json.Serialization;
 public sealed record TeacherRecord(Guid Id, string FullName, string IdentityNumber,
     string Iban, string School, string OccupationCode, DateTime? StartDate, DateTime? EndDate,
     ModuleId ModuleId = ModuleId.TemelEgitim,
-    [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] TeacherAssignmentHistory? Assignments=null);
+    [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] TeacherAssignmentHistory? Assignments=null)
+{
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+    public string? GivenName { get; init; }
+
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+    public string? FamilyName { get; init; }
+}

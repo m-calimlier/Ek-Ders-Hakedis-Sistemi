@@ -64,7 +64,8 @@ public sealed class SgkXmlEditor
             try{days=PayrollCores.Calendar(record.Document.ModuleId,data.Year,data.Month,t.StartDate,t.EndDate,row.Input.DayHours,row.Input.DykHours);}catch(ArgumentException){}
             string Date(DateTime? date)=>date is DateTime d && d.Year==data.Year && d.Month==data.Month?d.ToString("dd.MM.yyyy",CultureInfo.InvariantCulture):"";
             People.Add(new(){TeacherId=t.Id,FullName=t.FullName,IdentityNumber=t.IdentityNumber,
-                GivenName=known?.GivenName??string.Join(" ",parts.SkipLast(1)),FamilyName=known?.FamilyName??parts.LastOrDefault()??"",
+                GivenName=t.GivenName??known?.GivenName??string.Join(" ",parts.SkipLast(1)),
+                FamilyName=t.FamilyName??known?.FamilyName??parts.LastOrDefault()??"",
                 Days=days?.PremiumDays.ToString()??"—",MissingDays=days?.MissingDays.ToString()??"—",Start=Date(t.StartDate),End=Date(t.EndDate)});
         }
     }

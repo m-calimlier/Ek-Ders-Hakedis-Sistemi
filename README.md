@@ -8,7 +8,14 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.15 kararlı sürüm — Tarih okunabilirliği
+## 1.0.16 kararlı sürüm — Hakediş kartları ve öğretmen bilgileri
+
+- Hakediş özetindeki sekiz kart hibrit tablonun altında yer alır. Her kartın ayrı bir simgesi vardır. SGK Kontrol Tutarı, kişi ve işveren primlerinin toplamını gösterir.
+- Ad ve soyad ayrı alanlarda kaydedilir. Birden fazla kelimeden oluşan soyadlar SGK XML çıktısına birlikte aktarılır.
+- Tablo işlemleri başlığın sağında aynı satırdadır. Meslek kodu seçicisi ve tarih alanları Gece Mavisi tasarımıyla uyumludur.
+- [Güncel verisiz kurulum ve taşınabilir paket](https://github.com/m-calimlier/Ek-Ders-Hakedis-Sistemi/releases/latest)
+
+## 1.0.15 sürümü — Tarih okunabilirliği
 
 - Banka ödeme tarihi ve hibrit tablonun tarih düzenleme alanları ortak Gece Mavisi tarih stilini kullanır. Koyu zemindeki tarih metni açık renkle gösterilir.
 - Sağ üstteki küçültme, büyütme/geri yükleme ve kapatma simgeleri beyazdır; düğme zeminleri değiştirilmez.

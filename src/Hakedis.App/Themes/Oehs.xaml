@@ -74,6 +74,20 @@
             <Setter Property="Padding" Value="7,0"/>
         </Style>
 
+        <ControlTemplate x:Key="FieldDropToggleTemplate" TargetType="ToggleButton">
+            <Border x:Name="Frame" CornerRadius="6" BorderThickness="1"
+                    BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
+                <Grid>
+                    <ContentPresenter Margin="8,1,30,1" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                    <Path Data="M0,0 L5,5 L10,0" Stroke="#D4EBF8" StrokeThickness="1.5"
+                          HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
         <Style TargetType="ComboBox">
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
@@ -85,21 +99,9 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid x:Name="Root">
                             <ToggleButton x:Name="DropToggle" Focusable="False" ClickMode="Press"
-                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                                <ToggleButton.Template>
-                                    <ControlTemplate TargetType="ToggleButton">
-                                        <Border x:Name="Frame" CornerRadius="6" BorderThickness="1"
-                                            BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                            Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ComboBox}}">
-                                            <Path Data="M0,0 L5,5 L10,0" Stroke="#D4EBF8" StrokeThickness="1.5"
-                                                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </ToggleButton.Template>
-                            </ToggleButton>
+                                Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                Template="{StaticResource FieldDropToggleTemplate}"
+                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
                             <ContentPresenter x:Name="SelectedContent" IsHitTestVisible="False" Margin="8,1,30,1"
                                 VerticalAlignment="Center" HorizontalAlignment="Stretch"
                                 Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
@@ -448,7 +450,22 @@
                 <ControlTemplate TargetType="DatePicker">
                     <Border x:Name="Frame" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="30"/></Grid.ColumnDefinitions>
-                            <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" Foreground="{TemplateBinding Foreground}" BorderThickness="0" Padding="7,0" VerticalContentAlignment="Center"/>
+                            <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" Foreground="{TemplateBinding Foreground}" BorderThickness="0" Padding="7,0" VerticalContentAlignment="Center">
+                                <DatePickerTextBox.Template>
+                                    <ControlTemplate TargetType="DatePickerTextBox">
+                                        <Grid Margin="{TemplateBinding Padding}">
+                                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="DateHint" Text="__ / __ / ____" Foreground="#A9C2D4" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <MultiTrigger>
+                                                <MultiTrigger.Conditions><Condition Property="Text" Value=""/><Condition Property="IsKeyboardFocusWithin" Value="False"/></MultiTrigger.Conditions>
+                                                <Setter TargetName="DateHint" Property="Visibility" Value="Visible"/>
+                                            </MultiTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </DatePickerTextBox.Template>
+                            </DatePickerTextBox>
                             <Button x:Name="PART_Button" Grid.Column="1" Focusable="False" ToolTip="Takvimi aç" Background="Transparent" BorderThickness="0" Padding="0" Height="Auto">
                                 <Button.Template><ControlTemplate TargetType="Button"><Border Background="Transparent"><TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" Foreground="#C8E4F5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/></Border></ControlTemplate></Button.Template>
                             </Button>
