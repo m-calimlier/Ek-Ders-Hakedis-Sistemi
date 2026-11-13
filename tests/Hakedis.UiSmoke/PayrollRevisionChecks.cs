@@ -25,10 +25,10 @@ internal static class PayrollRevisionChecks
         var pdf=Descendants<Button>((DataGrid)window.FindName("OutputsGrid")).Single(b=>b.Content as string=="PDF");
         pdf.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         if(!events.SequenceEqual(new[]{"notice","folder"}) || opened is null || Directory.GetFiles(opened,"*.pdf").Length!=3)throw new Exception("PDF bildirimi sonrası tamamlanan klasör açılmadı.");
-        var detail=new PaymentDetailsWindow(archived){Owner=window};detail.Show();detail.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
+        var detail=new PaymentDetailsWindow(archived){Owner=window,Width=1180,Height=720};detail.Show();detail.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         var card=(FrameworkElement)detail.FindName("RequestedAppropriationsCard");var texts=Descendants<TextBlock>(card).Select(t=>t.Text).ToArray();
         var model=(PaymentDetailsViewModel)detail.DataContext;
-        if(!texts.Contains("01.04_Kişi ücreti") || !texts.Contains("02.04_SGK Ücreti") || !texts.Contains(model.Gross) || !texts.Contains(model.EmployerContribution) || !texts.Contains(model.Accrual))throw new Exception("Kayıtlı ödenek kartı eksik veya güncel hesaptan alınmış.");
+        if(!texts.Contains("Brüt Kişi Ücreti (01.04)") || !texts.Contains("İşveren SGK Payı (02.04)") || !texts.Contains("Toplam Talep") || !texts.Contains(model.Gross) || !texts.Contains(model.EmployerContribution) || !texts.Contains(model.Accrual))throw new Exception("Kayıtlı ödenek kartı eksik veya güncel hesaptan alınmış.");
         capture(detail,Path.Combine(output,"requested-appropriations.png"));detail.Close();
         if(!original.SequenceEqual(File.ReadAllBytes(archived.Path)))throw new Exception("Çıktı akışı kaynak hakedişi değiştirdi.");
         shell.ClearCurrentWork();window.Close();

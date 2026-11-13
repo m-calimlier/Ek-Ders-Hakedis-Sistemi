@@ -19,6 +19,46 @@ internal static class Program
         var app = new Application {ShutdownMode=ShutdownMode.OnExplicitShutdown};
         foreach(var theme in new[]{"Oehs","Workspace","PaymentCards","Vault"})
             app.Resources.MergedDictionaries.Add(new ResourceDictionary {Source=new Uri($"/Ek Ders Hakediş Sistemi;component/Themes/{theme}.xaml",UriKind.Relative)});
+        if(args.Length==2 && args[1]=="--example-cards")
+        {
+            var root=Path.Combine(output,Guid.NewGuid().ToString("N"));
+            var demo=new ShellViewModel(Path.Combine(root,"ogretmenler.json"));
+            demo.Registration.Editor.GivenName="Deneme";
+            demo.Registration.Editor.FamilyName="Öğretmeni";
+            demo.Registration.Editor.IdentityNumber="10000000146";
+            demo.Registration.Editor.Iban="TR330006100519786457841326";
+            demo.Registration.Editor.School="Örnek İlkokulu";
+            demo.Registration.Editor.OccupationCode="2341.04";
+            demo.Registration.Editor.StartDate=new DateTime(2026,11,2);
+            demo.SaveNewTeacher();
+            demo.Calculation.Year=2026;
+            demo.Calculation.Month=11;
+            demo.Calculation.Rows.Single().DayHours="117";
+            demo.Calculation.CreatePayment();
+            demo.Navigate("Calculation");
+            var example=new MainWindow(demo,personalOutputRoot:Path.Combine(root,"personal"),reportOutputRoot:Path.Combine(root,"reports"));
+            example.Loaded+=(_,_)=>example.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,new Action(()=>
+            {
+                example.Width=1280;example.Height=720;
+                demo.Navigate("Entry");
+                demo.Monthly.EntryModule=demo.Workspace.Modules.Single(m=>m.Id==Hakedis.Contracts.ModuleId.TemelEgitim);
+                demo.Monthly.Month=11;
+                demo.Monthly.EntryTeacher=demo.Monthly.EntryTeachers.Single();
+                example.UpdateLayout();
+                ((ComboBox)example.FindName("EntryModuleCombo")).Focus();
+                example.UpdateLayout();
+                Capture(example,Path.Combine(output,"entry-1280.png"));
+                var detail=new PaymentDetailsWindow(demo.Outputs.Records.Single()){Owner=example,Height=700,ShowActivated=false};
+                detail.Show();detail.UpdateLayout();
+                Capture(detail,Path.Combine(output,"details-1280.png"));
+                detail.Close();
+                demo.Navigate("Calculation");example.UpdateLayout();
+                ((ScrollViewer)example.FindName("CalculationScroll")).ScrollToEnd();example.UpdateLayout();
+                Capture(example,Path.Combine(output,"calculation-1280.png"));
+            }));
+            app.ShutdownMode=ShutdownMode.OnMainWindowClose;
+            return app.Run(example);
+        }
         if(args.Length==2 && args[1]=="--verify-midnight")
         {MidnightChecks.Run(output,Capture);return 0;}
         if(args.Length==2 && args[1]=="--card-options")
@@ -133,7 +173,7 @@ internal static class Program
         var notifications=new List<string>();var archiveConfirm=false;var archivePrompts=new List<string>();
         var openedFolders=new List<string>();
         var window = new MainWindow(model,notifications.Add,(message,title)=>{archivePrompts.Add(message);return archiveConfirm;},openedFolders.Add,Path.Combine(output,"personal-pdfs")) { ShowActivated = false, ShowInTaskbar = false };
-        if(window.Width!=1366 || window.Height!=768)throw new InvalidOperationException("Varsayılan laptop boyutu 1366×768 değil.");
+        if(window.Width!=1920 || window.Height!=1080)throw new InvalidOperationException("Varsayılan pencere boyutu 1920×1080 değil.");
         window.Show();
         if(window.ActualWidth>SystemParameters.WorkArea.Width+1 || window.ActualHeight>SystemParameters.WorkArea.Height+1)
             throw new InvalidOperationException("Açılış penceresi görev çubuğu dışındaki çalışma alanına sığmadı.");
@@ -224,7 +264,7 @@ internal static class Program
             Hakedis.Contracts.ExcelHeadings.School,"GÜNDÜZ SAAT TOPLAMI","DYK","PRİM GÜNÜ","EKSİK GÜN","BRÜT ÜCRET","NET ÖDEME",
             Hakedis.Contracts.ExcelHeadings.IdentityNumber,Hakedis.Contracts.ExcelHeadings.Iban,Hakedis.Contracts.ExcelHeadings.StartDate,
             Hakedis.Contracts.ExcelHeadings.EndDate,Hakedis.Contracts.ExcelHeadings.Occupation,
-            "ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI",Hakedis.Contracts.ExcelHeadings.Hours,
+            "ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ","KURUM SAAT\nUYARISI",Hakedis.Contracts.ExcelHeadings.Hours,
             Hakedis.Contracts.ExcelHeadings.Garnishment};
         if(!grid.Columns.Select(c=>c.Header as string).SequenceEqual(expectedHeaders))throw new InvalidOperationException("VERİ GİRİŞİ sütunları ve sırası uyuşmuyor.");
         if(grid.RowHeight!=30)throw new InvalidOperationException("Hibrit satır yüksekliği 30 değil.");
@@ -277,7 +317,7 @@ internal static class Program
         var archived=model.Outputs.ReadSelected();var archiveBytes=File.ReadAllBytes(archived.Path);
         window.Width=1366;window.Height=768;window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         var rowButtons=Descendants<Button>((DataGrid)window.FindName("OutputsGrid")).Where(b=>b.Content is string text && new[]{"PDF","Yazdır","Düzenle","Sil","Detay","XML","Banka"}.Contains(text)).ToArray();
-        if(rowButtons.Length!=7 || rowButtons.Any(b=>Math.Abs(b.ActualWidth-64)>1 || Math.Abs(b.ActualHeight-32)>1))throw new InvalidOperationException("Çıktı düğmeleri eşit ölçüde değil.");
+        if(rowButtons.Length!=7 || rowButtons.Any(b=>Math.Abs(b.ActualWidth-64)>1 || Math.Abs(b.ActualHeight-35)>1 || b.FontSize!=12))throw new InvalidOperationException("Çıktı düğmeleri eşit ölçüde değil.");
         var bankButton=rowButtons.Single(b=>b.Content as string=="Banka");var xmlButton=rowButtons.Single(b=>b.Content as string=="XML");
         var bankPosition=bankButton.TranslatePoint(new Point(0,0),window);var xmlPosition=xmlButton.TranslatePoint(new Point(0,0),window);
         if(rowButtons.Any(b=>Math.Abs(b.TranslatePoint(new Point(0,0),window).Y-bankPosition.Y)>1) || bankPosition.X+bankButton.ActualWidth>window.ActualWidth || Math.Abs(bankPosition.Y-xmlPosition.Y)>1 || bankPosition.X<=xmlPosition.X)throw new InvalidOperationException("Banka Excel düğmesi XML yanında ve ekranda görünür olmalı.");

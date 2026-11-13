@@ -55,7 +55,7 @@ internal static class MonthMarkerChecks
         Entry("PreviousSchoolDayHours").Text="40";Entry("NewSchoolDayHours").Text="35";Idle(window);
         shell.Monthly.Save(false);shell.Navigate("Calculation");Idle(window);
         var row=shell.Calculation.Rows.Single();var grid=(DataGrid)window.FindName("HybridGrid");
-        foreach(var (heading,expected) in new[]{("ÖNCEKİ KURUM GÜNDÜZ","40"),("YENİ KURUM GÜNDÜZ","35")})
+        foreach(var (heading,expected) in new[]{("ÖNCEKİ KURUM\nGÜNDÜZ","40"),("YENİ KURUM\nGÜNDÜZ","35")})
         {
             var column=grid.Columns.Single(c=>c.Header as string==heading);grid.ScrollIntoView(row,column);Idle(window);
             var content=column.GetCellContent(row)??throw new Exception("Kurum saati hücresi oluşmadı.");var input=content as TextBox??Descendants<TextBox>(content).Single();

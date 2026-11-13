@@ -19,7 +19,7 @@ public partial class MainWindow : Window
     {
         shell=viewModel;this.reportOutputRoot=reportOutputRoot;notify=notification;this.confirmation=confirmation;this.personalOutputRoot=personalOutputRoot;this.billingChoicePrompt=billingChoicePrompt;
         openFolder=folderOpener??(folder=>{_=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(folder){UseShellExecute=true});});
-        InitializeComponent();DataContext=shell;shell.Settings.Applied+=ApplyWindowPreference;
+        InitializeComponent();Width=shell.Settings.Preference.Width;Height=shell.Settings.Preference.Height;DataContext=shell;shell.Settings.Applied+=ApplyWindowPreference;
     }
     protected override void OnSourceInitialized(EventArgs e)
     {

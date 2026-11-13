@@ -25,10 +25,10 @@ internal static class LayoutSettingsChecks
         var fields=Descendants<TextBox>((FrameworkElement)window.FindName("ConstantsFields")).ToArray();
         if(fields.Any(t=>!t.IsReadOnly || ((SolidColorBrush)t.Background).Color!=Color.FromRgb(21,56,79)))throw new Exception("Sabitler kilitliyken koyu pasif yüzeyde değil.");
         ((Button)window.FindName("ConstantsUpdateButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
-        if(fields.Any(t=>t.IsReadOnly || t.Background is not LinearGradientBrush))throw new Exception("Güncelle ortak giriş yüzeyiyle düzenlemeyi açmadı.");
+        if(fields.Any(t=>t.IsReadOnly || t.Background is not SolidColorBrush brush || brush.Color!=Color.FromRgb(35,55,78)))throw new Exception("Güncelle ortak giriş yüzeyiyle düzenlemeyi açmadı.");
         ((Button)window.FindName("ConstantsUpdateButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         var grid=(DataGrid)window.FindName("HybridGrid");
-        var transferHeaders=new[]{"ÖNCEKİ KURUM GÜNDÜZ","YENİ KURUM GÜNDÜZ","KURUM SAAT UYARISI"};
+        var transferHeaders=new[]{"ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ","KURUM SAAT\nUYARISI"};
         if(grid.Columns.Where(c=>!transferHeaders.Contains(c.Header as string)).Sum(c=>c.Width.Value)>1800)throw new Exception("Hibrit sütunlar daraltılmadı.");
         foreach(var size in model.Settings.Sizes)
         {
@@ -50,6 +50,25 @@ internal static class LayoutSettingsChecks
                         {
                 model.Navigate(panel);Idle(window);
                 var preview=PreviewSurface(window,size);
+                if(panel=="Calculation")
+                {
+                    var actionLabels=new[]{"Hakediş oluştur","Çalışmayı temizle","Kayıtları yenile"};
+                    var actions=Descendants<Button>(preview).Where(button=>button.ActualHeight>0 && actionLabels.Contains(button.Content as string)).ToArray();
+                    var selectors=Descendants<ComboBox>(preview).Where(combo=>combo.ActualHeight>0).ToArray();
+                    if(actions.Length!=3 || selectors.Length<3 || actions.Any(button=>Math.Abs(button.ActualHeight-35)>1 || button.FontSize!=12))
+                        throw new Exception($"{size.Width}: Hakediş düğmelerinin ortak ölçüsü doğrulanamadı.");
+                    var top=selectors[0].TranslatePoint(new Point(),preview).Y;
+                    if(actions.Any(button=>Math.Abs(button.TranslatePoint(new Point(),preview).Y-top)>1))
+                        throw new Exception($"{size.Width}: Hakediş düğmeleri açılır listelerle hizalı değil.");
+                }
+                if(panel=="Entry")
+                {
+                    var forms=Descendants<HeaderedContentControl>(preview)
+                        .Where(card=>card.Header as string is "Öğretmen Bilgileri" or "Aylık Ders Bilgileri").ToArray();
+                    if(forms.Length!=2 || forms.Any(card=>card.ActualHeight<=0) ||
+                       Math.Abs(forms[0].ActualHeight-forms[1].ActualHeight)>1)
+                        throw new Exception($"{size.Width}: Veri Girişi kartlarının yükseklikleri eşit değil.");
+                }
                 if(panel=="Constants")
                 {
                     foreach(var name in new[]{"ConstantsFields","RetiredConstantsFields"})
@@ -66,9 +85,9 @@ internal static class LayoutSettingsChecks
             }
             model.Navigate("Calculation");Idle(window);
             var metrics=(System.Windows.Controls.Primitives.UniformGrid)window.FindName("PaymentMetrics");
-            var cards=metrics.Children.OfType<HeaderedContentControl>().ToArray();PersonalPayrollChecks.VerifyMetricRegions(cards);
-            if(cards.Length!=4 || cards.SelectMany(c=>Descendants<Image>(c)).Count(i=>i.Width>=40)!=4)throw new Exception("Alt sırada dört ayrı simge alanı bulunamadı.");
             metrics.BringIntoView();Idle(window);
+            var cards=metrics.Children.OfType<HeaderedContentControl>().ToArray();PersonalPayrollChecks.VerifyMetricRegions(cards);
+            if(cards.Length!=4 || cards.Select(c=>c.Tag).Distinct().Count()!=4 || cards.Any(c=>Descendants<Image>(c).Count(i=>i.Width>=16 && Equals(i.Source,c.Tag))!=1))throw new Exception("Alt sırada dört ayrı simge alanı bulunamadı.");
             var metricPreview=(UserControl)PreviewSurface(window,size);
             var previewMetrics=(System.Windows.Controls.Primitives.UniformGrid)metricPreview.FindName("PaymentMetrics");
             previewMetrics.BringIntoView();metricPreview.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);metricPreview.UpdateLayout();
@@ -76,7 +95,7 @@ internal static class LayoutSettingsChecks
             capture(metricPreview,Path.Combine(output,$"Metrics-{size.Width}.png"));
         }
         model.ClearCurrentWork();window.Close();
-        Console.WriteLine("Ek Ders Hakediş Sistemi: 1280×720 / 1366×768 / 1920×1080, kalıcı Ayarlar, gri/beyaz sabit kilidi, geniş simgeler ve büyük tutar geometrisi doğrulandı.");
+        Console.WriteLine("Ek Ders Hakediş Sistemi: 1280×720 / 1366×768 / 1920×1080, kalıcı Ayarlar, gri/beyaz sabit kilidi, ayrı simgeler ve büyük tutar geometrisi doğrulandı.");
     }
     private static FrameworkElement PreviewSurface(Window window,WindowSizeOption size)
     {

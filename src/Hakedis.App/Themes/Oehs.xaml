@@ -1,8 +1,12 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:Hakedis.App">
 <!-- Adapted from TEHYS v0.1.5; preserves Ek Ders resource keys and screen bindings. -->
-<!-- Gece Mavisi: ortak yüzey, giriş, tablo ve etkileşim renkleri -->
-        <Color x:Key="Navy900">#061E32</Color>
-        <Color x:Key="Navy950">#041726</Color>
+        <SolidColorBrush x:Key="SlateBorderBrush" Color="#617C99"/>
+        <Color x:Key="SlateFieldColor">#23374E</Color>
+        <SolidColorBrush x:Key="SlateFieldBrush" Color="{StaticResource SlateFieldColor}"/>
+        <SolidColorBrush x:Key="SlateActiveBrush" Color="#354C65"/>
+        <SolidColorBrush x:Key="SlateInsetBorderBrush" Color="#384C64"/>
+        <Color x:Key="Navy900">#0B162B</Color>
+        <Color x:Key="Navy950">#091426</Color>
         <Color x:Key="Blue600">#2468D8</Color>
         <Color x:Key="Blue700">#1756B8</Color>
         <Color x:Key="Gold500">#F4C45E</Color>
@@ -11,8 +15,8 @@
         <Color x:Key="Text900">#F0F6FC</Color>
         <Color x:Key="Text600">#B9CDDF</Color>
         <Color x:Key="Text700">#D5E4F1</Color>
-        <Color x:Key="Line200">#466780</Color>
-        <Color x:Key="Surface">#09283F</Color>
+        <Color x:Key="Line200">#384C64</Color>
+        <Color x:Key="Surface">#0F1D33</Color>
 
         <SolidColorBrush x:Key="Navy900Brush" Color="{StaticResource Navy900}"/>
         <SolidColorBrush x:Key="Navy950Brush" Color="{StaticResource Navy950}"/>
@@ -28,9 +32,9 @@
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Surface}"/>
 
         <LinearGradientBrush x:Key="PremiumPanelBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#123952" Offset="0"/>
-            <GradientStop Color="#0B2C44" Offset="0.58"/>
-            <GradientStop Color="#071F33" Offset="1"/>
+            <GradientStop Color="#182943" Offset="0"/>
+            <GradientStop Color="#132541" Offset="0.58"/>
+            <GradientStop Color="#111F36" Offset="1"/>
         </LinearGradientBrush>
         <SolidColorBrush x:Key="PremiumInputBrush" Color="#082744"/>
         <SolidColorBrush x:Key="PremiumInputBorderBrush" Color="#365874"/>
@@ -39,15 +43,19 @@
 
         <SolidColorBrush x:Key="NightTextBrush" Color="#F0F6FC"/>
         <SolidColorBrush x:Key="NightInkBrush" Color="#08223A"/>
-        <SolidColorBrush x:Key="NightTableBrush" Color="#09283F"/>
-        <SolidColorBrush x:Key="NightAlternateBrush" Color="#14374F"/>
+        <SolidColorBrush x:Key="NightTableBrush" Color="#111F36"/>
+        <SolidColorBrush x:Key="NightAlternateBrush" Color="#182943"/>
         <SolidColorBrush x:Key="NightSelectionBrush" Color="#A8D8F2"/>
-        <LinearGradientBrush x:Key="NightInputBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#264E69" Offset="0"/><GradientStop Color="#12354D" Offset="1"/>
-        </LinearGradientBrush>
+        <SolidColorBrush x:Key="NightInputBrush" Color="{StaticResource SlateFieldColor}"/>
         <LinearGradientBrush x:Key="NightPrimaryBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#DDF4FF" Offset="0"/><GradientStop Color="#83CEE9" Offset="1"/>
+            <GradientStop Color="#E8C778" Offset="0"/><GradientStop Color="#D7AE61" Offset="1"/>
         </LinearGradientBrush>
+        <SolidColorBrush x:Key="PrimaryActionFillBrush" Color="#D7AE61"/>
+        <SolidColorBrush x:Key="PrimaryActionBorderBrush" Color="#E8C778"/>
+        <SolidColorBrush x:Key="PrimaryActionTextBrush" Color="#0B162B"/>
+        <SolidColorBrush x:Key="DeleteActionFillBrush" Color="#512A34"/>
+        <SolidColorBrush x:Key="DeleteActionBorderBrush" Color="#AB6675"/>
+        <SolidColorBrush x:Key="DeleteActionTextBrush" Color="#FFE4E9"/>
         <Style TargetType="Window">
             <Setter Property="local:NightTheme.Enabled" Value="True"/>
             <Setter Property="Background" Value="{StaticResource Navy900Brush}"/>
@@ -66,7 +74,7 @@
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
             <Setter Property="CaretBrush" Value="White"/>
             <Setter Property="SelectionBrush" Value="#4286B1"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -74,6 +82,8 @@
             <Setter Property="Padding" Value="7,0"/>
         </Style>
 
+        <SolidColorBrush x:Key="EntryTextFocusBrush" Color="{StaticResource Blue600}"/>
+        <SolidColorBrush x:Key="EntryFieldFocusBrush" Color="#A8D8F2"/>
         <ControlTemplate x:Key="FieldDropToggleTemplate" TargetType="ToggleButton">
             <Border x:Name="Frame" CornerRadius="6" BorderThickness="1"
                     BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
@@ -85,13 +95,13 @@
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource EntryFieldFocusBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
         <Style TargetType="ComboBox">
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="MaxDropDownHeight" Value="320"/>
             <Setter Property="Template">
@@ -120,7 +130,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEditable" Value="True"><Setter TargetName="SelectedContent" Property="Visibility" Value="Hidden"/><Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/></Trigger>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="BorderBrush" Value="#A8D8F2"/></Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource EntryFieldFocusBrush}"/></Trigger>
                             <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Root" Property="Opacity" Value="0.5"/></Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -135,10 +145,10 @@
         </Style>
 
         <Style x:Key="StandardButtonBase" TargetType="Button">
-            <Setter Property="Height" Value="32"/>
+            <Setter Property="Height" Value="35"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="11.5"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="ClickMode" Value="Release"/>
@@ -153,7 +163,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Root" Background="{TemplateBinding Background}"
-                                CornerRadius="7" Padding="{TemplateBinding Padding}">
+                                CornerRadius="7" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -186,11 +197,11 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="Uid" Value="Active">
-                                <Setter Property="Background" Value="#1D4E91"/>
+                                <Setter Property="Background" Value="{StaticResource SlateActiveBrush}"/>
                                 <Setter TargetName="Accent" Property="Background" Value="{StaticResource Gold500Brush}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#123B6C"/>
+                                <Setter Property="Background" Value="{StaticResource SlateFieldBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -238,7 +249,7 @@
         <Style x:Key="FieldTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Height" Value="33"/>
             <Setter Property="Padding" Value="7,0"/>
@@ -254,7 +265,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Blue600Brush}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource EntryTextFocusBrush}"/>
                                 <Setter TargetName="Border" Property="BorderThickness" Value="1.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -333,7 +344,7 @@
         <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource StandardButtonBase}">
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="Template">
@@ -348,7 +359,7 @@
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Root" Property="Background" Value="#2C5C7C"/></Trigger>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Root" Property="Opacity" Value="0.88"/></Trigger>
                             <Trigger Property="IsPressed" Value="True"><Setter TargetName="Root" Property="Opacity" Value="0.78"/></Trigger>
                             <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Root" Property="Opacity" Value="0.45"/></Trigger>
                         </ControlTemplate.Triggers>
@@ -358,13 +369,15 @@
         </Style>
 
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
-            <Setter Property="Background" Value="{StaticResource Danger500Brush}"/>
-        <Setter Property="Foreground" Value="White"/></Style>
+            <Setter Property="Background" Value="{StaticResource DeleteActionFillBrush}"/><Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DeleteActionBorderBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource DeleteActionTextBrush}"/>
+        </Style>
 
         <Style x:Key="FieldComboBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Height" Value="31"/>
             <Setter Property="Padding" Value="7,1"/>
@@ -439,7 +452,7 @@
             <Setter Property="CalendarStyle" Value="{StaticResource NightCalendar}"/>
             <Setter Property="Background" Value="{StaticResource NightInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource NightTextBrush}"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -472,7 +485,7 @@
                             <Popup x:Name="PART_Popup" Placement="Bottom" StaysOpen="False" AllowsTransparency="True"/>
                         </Grid>
                     </Border>
-                    <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#A8D8F2"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter TargetName="Frame" Property="Opacity" Value="0.5"/></Trigger></ControlTemplate.Triggers>
+                    <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource EntryFieldFocusBrush}"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter TargetName="Frame" Property="Opacity" Value="0.5"/></Trigger></ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value></Setter>
         </Style>
@@ -699,7 +712,7 @@
                                 <Setter TargetName="ItemBorder" Property="Background" Value="#123B5C"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="ItemBorder" Property="Background" Value="#1D4E91"/>
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource SlateActiveBrush}"/>
                                 <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource Gold500Brush}"/>
                                 <Setter Property="Foreground" Value="White"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
@@ -780,7 +793,7 @@
         <Style TargetType="DataGridCell" BasedOn="{StaticResource ModernDataGridCell}"/>
         <Style TargetType="ToolTip">
             <Setter Property="Background" Value="#14374F"/><Setter Property="Foreground" Value="#F0F6FC"/>
-            <Setter Property="BorderBrush" Value="#5A7B94"/><Setter Property="Padding" Value="10,7"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/><Setter Property="Padding" Value="10,7"/>
         </Style>
         <!-- Raw date pickers in bank export and editable grid cells share the same readable template. -->
         <Style TargetType="DatePicker" BasedOn="{StaticResource FieldDatePicker}"/>

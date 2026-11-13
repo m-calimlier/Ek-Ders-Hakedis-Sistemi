@@ -9,10 +9,10 @@ public sealed class UiSettingsTests : IDisposable
     private readonly string root=Path.Combine(Path.GetTempPath(),"EdhsSettingsTests",Guid.NewGuid().ToString("N"));
     [Fact] public void Settings_are_persisted_independently_of_payroll_and_restore_on_reopen()
     {
-        var vm=new UiSettingsViewModel(root);Assert.Equal(1366,vm.SelectedSize.Width);
+        var vm=new UiSettingsViewModel(root);Assert.Equal(new UiPreferences(1920,1080),vm.Preference);
         var applied=0;vm.Applied+=()=>applied++;
-        vm.SelectedSize=vm.Sizes.Single(s=>s.Width==1920);vm.Save();Assert.Equal(1,applied);
-        var next=new UiSettingsViewModel(root);Assert.Equal(1920,next.SelectedSize.Width);Assert.Equal(1080,next.SelectedSize.Height);
+        vm.SelectedSize=vm.Sizes.Single(s=>s.Width==1366);vm.Save();Assert.Equal(1,applied);
+        var next=new UiSettingsViewModel(root);Assert.Equal(1366,next.SelectedSize.Width);Assert.Equal(768,next.SelectedSize.Height);
         Assert.False(Directory.Exists(Path.Combine(root,"AylikKayitlar")));
         Assert.False(File.Exists(Path.Combine(root,"ogretmenler.json")));
     }

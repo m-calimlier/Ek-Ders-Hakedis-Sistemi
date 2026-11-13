@@ -8,7 +8,16 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.16 kararlı sürüm — Hakediş kartları ve öğretmen bilgileri
+## 1.0.17 — Kararlı Sürüm
+
+- Koyu lacivert, altın sarısı ve Barut Mavisi teması. Panel içi ana işlemler altın, yardımcı işlemler Barut Mavisi, silme işlemleri bordo.
+- Hakediş özetinde eş boyutlu kartlar, standart başlık ve tutar ölçüleri, Detay penceresinde Sol Simge Plakalı ödenek cetveli.
+- Veri Girişi kartları eş yükseklikte. Hakediş işlem düğmeleri açılır listelerle hizalı.
+- Önceki ve yeni kurum gündüz saatleri ile kurum saat uyarısı sütunları daraltıldı. Başlıklar iki satırda.
+- Varsayılan pencere boyutu 1920×1080. Kaydedilmiş pencere tercihleri kullanılır.
+- Windows kurulum dosyası ve taşınabilir ZIP kişisel veri içermez.
+
+## 1.0.16 sürümü — Hakediş kartları ve öğretmen bilgileri
 
 - Hakediş özetindeki sekiz kart hibrit tablonun altında yer alır. Her kartın ayrı bir simgesi vardır. SGK Kontrol Tutarı, kişi ve işveren primlerinin toplamını gösterir.
 - Ad ve soyad ayrı alanlarda kaydedilir. Birden fazla kelimeden oluşan soyadlar SGK XML çıktısına birlikte aktarılır.

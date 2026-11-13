@@ -3,81 +3,108 @@
  <Style x:Key="CalculationCaption" TargetType="TextBlock" BasedOn="{StaticResource CardSubtitle}">
   <Setter Property="Foreground" Value="{StaticResource MetricGold}"/>
  </Style>
- <Style x:Key="CalculationPrimaryAction" TargetType="Button" BasedOn="{StaticResource GoldAction}">
-  <Setter Property="Background" Value="{StaticResource MetricGold}"/>
-  <Setter Property="Foreground" Value="#0B243A"/>
-  <Setter Property="BorderBrush" Value="#F1D59A"/>
+
+ <SolidColorBrush x:Key="InsetCardGold" Color="#D7AE61"/>
+ <LinearGradientBrush x:Key="InsetCardSurface" StartPoint="0,0" EndPoint="1,1">
+  <GradientStop Color="#182943" Offset="0"/><GradientStop Color="#132541" Offset=".4"/><GradientStop Color="#111F36" Offset="1"/>
+ </LinearGradientBrush>
+ <Style x:Key="InsetCardShell" TargetType="Border">
+  <Setter Property="Background" Value="{StaticResource InsetCardSurface}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/><Setter Property="BorderThickness" Value="1"/>
+  <Setter Property="CornerRadius" Value="10"/>
+  <Setter Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="13" ShadowDepth="3" Opacity=".35"/></Setter.Value></Setter>
  </Style>
- <Style x:Key="CalculationOverviewCard" TargetType="HeaderedContentControl">
-  <Setter Property="Margin" Value="0,0,12,0"/>
-  <Setter Property="Foreground" Value="#F0F6FC"/>
-  <Setter Property="BorderBrush" Value="#2C4B60"/>
-  <Setter Property="ContentTemplate">
-   <Setter.Value>
-    <DataTemplate>
-     <TextBlock Text="{Binding}" FontSize="23" FontWeight="SemiBold" TextWrapping="NoWrap"/>
-    </DataTemplate>
-   </Setter.Value>
-  </Setter>
-  <Setter Property="Template">
-   <Setter.Value>
-    <ControlTemplate TargetType="HeaderedContentControl">
-     <Border CornerRadius="12" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" ClipToBounds="True">
-      <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#112B3D" Offset="0"/><GradientStop Color="#0C2131" Offset="1"/></LinearGradientBrush></Border.Background>
-      <Grid Height="94">
-       <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width=".373*" MaxWidth="84"/></Grid.ColumnDefinitions>
-       <StackPanel Margin="12,9,9,9" VerticalAlignment="Center">
-        <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource CalculationCaption}" FontWeight="SemiBold" FontSize="11" TextWrapping="Wrap"/>
-        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" Margin="0,5,0,0">
-         <ContentPresenter ContentSource="Content" TextElement.Foreground="{TemplateBinding Foreground}"/>
-        </Viewbox>
-       </StackPanel>
-       <Border Grid.Column="1" Background="#18384E" BorderBrush="#726344" BorderThickness="1,0,0,0" CornerRadius="0,11,11,0" ClipToBounds="True">
-        <Grid>
-         <Grid.Background>
-          <RadialGradientBrush Center="0.5,0.46" GradientOrigin="0.5,0.46" RadiusX="0.67" RadiusY="0.59">
-           <GradientStop Color="#36E8C778" Offset="0"/>
-           <GradientStop Color="#14E8C778" Offset="0.57"/>
-           <GradientStop Color="#00E8C778" Offset="1"/>
-          </RadialGradientBrush>
-         </Grid.Background>
-         <Viewbox MaxWidth="48" MaxHeight="48" Margin="4" HorizontalAlignment="Center" VerticalAlignment="Center" StretchDirection="DownOnly" IsHitTestVisible="False">
-          <Image Source="{TemplateBinding Tag}" Width="48" Height="48" Stretch="Uniform">
-           <Image.OpacityMask>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-             <GradientStop Color="White" Offset="0"/>
-             <GradientStop Color="#CCFFFFFF" Offset="1"/>
-            </LinearGradientBrush>
-           </Image.OpacityMask>
-          </Image>
-         </Viewbox>
-        </Grid>
-       </Border>
-      </Grid>
+ <Style x:Key="InsetCardWell" TargetType="Border">
+  <Setter Property="Background" Value="#091529"/><Setter Property="BorderBrush" Value="{StaticResource SlateInsetBorderBrush}"/>
+  <Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="7"/>
+ </Style>
+ <Style x:Key="InsetCardPlate" TargetType="Border" BasedOn="{StaticResource InsetCardShell}">
+  <Setter Property="Width" Value="38"/><Setter Property="Height" Value="38"/><Setter Property="CornerRadius" Value="7"/>
+  <Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
+  <Setter Property="Background" Value="{StaticResource SlateFieldBrush}"/>
+ </Style>
+ <Style x:Key="InsetFormCard" TargetType="HeaderedContentControl">
+  <Setter Property="VerticalAlignment" Value="Stretch"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="HeaderedContentControl">
+   <Border Style="{StaticResource InsetCardShell}" Padding="12">
+    <DockPanel>
+     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+      <Border DockPanel.Dock="Left" Style="{StaticResource InsetCardPlate}" Margin="0,0,9,0"><Image Source="{TemplateBinding Tag}" Width="23" Height="23"/></Border>
+      <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource CardTitle}" Foreground="{StaticResource MetricGold}" FontSize="17" TextWrapping="Wrap" VerticalAlignment="Center"/>
+     </DockPanel>
+     <Border Style="{StaticResource InsetCardWell}" Padding="10,9"><ContentPresenter ContentSource="Content"/></Border>
+    </DockPanel>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style x:Key="InsetLedgerCard" TargetType="HeaderedContentControl">
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="HeaderedContentControl">
+   <Border Style="{StaticResource InsetCardShell}" BorderBrush="{StaticResource InsetCardGold}" Padding="{TemplateBinding Padding}">
+    <DockPanel>
+     <Border DockPanel.Dock="Left" BorderThickness="0,0,1,0" BorderBrush="#7C663F" Padding="0,0,10,0" Margin="0,0,12,0">
+      <Border Style="{StaticResource InsetCardPlate}" Width="44" Height="44"><Image Source="{TemplateBinding Tag}" Width="29" Height="29"/></Border>
      </Border>
-    </ControlTemplate>
-   </Setter.Value>
-  </Setter>
+     <StackPanel>
+      <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource CardTitle}" Foreground="{StaticResource MetricGold}" FontSize="19" TextWrapping="Wrap" Margin="0,0,0,8"/>
+      <ContentPresenter ContentSource="Content"/>
+     </StackPanel>
+    </DockPanel>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
  </Style>
- <Style x:Key="MetricPairLabel" TargetType="TextBlock" BasedOn="{StaticResource CalculationCaption}">
-  <Setter Property="FontSize" Value="11"/>
-  <Setter Property="VerticalAlignment" Value="Center"/>
-  <Setter Property="Margin" Value="0,0,9,0"/>
+ <Style x:Key="InsetLedgerRow" TargetType="Border" BasedOn="{StaticResource InsetCardWell}">
+  <Setter Property="Padding" Value="12,5"/><Setter Property="Margin" Value="0,0,0,4"/>
  </Style>
- <Style x:Key="MetricPairValue" TargetType="TextBlock">
-  <Setter Property="FontSize" Value="14"/>
-  <Setter Property="FontWeight" Value="SemiBold"/>
-  <Setter Property="HorizontalAlignment" Value="Right"/>
-  <Setter Property="VerticalAlignment" Value="Center"/>
+ <DrawingImage x:Key="InsetLedgerIcon"><DrawingImage.Drawing><GeometryDrawing Geometry="M2,5 L29,5 29,29 2,29 Z M2,11 L29,11 M2,17 L29,17 M2,23 L29,23 M11,11 L11,29 M20,11 L20,29 M8,1 L8,8 M16,1 L16,8 M24,1 L24,8"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.6"/></GeometryDrawing.Pen></GeometryDrawing></DrawingImage.Drawing></DrawingImage>
+ <DrawingImage x:Key="InsetTeacherIcon"><DrawingImage.Drawing><GeometryDrawing Geometry="M2,7 L30,7 30,26 2,26 Z M13,7 L13,3 19,3 19,7 M8,14 A3,3 0 1 0 14,14 A3,3 0 1 0 8,14 M6,23 Q11,16 16,23 M19,13 L27,13 M19,18 L27,18 M19,23 L25,23"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.6"/></GeometryDrawing.Pen></GeometryDrawing></DrawingImage.Drawing></DrawingImage>
+ <DrawingImage x:Key="InsetLessonIcon"><DrawingImage.Drawing><GeometryDrawing Geometry="M16,7 Q10,3 2,6 L2,23 Q10,20 16,24 M16,7 Q22,3 30,6 L30,14 M16,7 L16,24 M19,23 A6,6 0 1 0 31,23 A6,6 0 1 0 19,23 M25,19 L25,23 28,23"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.6"/></GeometryDrawing.Pen></GeometryDrawing></DrawingImage.Drawing></DrawingImage>
+
+ <Style x:Key="OverviewAmount" TargetType="TextBlock">
+  <Setter Property="FontSize" Value="20"/><Setter Property="FontWeight" Value="SemiBold"/>
+ </Style>
+ <Style x:Key="OverviewWell" TargetType="Border" BasedOn="{StaticResource InsetCardWell}">
+  <Setter Property="Height" Value="36"/><Setter Property="Padding" Value="8,3"/>
+ </Style>
+ <DataTemplate x:Key="OverviewItemTemplate">
+  <Border Style="{StaticResource OverviewWell}" Margin="0,0,0,5">
+   <Grid>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="4*"/><ColumnDefinition Width="6*"/></Grid.ColumnDefinitions>
+    <TextBlock Text="{Binding Header}" FontSize="12" Foreground="#CDD7E3" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,5,0"/>
+    <Viewbox Grid.Column="1" StretchDirection="DownOnly" HorizontalAlignment="Right">
+     <TextBlock Text="{Binding Content}" Style="{StaticResource OverviewAmount}" Foreground="#F4F6FB"/>
+    </Viewbox>
+   </Grid>
+  </Border>
+ </DataTemplate>
+ <Style x:Key="CalculationOverviewCard" TargetType="HeaderedContentControl">
+  <Setter Property="Margin" Value="0,0,12,0"/><Setter Property="Height" Value="146"/>
+  <Setter Property="Foreground" Value="#F4F6FB"/><Setter Property="BorderBrush" Value="{StaticResource SlateBorderBrush}"/>
+  <Setter Property="ContentTemplate"><Setter.Value><DataTemplate>
+   <Border Style="{StaticResource OverviewWell}">
+    <Viewbox StretchDirection="DownOnly"><TextBlock Text="{Binding}" Style="{StaticResource OverviewAmount}"/></Viewbox>
+   </Border>
+  </DataTemplate></Setter.Value></Setter>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="HeaderedContentControl">
+   <Border Style="{StaticResource InsetCardShell}" BorderBrush="{TemplateBinding BorderBrush}" Padding="11,9,11,7">
+    <StackPanel>
+     <DockPanel Height="38" Margin="0,0,0,8">
+      <Border DockPanel.Dock="Left" Style="{StaticResource InsetCardPlate}" Margin="0,0,9,0">
+       <Image Source="{TemplateBinding Tag}" Width="24" Height="24"/>
+      </Border>
+      <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource CalculationCaption}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center"/>
+     </DockPanel>
+     <ContentPresenter ContentSource="Content" TextElement.Foreground="{TemplateBinding Foreground}"/>
+    </StackPanel>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
  </Style>
  <Style x:Key="PaymentMetricCard" TargetType="Border" BasedOn="{StaticResource MetricCard}">
   <Setter Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#133F60" Offset="0"/><GradientStop Color="#0A2946" Offset="0.55"/><GradientStop Color="#061D35" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
   <Setter Property="BorderBrush"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#F4D99A" Offset="0"/><GradientStop Color="#B78B42" Offset="0.35"/><GradientStop Color="#3E5361" Offset="0.72"/><GradientStop Color="#CAAA64" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
   <Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#BD9447" BlurRadius="10" ShadowDepth="2" Opacity="0.14"/></Setter.Value></Setter>
  </Style>
- <Style x:Key="ArchiveAction" TargetType="Button" BasedOn="{StaticResource SecondaryAction}"><Setter Property="Width" Value="64"/><Setter Property="Height" Value="32"/><Setter Property="Margin" Value="3,0"/><Setter Property="Padding" Value="7,0"/><Setter Property="FontSize" Value="11.5"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
- <Style x:Key="ArchiveDeleteAction" TargetType="Button" BasedOn="{StaticResource ArchiveAction}"><Setter Property="Foreground" Value="#A52E38"/><Setter Property="Background" Value="#FFF0F0"/><Setter Property="BorderBrush" Value="#E5B4B8"/></Style>
- <Style x:Key="ArchiveXmlAction" TargetType="Button" BasedOn="{StaticResource ArchiveAction}"><Setter Property="Background" Value="#E7C16B"/><Setter Property="Foreground" Value="#09253F"/><Setter Property="BorderBrush" Value="#F4D99A"/></Style>
+ <Style x:Key="ArchiveAction" TargetType="Button" BasedOn="{StaticResource SecondaryAction}"><Setter Property="Width" Value="64"/><Setter Property="Margin" Value="3,0"/><Setter Property="Padding" Value="7,0"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+ <Style x:Key="ArchiveDeleteAction" TargetType="Button" BasedOn="{StaticResource ArchiveAction}"><Setter Property="Foreground" Value="{StaticResource DeleteActionTextBrush}"/><Setter Property="Background" Value="{StaticResource DeleteActionFillBrush}"/><Setter Property="BorderBrush" Value="{StaticResource DeleteActionBorderBrush}"/></Style>
  <DrawingImage x:Key="MetricCoins"><DrawingImage.Drawing><DrawingGroup><GeometryDrawing Geometry="M 3,8 C 3,2 29,2 29,8 C 29,14 3,14 3,8 M 3,8 L 3,22 C 3,29 29,29 29,22 L 29,8 M 3,15 C 3,22 29,22 29,15"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.6"/></GeometryDrawing.Pen></GeometryDrawing></DrawingGroup></DrawingImage.Drawing></DrawingImage>
  <DrawingImage x:Key="MetricTransfer"><DrawingImage.Drawing><GeometryDrawing Geometry="M 2,9 L 29,9 M 22,2 L 29,9 L 22,16 M 30,23 L 3,23 M 10,16 L 3,23 L 10,30"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.8"/></GeometryDrawing.Pen></GeometryDrawing></DrawingImage.Drawing></DrawingImage>
  <DrawingImage x:Key="MetricShield"><DrawingImage.Drawing><GeometryDrawing Geometry="M 16,1 L 29,6 L 27,19 Q 24,28 16,31 Q 8,28 5,19 L 3,6 Z M 10,16 L 14,20 L 23,11"><GeometryDrawing.Pen><Pen Brush="{StaticResource MetricGold}" Thickness="1.8"/></GeometryDrawing.Pen></GeometryDrawing></DrawingImage.Drawing></DrawingImage>
