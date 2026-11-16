@@ -1,6 +1,6 @@
 ﻿#define DataFolderName "Ek Ders Hakediş Sistemi"
 #ifndef AppVersion
-  #define AppVersion "1.0.17"
+  #define AppVersion "1.0.18"
 #endif
 #ifndef PayloadDir
   #define PayloadDir "..\dist\v" + AppVersion

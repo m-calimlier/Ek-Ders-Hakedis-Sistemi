@@ -25,6 +25,44 @@ public sealed class PeriodWorkspace : INotifyPropertyChanged
     }
     public bool HasHybridSelection=>hybridRow is not null && !IsArchiveEditing;
     public bool CanChooseBillingModule=>HasHybridSelection && hybridRow!.HasInput && TeacherRouting.Candidates(hybridRow.Teacher,year,month).Count>1;
+    public sealed record ReviewItem(PayrollRow Row,string ColumnHeader,string Message,bool BlocksPayment)
+    {
+        public string Label=>$"{(BlocksPayment?"Düzeltme":"Bilgi")} · {Row.FullName} · {Message}";
+    }
+
+    public IReadOnlyList<ReviewItem> ReviewItems
+    {
+        get
+        {
+            if(IsArchiveEditing)return [];
+            var items=new List<ReviewItem>();
+            var needsChoice=BillingChoicesNeeded.ToHashSet();
+            foreach(var row in Rows.Where(row=>row.HasInput))
+            {
+                if(string.IsNullOrWhiteSpace(row.Iban))
+                    items.Add(new(row,ExcelHeadings.Iban,"IBAN eksik.",true));
+                if(row.Result is null && !string.IsNullOrEmpty(row.Error))
+                    items.Add(new(row,ExcelHeadings.FullName,row.Error,true));
+                if(needsChoice.Contains(row))
+                    items.Add(new(row,ExcelHeadings.FullName,"Ödeme modülü seçilmeli.",true));
+                if(row.Result is not null && !string.IsNullOrEmpty(row.SgkError))
+                    items.Add(new(row,"EKSİK GÜN",row.SgkError,false));
+            }
+            return items.OrderByDescending(item=>item.BlocksPayment).ToArray();
+        }
+    }
+
+    public bool HasReviewItems=>ReviewItems.Count>0;
+    public string ReviewHeading
+    {
+        get
+        {
+            var items=ReviewItems;
+            var fixes=items.Count(item=>item.BlocksPayment);
+            return $"Hakediş Kontrolleri · {fixes} düzeltme · {items.Count-fixes} bilgi";
+        }
+    }
+
     public bool HasHybridChanges=>Rows.Any(r=>r.HasChanges);
     public bool CanChangePeriod=>!IsArchiveEditing && !HasHybridChanges;
     public string HybridChangeText=>HasHybridChanges?$"{Rows.Count(r=>r.HasChanges)} satırda kaydedilmemiş değişiklik var.":"Tüm değişiklikler kaydedildi.";
@@ -130,7 +168,6 @@ public sealed class PeriodWorkspace : INotifyPropertyChanged
     public string NewSchoolLabel=>selectedRow?.NewSchoolLabel??"";
     public string PreviousSchoolDayHours {get=>selectedRow?.PreviousSchoolDayHours??"";set{if(selectedRow is not null)selectedRow.PreviousSchoolDayHours=value;}}
     public string NewSchoolDayHours {get=>selectedRow?.NewSchoolDayHours??"";set{if(selectedRow is not null)selectedRow.NewSchoolDayHours=value;}}
-    public string SchoolHoursWarning=>selectedRow?.SchoolHoursWarning??"";
     public string DykHours { get=>selectedRow?.DykHours??"0";set { if(selectedRow is not null)selectedRow.DykHours=value; } }
     public string Garnishment { get=>selectedRow?.Garnishment??"0";set { if(selectedRow is not null)selectedRow.Garnishment=value; } }
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -381,7 +418,7 @@ public sealed class PeriodWorkspace : INotifyPropertyChanged
     private void Notify()
     {
         PropertyChanged?.Invoke(this,new(nameof(PayrollTitle)));
-        foreach(var name in new[]{nameof(EntryHasSchoolHourSplit),nameof(EntryHasSingleSchoolHours),nameof(EntrySummary),nameof(HasEntryModule),nameof(EntryModule),nameof(EntryTeachers),nameof(EntryTeacher),nameof(HasEntryTeacher),nameof(CanEditEntry),nameof(EntryDayHours),nameof(EntryDykHours),nameof(EntryGarnishment),nameof(CanChooseBillingModule),nameof(CanChangePeriod),nameof(IsArchiveEditing),nameof(IsNormalWork),nameof(HasActiveWork),nameof(SelectedHybridRow),nameof(HasHybridSelection),nameof(HasHybridChanges),nameof(HybridChangeText),nameof(SelectedModule),nameof(Year),nameof(Month),nameof(PeriodText),nameof(Constants),nameof(SelectedTeacher),nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(SchoolHoursWarning),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(IsEditing),nameof(HasTeacher),nameof(IsAvailable),nameof(Status),nameof(HoursText),nameof(GrossText),nameof(AccrualText),nameof(NetText),nameof(EmployeeText),nameof(EmployerText),nameof(SgkControlText),nameof(DeductionsText),nameof(CountText),nameof(OverviewText),nameof(NetTotal),nameof(SgkSummary)})
+        foreach(var name in new[]{nameof(EntryHasSchoolHourSplit),nameof(EntryHasSingleSchoolHours),nameof(EntrySummary),nameof(HasEntryModule),nameof(EntryModule),nameof(EntryTeachers),nameof(EntryTeacher),nameof(HasEntryTeacher),nameof(CanEditEntry),nameof(EntryDayHours),nameof(EntryDykHours),nameof(EntryGarnishment),nameof(CanChooseBillingModule),nameof(CanChangePeriod),nameof(IsArchiveEditing),nameof(IsNormalWork),nameof(HasActiveWork),nameof(SelectedHybridRow),nameof(HasHybridSelection),nameof(HasHybridChanges),nameof(ReviewItems),nameof(HasReviewItems),nameof(ReviewHeading),nameof(HybridChangeText),nameof(SelectedModule),nameof(Year),nameof(Month),nameof(PeriodText),nameof(Constants),nameof(SelectedTeacher),nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(IsEditing),nameof(HasTeacher),nameof(IsAvailable),nameof(Status),nameof(HoursText),nameof(GrossText),nameof(AccrualText),nameof(NetText),nameof(EmployeeText),nameof(EmployerText),nameof(SgkControlText),nameof(DeductionsText),nameof(CountText),nameof(OverviewText),nameof(NetTotal),nameof(SgkSummary)})
             PropertyChanged?.Invoke(this,new(name));
     }
 }

@@ -29,7 +29,7 @@ internal static class DinOgretimiChecks
         model.Outputs.Details.PreparedBy="Deneme Görevli";model.Outputs.Details.AuthorizedBy="Deneme Yetkili";model.Outputs.SaveDetails();
         model.Navigate("Calculation");window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         capture(window,Path.Combine(output,"Din-Calculation-1366.png"));
-        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content is string text && text=="Hakediş oluştur");
+        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content is string text && text=="Hakediş Oluştur");
         create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         if(!model.OutputsVisible || notifications.Count==0 || model.Outputs.Records.Count!=1)throw new Exception("Din hakediş oluştur/onay/çıktı akışı başarısız.");
         var record=model.Outputs.Records.Single();var bytes=File.ReadAllBytes(record.Path);var svc=new PaymentReportService();

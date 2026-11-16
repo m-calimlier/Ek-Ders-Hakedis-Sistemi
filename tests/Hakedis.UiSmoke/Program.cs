@@ -253,7 +253,7 @@ internal static class Program
         if(row.MissingDays!="15")throw new InvalidOperationException("Hücre yazılırken SGK bilgisi güncellenmedi.");
         grid.CommitEdit(DataGridEditingUnit.Cell,true);grid.CommitEdit(DataGridEditingUnit.Row,true);
         var beforeCreateNotifications=notifications.Count;
-        Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş oluştur").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         if(!model.OutputsVisible || notifications.Count!=beforeCreateNotifications+1)throw new InvalidOperationException("Hakediş sonrası bildirim ve Çıktı yönlendirmesi yok.");
         Capture(window,Path.Combine(output,"Outputs-saved.png"));
         var outputsGrid=(DataGrid)window.FindName("OutputsGrid");
@@ -264,7 +264,7 @@ internal static class Program
             Hakedis.Contracts.ExcelHeadings.School,"GÜNDÜZ SAAT TOPLAMI","DYK","PRİM GÜNÜ","EKSİK GÜN","BRÜT ÜCRET","NET ÖDEME",
             Hakedis.Contracts.ExcelHeadings.IdentityNumber,Hakedis.Contracts.ExcelHeadings.Iban,Hakedis.Contracts.ExcelHeadings.StartDate,
             Hakedis.Contracts.ExcelHeadings.EndDate,Hakedis.Contracts.ExcelHeadings.Occupation,
-            "ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ","KURUM SAAT\nUYARISI",Hakedis.Contracts.ExcelHeadings.Hours,
+            "ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ",Hakedis.Contracts.ExcelHeadings.Hours,
             Hakedis.Contracts.ExcelHeadings.Garnishment};
         if(!grid.Columns.Select(c=>c.Header as string).SequenceEqual(expectedHeaders))throw new InvalidOperationException("VERİ GİRİŞİ sütunları ve sırası uyuşmuyor.");
         if(grid.RowHeight!=30)throw new InvalidOperationException("Hibrit satır yüksekliği 30 değil.");
@@ -278,7 +278,7 @@ internal static class Program
         if(!model.EntryVisible || !model.Registration.IsEditingRecord || model.Registration.Editor.FullName!=row.FullName)
             throw new InvalidOperationException("Satır düzenlemesi öğretmen formunu açmadı.");
         var saveRegistration=(Button)window.FindName("SaveRegistrationButton");var cancelRegistration=(Button)window.FindName("CancelRegistrationButton");
-        if(saveRegistration.Content as string!="Öğretmen Değişiklik kaydet" || cancelRegistration.Content as string!="Vazgeç")
+        if(saveRegistration.Content as string!="Öğretmen Değişikliklerini Kaydet" || cancelRegistration.Content as string!="Vazgeç")
             throw new InvalidOperationException("Düzenleme düğmeleri değişmedi.");
         model.Registration.Editor.FullName="Kaydedilmez";cancelRegistration.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
@@ -348,7 +348,7 @@ internal static class Program
         model.BeginArchiveEdit();window.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);
         if(!((Button)window.FindName("SaveArchiveButton")).IsVisible || ((Button)window.FindName("SaveHybridButton")).IsVisible)
             throw new InvalidOperationException("Geçmiş düzenlemede düğmeler doğru değişmedi.");
-        if(Descendants<Button>(window).Any(b=>b.IsVisible && b.Content as string=="Hakediş oluştur"))throw new InvalidOperationException("Geçmiş düzenlemede yeni kayıt düğmesi açık.");
+        if(Descendants<Button>(window).Any(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur"))throw new InvalidOperationException("Geçmiş düzenlemede yeni kayıt düğmesi açık.");
         model.Calculation.Rows[0].DayHours="75";
         Capture(window,Path.Combine(output,"Archive-edit.png"));
         ((Button)window.FindName("CancelArchiveButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

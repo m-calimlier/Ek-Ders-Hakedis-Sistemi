@@ -28,7 +28,7 @@ internal static class LayoutSettingsChecks
         if(fields.Any(t=>t.IsReadOnly || t.Background is not SolidColorBrush brush || brush.Color!=Color.FromRgb(35,55,78)))throw new Exception("Güncelle ortak giriş yüzeyiyle düzenlemeyi açmadı.");
         ((Button)window.FindName("ConstantsUpdateButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         var grid=(DataGrid)window.FindName("HybridGrid");
-        var transferHeaders=new[]{"ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ","KURUM SAAT\nUYARISI"};
+        var transferHeaders=new[]{"ÖNCEKİ KURUM\nGÜNDÜZ","YENİ KURUM\nGÜNDÜZ"};
         if(grid.Columns.Where(c=>!transferHeaders.Contains(c.Header as string)).Sum(c=>c.Width.Value)>1800)throw new Exception("Hibrit sütunlar daraltılmadı.");
         foreach(var size in model.Settings.Sizes)
         {
@@ -52,7 +52,7 @@ internal static class LayoutSettingsChecks
                 var preview=PreviewSurface(window,size);
                 if(panel=="Calculation")
                 {
-                    var actionLabels=new[]{"Hakediş oluştur","Çalışmayı temizle","Kayıtları yenile"};
+                    var actionLabels=new[]{"Hakediş Oluştur","Çalışmayı Temizle","Kayıtları Yenile"};
                     var actions=Descendants<Button>(preview).Where(button=>button.ActualHeight>0 && actionLabels.Contains(button.Content as string)).ToArray();
                     var selectors=Descendants<ComboBox>(preview).Where(combo=>combo.ActualHeight>0).ToArray();
                     if(actions.Length!=3 || selectors.Length<3 || actions.Any(button=>Math.Abs(button.ActualHeight-35)>1 || button.FontSize!=12))

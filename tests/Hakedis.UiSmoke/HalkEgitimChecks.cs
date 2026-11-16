@@ -29,7 +29,7 @@ internal static class HalkEgitimChecks
         model.Navigate("Calculation");Idle(window);
         if(!Descendants<TextBlock>(window).Any(t=>t.IsVisible && t.Text.EndsWith("(USTA ÖĞRETİCİ)")))throw new Exception("Usta öğretici bordro başlığı gösterilmiyor.");
         capture(window,Path.Combine(output,"Halk-Calculation-1366.png"));
-        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş oluştur");
+        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur");
         create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         var record=model.Outputs.Records.Single();var row=record.Document.Data.Rows.Single();
         if(!model.OutputsVisible || notifications.Count==0 || record.Document.ModuleId!=module || row.Result.Net!=11381.50m || row.SgkInformation?.MissingDays!=23)

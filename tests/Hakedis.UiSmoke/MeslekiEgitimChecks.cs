@@ -29,7 +29,7 @@ internal static class MeslekiEgitimChecks
         model.Navigate("Calculation");Idle(window);
         if(!Descendants<TextBlock>(window).Any(t=>t.IsVisible && t.Text.EndsWith("(ÜCRETLİ ÖĞRETMEN)")))throw new Exception("Usta öğretici bordro başlığı gösterilmiyor.");
         capture(window,Path.Combine(output,"Mesleki-Calculation-1366.png"));
-        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş oluştur");
+        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur");
         create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         var record=model.Outputs.Records.Single();var row=record.Document.Data.Rows.Single();
         if(!model.OutputsVisible || notifications.Count==0 || record.Document.ModuleId!=module || row.Result.Net!=9674.28m || row.SgkInformation?.MissingDays!=23)

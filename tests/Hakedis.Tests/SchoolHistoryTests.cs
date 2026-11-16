@@ -13,6 +13,31 @@ public sealed class SchoolHistoryTests : IDisposable
     {
         var t=Teacher();return t with {Assignments=new(ModuleId.TemelEgitim,t.School,[new(new(2026,9,25),ModuleId.TemelEgitim,t.School,ModuleId.DinOgretimi,"Yeni Okul")],[])};
     }
+    [Fact]
+    public void Returning_to_october_excludes_november_starters_and_restores_october_hours()
+    {
+        var continuing=Teacher();
+        var november=continuing with {Id=Guid.NewGuid(),FullName="Kasım Başlayan",IdentityNumber="10000000224",StartDate=new(2026,11,30)};
+        var directory=new TeacherDirectory(PathName);
+        directory.Save(continuing);
+        var workspace=new PeriodWorkspace(PathName){Year=2026,Month=10};
+        workspace.Rows.Single().DayHours="40";
+        workspace.CreatePayment();
+
+        directory.Save(november);
+        workspace.Month=11;
+        Assert.Equal(2,workspace.Rows.Count);
+        workspace.Rows.Single(row=>row.Teacher.Id==continuing.Id).DayHours="60";
+        workspace.Rows.Single(row=>row.Teacher.Id==november.Id).DayHours="8";
+        workspace.CreatePayment();
+
+        workspace.Month=10;
+        Assert.Equal(10,workspace.Month);
+        var restored=Assert.Single(workspace.Rows);
+        Assert.Equal(continuing.Id,restored.Teacher.Id);
+        Assert.Equal(40m,restored.Read().DayHours);
+        Assert.Equal(continuing.Id,Assert.Single(workspace.Teachers).Id);
+    }
     [Fact] public void Normal_editor_hides_optional_fields_and_keeps_old_json_compatible()
     {
         var e=new TeacherEditor();Assert.False(e.HasSchoolTransfer);var t=Teacher();new TeacherDirectory(PathName).Save(t);
@@ -92,7 +117,7 @@ public sealed class SchoolHistoryTests : IDisposable
         var t=Transferred();var h=t.Assignments!;
         t=t with {Assignments=new(h.HomeModuleId,h.HomeSchool,[..h.Transfers,new(new(2026,10,10),ModuleId.DinOgretimi,"Yeni Okul",ModuleId.TemelEgitim,"Dönüş Okulu")],[])};
         new TeacherDirectory(PathName).Save(t);
-        var before=new TeacherDirectory(PathName).ReadForPeriod(2026,8).Single();Assert.Equal("İlk Okul",before.School);
+        var before=new TeacherDirectory(PathName).ReadForPeriod(2026,9).Single();Assert.Equal("İlk Okul",before.School);
         Assert.Equal("Dönüş Okulu",new TeacherDirectory(PathName).ReadForPeriod(2026,11).Single().School);
         new TeacherDirectory(PathName).UpdateBatch([before],[before with {FullName="Güncel Ad"}]);
         Assert.Equal("Dönüş Okulu",new TeacherDirectory(PathName).ReadForPeriod(2026,11).Single().School);

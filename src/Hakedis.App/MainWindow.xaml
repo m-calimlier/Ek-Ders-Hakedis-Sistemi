@@ -4,19 +4,42 @@
  <Window.Resources>
   <Style x:Key="HybridText" TargetType="TextBlock"><Setter Property="TextAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="HorizontalAlignment" Value="Stretch"/></Style>
   <Style x:Key="ArchiveModuleText" TargetType="TextBlock"><Setter Property="TextAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="ToolTip" Value="{Binding Module}"/></Style>
-  <Style x:Key="HybridEditor" TargetType="TextBox"><Setter Property="local:ZeroInput.Enabled" Value="True"/><Setter Property="TextAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Padding" Value="2,0"/><Setter Property="BorderThickness" Value="0"/></Style>
+  <Style x:Key="HybridEditor" TargetType="TextBox"><Setter Property="local:ZeroInput.Enabled" Value="True"/><Setter Property="TextAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Padding" Value="2,0"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"/></Style>
   <Style x:Key="ConstantsText" TargetType="TextBox" BasedOn="{StaticResource FormText}">
    <Setter Property="Height" Value="30"/><Setter Property="MinHeight" Value="30"/><Setter Property="Margin" Value="0"/><Setter Property="Padding" Value="7,3"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Background" Value="{StaticResource NightInputBrush}"/><Style.Triggers><Trigger Property="IsReadOnly" Value="True"><Setter Property="Background" Value="#15384F"/><Setter Property="Foreground" Value="#B9CDDF"/><Setter Property="BorderBrush" Value="#365874"/><Setter Property="Cursor" Value="Arrow"/></Trigger></Style.Triggers>
   </Style>
   <DataTemplate x:Key="HybridTransferHeader">
    <TextBlock Text="{Binding}" TextAlignment="Center" TextWrapping="Wrap"/>
   </DataTemplate>
-  <Style x:Key="HybridTransferWarning" TargetType="TextBlock" BasedOn="{StaticResource HybridText}">
-   <Setter Property="TextWrapping" Value="Wrap"/>
-   <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-   <Setter Property="Margin" Value="5,0"/>
-   <Setter Property="MaxHeight" Value="28"/>
-   <Setter Property="ToolTip" Value="{Binding SchoolHoursWarning}"/>
+  <ControlTemplate x:Key="SchoolHoursEditorTemplate" TargetType="TextBox">
+   <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+           BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+    <Grid>
+     <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalContentAlignment="Center"/>
+     <TextBlock x:Name="DefaultZero" Text="0" Visibility="Collapsed" IsHitTestVisible="False"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"/>
+    </Grid>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="Text" Value="">
+     <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource MetricGold}"/>
+     <Setter TargetName="Frame" Property="BorderThickness" Value="1"/>
+     <Setter TargetName="DefaultZero" Property="Visibility" Value="Visible"/>
+    </Trigger>
+    <Trigger Property="IsKeyboardFocused" Value="True">
+     <Setter TargetName="DefaultZero" Property="Visibility" Value="Collapsed"/>
+    </Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate>
+  <Style x:Key="HybridSchoolHoursEditor" TargetType="TextBox" BasedOn="{StaticResource HybridEditor}">
+   <Setter Property="Template" Value="{StaticResource SchoolHoursEditorTemplate}"/>
+   <Setter Property="local:ZeroInput.Enabled" Value="False"/>
+   <Setter Property="HorizontalContentAlignment" Value="Center"/>
+   <Setter Property="Margin" Value="2,1"/>
+  </Style>
+  <Style x:Key="FormSchoolHoursEditor" TargetType="TextBox" BasedOn="{StaticResource FormText}">
+   <Setter Property="Template" Value="{StaticResource SchoolHoursEditorTemplate}"/>
+   <Setter Property="local:ZeroInput.Enabled" Value="False"/>
   </Style>
  </Window.Resources>
  <WindowChrome.WindowChrome><WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0"/></WindowChrome.WindowChrome>
@@ -107,18 +130,19 @@
   <ComboBox Style="{StaticResource FormCombo}" ItemsSource="{Binding EntryTeachers}" SelectedItem="{Binding EntryTeacher}" DisplayMemberPath="FullName" Margin="0,5,0,16"/>
   <StackPanel IsEnabled="{Binding HasEntryTeacher}"><StackPanel IsEnabled="{Binding CanEditEntry}">
 <StackPanel Visibility="{Binding EntryHasSchoolHourSplit,Converter={StaticResource Visible}}">
-<TextBlock Text="{Binding PreviousSchoolLabel}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormText}" Text="{Binding PreviousSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,12"/>
-<TextBlock Text="{Binding NewSchoolLabel}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormText}" Text="{Binding NewSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,12"/>
+<TextBlock Text="{Binding PreviousSchoolLabel}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormSchoolHoursEditor}" Text="{Binding PreviousSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,12"/>
+<TextBlock Text="{Binding NewSchoolLabel}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormSchoolHoursEditor}" Text="{Binding NewSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" Margin="0,5,0,12"/>
 <TextBlock Text="{Binding EntryDayHours,StringFormat=Toplam gündüz saati: {0}}" Style="{StaticResource CardSubtitle}" Margin="0,0,0,12"/>
 </StackPanel><StackPanel Visibility="{Binding EntryHasSingleSchoolHours,Converter={StaticResource Visible}}" Margin="0,0,10,14"><TextBlock Text="{x:Static c:ExcelHeadings.DayHours}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormText}" Text="{Binding EntryDayHours, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Margin="0,0,10,14"><TextBlock Text="{x:Static c:ExcelHeadings.DykHours}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormText}" Text="{Binding EntryDykHours, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Margin="0,0,10,14"><TextBlock Text="{x:Static c:ExcelHeadings.Garnishment}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><TextBox Style="{StaticResource FormText}" Text="{Binding EntryGarnishment, UpdateSourceTrigger=PropertyChanged}"/></StackPanel></StackPanel><WrapPanel><Button Content="Kaydet" Style="{StaticResource GoldAction}" Click="SaveMonthly_Click" IsEnabled="{Binding CanEditEntry}"/><Button Content="Düzenle" Style="{StaticResource SecondaryAction}" Click="EditMonthly_Click" IsEnabled="{Binding HasEntryTeacher}"/></WrapPanel></StackPanel>
   <TextBlock Text="{Binding EntrySummary}" Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,12,0,0"/><TextBlock Text="{Binding Status}" Style="{StaticResource ValidationText}" TextWrapping="Wrap" Margin="0,10,0,0"/>
  </StackPanel></HeaderedContentControl>
 </Grid></ScrollViewer></Grid>
-<Grid Grid.Row="1" Visibility="{Binding CalculationVisible, Converter={StaticResource Visible}}"><ScrollViewer x:Name="CalculationScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,10,0"><StackPanel DataContext="{Binding Calculation}">
-
- <Border Style="{StaticResource WorkspaceCard}" Padding="14,10" Margin="0,0,0,12">
+<Grid Grid.Row="1" Visibility="{Binding CalculationVisible, Converter={StaticResource Visible}}">
+ <DockPanel DataContext="{Binding Calculation}">
+ <Border DockPanel.Dock="Top" Style="{StaticResource WorkspaceCard}" Padding="14,10" Margin="0,0,0,12">
+  <StackPanel>
   <Grid>
-   <Grid.ColumnDefinitions><ColumnDefinition Width="1.2*"/><ColumnDefinition Width="15"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="15"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
    <Grid VerticalAlignment="Bottom" IsEnabled="{Binding CanChangePeriod}">
     <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <StackPanel><TextBlock Text="Modül" Style="{StaticResource CalculationCaption}"/><ComboBox Style="{StaticResource FormCombo}" ItemsSource="{Binding Modules}" SelectedItem="{Binding SelectedModule}" DisplayMemberPath="DisplayName" Margin="0,5,0,0"/></StackPanel>
@@ -127,9 +151,30 @@
    </Grid>
    <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
     <WrapPanel Visibility="{Binding IsNormalWork, Converter={StaticResource Visible}}">
-     <Button Margin="0,0,8,0" Content="Hakediş oluştur" Style="{StaticResource GoldAction}" Click="CreatePayment_Click" IsEnabled="{Binding IsAvailable}"/>
-     <Button Margin="0,0,8,0" Content="Çalışmayı temizle" Style="{StaticResource SecondaryAction}" Click="ClearWork_Click"/>
-     <Button Margin="0,0,8,0" Content="Kayıtları yenile" Style="{StaticResource SecondaryAction}" Click="ReloadPayment_Click"/>
+     <Button Margin="0,0,8,0" Content="Hakediş Oluştur" Style="{StaticResource GoldAction}" Click="CreatePayment_Click" IsEnabled="{Binding IsAvailable}"/>
+     <Button Margin="0,0,8,0" Content="Çalışmayı Temizle" Style="{StaticResource SecondaryAction}" Click="ClearWork_Click"/>
+     <Button Margin="0,0,8,0" Content="Kayıtları Yenile" Style="{StaticResource SecondaryAction}" Click="ReloadPayment_Click"/>
+     <Button x:Name="ReviewButton" Margin="0" Content="Hakediş Kontrolleri" Style="{StaticResource SecondaryAction}"
+             IsEnabled="{Binding HasReviewItems}" ToolTip="{Binding ReviewHeading}" Click="ReviewButton_Click"/>
+     <Popup x:Name="ReviewPopup" PlacementTarget="{Binding ElementName=ReviewButton}" Placement="Bottom"
+            StaysOpen="False" AllowsTransparency="True">
+      <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SlateBorderBrush}"
+              BorderThickness="1" CornerRadius="8" Padding="10" MaxWidth="430"
+              DataContext="{Binding PlacementTarget.DataContext, ElementName=ReviewPopup}">
+       <StackPanel>
+        <TextBlock Text="{Binding ReviewHeading}" Style="{StaticResource CardTitle}" Margin="0,0,0,8"/>
+        <ScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+         <ItemsControl x:Name="ReviewItemsList" ItemsSource="{Binding ReviewItems}">
+          <ItemsControl.ItemTemplate><DataTemplate>
+           <Button Style="{StaticResource SecondaryAction}" HorizontalAlignment="Stretch" Click="ReviewItem_Click" ToolTip="{Binding Label}">
+            <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+           </Button>
+          </DataTemplate></ItemsControl.ItemTemplate>
+         </ItemsControl>
+        </ScrollViewer>
+       </StackPanel>
+      </Border>
+     </Popup>
     </WrapPanel>
     <WrapPanel Visibility="{Binding IsArchiveEditing, Converter={StaticResource Visible}}">
      <Button Margin="0,0,8,0" x:Name="SaveArchiveButton" Content="Değiştir/Kaydet" Style="{StaticResource GoldAction}" Click="SaveArchive_Click"/>
@@ -137,16 +182,20 @@
     </WrapPanel>
    </StackPanel>
   </Grid>
+  <TextBlock Text="{Binding HybridChangeText}" Style="{StaticResource CardSubtitle}" Margin="0,6,0,0"/>
+  </StackPanel>
  </Border>
+  <ScrollViewer x:Name="CalculationScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,10,0">
+   <StackPanel>
 <Border Style="{StaticResource WorkspaceCard}"><StackPanel><Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
   <TextBlock Text="{Binding PayrollTitle}" Style="{StaticResource CardTitle}" Foreground="{StaticResource MetricGold}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,12,0"/>
   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-   <Button x:Name="ChangeBillingChoiceButton" Content="Ödeme tercihi" Style="{StaticResource SecondaryAction}" Visibility="{Binding CanChooseBillingModule, Converter={StaticResource Visible}}" Click="ChangeBillingChoice_Click"/>
-   <Button x:Name="SaveHybridButton" Content="Değişiklikleri kaydet" Style="{StaticResource GoldAction}" Visibility="{Binding IsNormalWork, Converter={StaticResource Visible}}" IsEnabled="{Binding HasHybridChanges}" Click="SaveHybrid_Click" ToolTip="{Binding HybridChangeText}" ToolTipService.ShowOnDisabled="True"/>
+   <Button x:Name="ChangeBillingChoiceButton" Content="Ödeme Tercihi" Style="{StaticResource SecondaryAction}" Visibility="{Binding CanChooseBillingModule, Converter={StaticResource Visible}}" Click="ChangeBillingChoice_Click"/>
+   <Button x:Name="SaveHybridButton" Content="Değişiklikleri Kaydet" Style="{StaticResource GoldAction}" Visibility="{Binding IsNormalWork, Converter={StaticResource Visible}}" IsEnabled="{Binding HasHybridChanges}" Click="SaveHybrid_Click" ToolTip="{Binding HybridChangeText}" ToolTipService.ShowOnDisabled="True"/>
    <Button x:Name="EditHybridButton" Content="Düzenle" Style="{StaticResource SecondaryAction}" IsEnabled="{Binding HasHybridSelection}" Click="EditHybrid_Click"/>
    <Button x:Name="DeleteHybridButton" Content="Sil" Style="{StaticResource DeleteAction}" IsEnabled="{Binding HasHybridSelection}" Click="DeleteHybrid_Click"/>
   </StackPanel></Grid>
-  <DataGrid x:Name="HybridGrid" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedHybridRow, Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Height="260" RowHeight="30" MinRowHeight="30" FrozenColumnCount="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" EnableRowVirtualization="True" EnableColumnVirtualization="True">
+  <DataGrid x:Name="HybridGrid" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedHybridRow, Mode=TwoWay}" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" Height="260" RowHeight="30" MinRowHeight="30" FrozenColumnCount="4" CanUserReorderColumns="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" EnableRowVirtualization="True" EnableColumnVirtualization="True">
 <DataGrid.RowStyle><Style TargetType="DataGridRow" BasedOn="{StaticResource ModernDataGridRow}"><Style.Triggers>
 <DataTrigger Binding="{Binding StartedInSelectedMonth}" Value="True"><Setter Property="Background" Value="#174737"/><Setter Property="Foreground" Value="#F0F6FC"/><Setter Property="ToolTip" Value="İşe başlama ayı seçili ayla aynı."/></DataTrigger>
 <MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding StartedInSelectedMonth}" Value="True"/><Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/></MultiDataTrigger.Conditions><Setter Property="Background" Value="#285D51"/><Setter Property="Foreground" Value="#F0F6FC"/></MultiDataTrigger>
@@ -167,9 +216,8 @@
 <DataGridTemplateColumn Header="{x:Static c:ExcelHeadings.StartDate}" Width="104"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource HybridText}" Text="{Binding StartDate, StringFormat={}{0:dd.MM.yyyy}}"/></DataTemplate></DataGridTemplateColumn.CellTemplate><DataGridTemplateColumn.CellEditingTemplate><DataTemplate><DatePicker SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"><DatePicker.Resources><Style TargetType="{x:Type p:DatePickerTextBox}"><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style></DatePicker.Resources></DatePicker></DataTemplate></DataGridTemplateColumn.CellEditingTemplate></DataGridTemplateColumn>
 <DataGridTemplateColumn Header="{x:Static c:ExcelHeadings.EndDate}" Width="104"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource HybridText}" Text="{Binding EndDate, StringFormat={}{0:dd.MM.yyyy}}"/></DataTemplate></DataGridTemplateColumn.CellTemplate><DataGridTemplateColumn.CellEditingTemplate><DataTemplate><DatePicker SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"><DatePicker.Resources><Style TargetType="{x:Type p:DatePickerTextBox}"><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style></DatePicker.Resources></DatePicker></DataTemplate></DataGridTemplateColumn.CellEditingTemplate></DataGridTemplateColumn>
 <DataGridTemplateColumn Header="{x:Static c:ExcelHeadings.Occupation}" Width="125"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource HybridText}" Text="{Binding OccupationCode}"/></DataTemplate></DataGridTemplateColumn.CellTemplate><DataGridTemplateColumn.CellEditingTemplate><DataTemplate><local:SearchableOccupation Code="{Binding OccupationCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/></DataTemplate></DataGridTemplateColumn.CellEditingTemplate></DataGridTemplateColumn>
-<DataGridTemplateColumn Header="ÖNCEKİ KURUM&#10;GÜNDÜZ" HeaderTemplate="{StaticResource HybridTransferHeader}" Width="106"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBox Text="{Binding PreviousSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding PreviousSchoolLabel}" Visibility="{Binding HasSchoolHourSplit,Converter={StaticResource Visible}}" Style="{StaticResource HybridEditor}"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
-<DataGridTemplateColumn Header="YENİ KURUM&#10;GÜNDÜZ" HeaderTemplate="{StaticResource HybridTransferHeader}" Width="106"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBox Text="{Binding NewSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding NewSchoolLabel}" Visibility="{Binding HasSchoolHourSplit,Converter={StaticResource Visible}}" Style="{StaticResource HybridEditor}"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
-<DataGridTextColumn Header="KURUM SAAT&#10;UYARISI" HeaderTemplate="{StaticResource HybridTransferHeader}" Binding="{Binding SchoolHoursWarning}" ElementStyle="{StaticResource HybridTransferWarning}" Width="198" IsReadOnly="True"/>
+<DataGridTemplateColumn Header="ÖNCEKİ KURUM&#10;GÜNDÜZ" HeaderTemplate="{StaticResource HybridTransferHeader}" Width="106"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBox Text="{Binding PreviousSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding PreviousSchoolLabel}" Visibility="{Binding HasSchoolHourSplit,Converter={StaticResource Visible}}" Style="{StaticResource HybridSchoolHoursEditor}"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+<DataGridTemplateColumn Header="YENİ KURUM&#10;GÜNDÜZ" HeaderTemplate="{StaticResource HybridTransferHeader}" Width="106"><DataGridTemplateColumn.CellTemplate><DataTemplate><TextBox Text="{Binding NewSchoolDayHours,UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding NewSchoolLabel}" Visibility="{Binding HasSchoolHourSplit,Converter={StaticResource Visible}}" Style="{StaticResource HybridSchoolHoursEditor}"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
 <DataGridTextColumn Header="{x:Static c:ExcelHeadings.Hours}" Binding="{Binding TotalHours, UpdateSourceTrigger=PropertyChanged}" Width="95" IsReadOnly="True" ElementStyle="{StaticResource HybridText}" EditingElementStyle="{StaticResource HybridEditor}"/>
 <DataGridTextColumn Header="{x:Static c:ExcelHeadings.Garnishment}" Binding="{Binding Garnishment, UpdateSourceTrigger=PropertyChanged}" Width="135" IsReadOnly="False" ElementStyle="{StaticResource HybridText}" EditingElementStyle="{StaticResource HybridEditor}"/>
 </DataGrid.Columns></DataGrid>
@@ -203,9 +251,9 @@
  <HeaderedContentControl Header="Kesintiler Toplamı" Content="{Binding DeductionsText}" Tag="{StaticResource MetricDeductions}" Style="{StaticResource CalculationOverviewCard}"/>
 </UniformGrid><Border Style="{StaticResource StatusBanner}" Margin="0,0,0,12"><TextBlock Text="{Binding Status}" Foreground="#D5E4F1" TextWrapping="Wrap"/></Border>
  <TextBlock Text="SGK yan bilgisi: Çalışma Gün Sayısı = toplam saat / 7,5 (yukarı tam sayıya yuvarlanır). Eksik Gün Sayısı = ayda çalışabileceği en fazla gün − Çalışma Gün Sayısı. İşe başlama ve işten ayrılış günleri dahildir. Bu bilgiler hakediş tutarını etkilemez." Foreground="#B9CDDF" TextWrapping="Wrap"/>
-</StackPanel></ScrollViewer></Grid>
+</StackPanel></ScrollViewer></DockPanel></Grid>
 <Grid Grid.Row="1" Visibility="{Binding ConstantsVisible, Converter={StaticResource Visible}}"><ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,10,0"><StackPanel DataContext="{Binding CommonConstants}">
-<Border Style="{StaticResource WorkspaceCard}" Padding="14" Margin="0,0,0,10"><StackPanel><Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Dönem sabitleri" Style="{StaticResource CardTitle}" FontSize="15" TextWrapping="Wrap" Margin="0,0,12,0" VerticalAlignment="Center"/><Button Grid.Column="1" x:Name="ConstantsUpdateButton" Content="{Binding ButtonText}" Style="{StaticResource GoldAction}" Click="SaveConstants_Click"/></Grid>
+<Border Style="{StaticResource WorkspaceCard}" Padding="14" Margin="0,0,0,10"><StackPanel><Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Dönem Sabitleri" Style="{StaticResource CardTitle}" FontSize="15" TextWrapping="Wrap" Margin="0,0,12,0" VerticalAlignment="Center"/><Button Grid.Column="1" x:Name="ConstantsUpdateButton" Content="{Binding ButtonText}" Style="{StaticResource GoldAction}" Click="SaveConstants_Click"/></Grid>
 <UniformGrid x:Name="ConstantsFields" Columns="3" Rows="3" DataContext="{Binding Editor}" Margin="0,0,-12,0">
 <Grid Margin="0,0,12,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="96"/></Grid.ColumnDefinitions><TextBlock Text="Katsayı" Style="{StaticResource FieldLabel}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/><TextBox Grid.Column="1" AutomationProperties.Name="Katsayı" IsReadOnly="{Binding DataContext.CommonConstants.IsReadOnly, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ConstantsText}" Text="{Binding Coefficient, UpdateSourceTrigger=PropertyChanged}"/></Grid>
 <Grid Margin="0,0,12,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="96"/></Grid.ColumnDefinitions><TextBlock Text="Gösterge" Style="{StaticResource FieldLabel}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/><TextBox Grid.Column="1" AutomationProperties.Name="Gösterge" IsReadOnly="{Binding DataContext.CommonConstants.IsReadOnly, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ConstantsText}" Text="{Binding Indicator, UpdateSourceTrigger=PropertyChanged}"/></Grid>
@@ -219,7 +267,7 @@
 </UniformGrid>
 <TextBlock Text="Ondalık ayırıcı virgül; oran örneği: 0,14. Başlangıç değerleri kaynak Eylül-2026 Excel dosyasındandır. Aktif ve sonraki hesaplar ortak değerleri kullanır. Önceden kaydedilmiş hakedişler değişmez." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,0,0,2"/>
 <TextBlock Text="{Binding Status}" Style="{StaticResource ValidationText}" TextWrapping="Wrap"/></StackPanel></Border>
-<Border x:Name="RetiredConstantsCard" DataContext="{Binding DataContext.RetiredConstants, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource WorkspaceCard}" Padding="14" Margin="0,0,0,10"><StackPanel><Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Emekli Usta Öğretici dönem sabitleri" Style="{StaticResource CardTitle}" FontSize="15" TextWrapping="Wrap" Margin="0,0,12,0" VerticalAlignment="Center"/><Button Grid.Column="1" x:Name="RetiredConstantsUpdateButton" Content="{Binding ButtonText}" Style="{StaticResource GoldAction}" Click="SaveRetiredConstants_Click"/></Grid>
+<Border x:Name="RetiredConstantsCard" DataContext="{Binding DataContext.RetiredConstants, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource WorkspaceCard}" Padding="14" Margin="0,0,0,10"><StackPanel><Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Emekli Usta Öğretici Dönem Sabitleri" Style="{StaticResource CardTitle}" FontSize="15" TextWrapping="Wrap" Margin="0,0,12,0" VerticalAlignment="Center"/><Button Grid.Column="1" x:Name="RetiredConstantsUpdateButton" Content="{Binding ButtonText}" Style="{StaticResource GoldAction}" Click="SaveRetiredConstants_Click"/></Grid>
 <UniformGrid x:Name="RetiredConstantsFields" Columns="3" Rows="3" DataContext="{Binding Editor}" Margin="0,0,-12,0">
 <Grid Margin="0,0,12,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="96"/></Grid.ColumnDefinitions><TextBlock Text="Katsayı" Style="{StaticResource FieldLabel}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/><TextBox Grid.Column="1" AutomationProperties.Name="Katsayı" IsReadOnly="{Binding DataContext.RetiredConstants.IsReadOnly, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ConstantsText}" Text="{Binding Coefficient, UpdateSourceTrigger=PropertyChanged}"/></Grid>
 <Grid Margin="0,0,12,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="96"/></Grid.ColumnDefinitions><TextBlock Text="Gösterge" Style="{StaticResource FieldLabel}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/><TextBox Grid.Column="1" AutomationProperties.Name="Gösterge" IsReadOnly="{Binding DataContext.RetiredConstants.IsReadOnly, RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource ConstantsText}" Text="{Binding Indicator, UpdateSourceTrigger=PropertyChanged}"/></Grid>
@@ -251,21 +299,21 @@
 </StackPanel></ScrollViewer></Border></Grid>
 <Grid Grid.Row="1" Visibility="{Binding DataContext.PersonalVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource Visible}}" DataContext="{Binding Personal}">
 <Grid.ColumnDefinitions><ColumnDefinition Width="0.9*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="1.6*"/></Grid.ColumnDefinitions>
-<Border Style="{StaticResource WorkspaceCard}" VerticalAlignment="Top"><StackPanel><TextBlock Text="Dönem ve Modül" Style="{StaticResource CardTitle}" Margin="0,0,0,16"/><local:PeriodSelector/>
+<Border Style="{StaticResource WorkspaceCard}" VerticalAlignment="Top"><StackPanel><TextBlock Text="Dönem Ve Modül" Style="{StaticResource CardTitle}" Margin="0,0,0,16"/><local:PeriodSelector/>
 <TextBlock Text="Kişisel bordro, seçilen dönemin kayıtlı hakedişinden hazırlanır. Güncel ders girişleri ve sonradan değişen sabitler geçmiş tutarları değiştirmez." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,18,0,16"/>
-<Button Content="Listeyi yenile" Style="{StaticResource SecondaryAction}" Click="ReloadPersonal_Click" HorizontalAlignment="Left"/></StackPanel></Border>
+<Button Content="Listeyi Yenile" Style="{StaticResource SecondaryAction}" Click="ReloadPersonal_Click" HorizontalAlignment="Left"/></StackPanel></Border>
 <Border Grid.Column="2" Style="{StaticResource WorkspaceCard}" Margin="0"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
 <StackPanel Margin="0,0,0,14"><TextBlock Text="Kayıtlı Öğretmenler" Style="{StaticResource CardTitle}"/><TextBlock Text="{Binding CountText}" Style="{StaticResource CardSubtitle}" Margin="0,6,0,0"/></StackPanel>
 <DataGrid Grid.Row="1" x:Name="PersonalTeachersGrid" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding Teachers}" SelectedItem="{Binding SelectedTeacher}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" RowHeight="34" MinHeight="180"><DataGrid.Columns>
 <DataGridTextColumn Header="{x:Static c:ExcelHeadings.FullName}" Binding="{Binding FullName}" ElementStyle="{StaticResource HybridText}" Width="*"/>
 <DataGridTextColumn Header="{x:Static c:ExcelHeadings.IdentityNumber}" Binding="{Binding IdentityNumber}" ElementStyle="{StaticResource HybridText}" Width="150"/>
 </DataGrid.Columns></DataGrid>
-<WrapPanel Grid.Row="2" Margin="0,16,0,0"><Button x:Name="CreatePersonalButton" Content="Bordro oluştur" Style="{StaticResource GoldAction}" IsEnabled="{Binding CanCreate}" Click="CreatePersonal_Click"/><Button x:Name="PersonalFolderButton" Content="Klasör" Style="{StaticResource SecondaryAction}" IsEnabled="{Binding CanOpenFolder}" Click="OpenPersonalFolder_Click"/></WrapPanel>
+<WrapPanel Grid.Row="2" Margin="0,16,0,0"><Button x:Name="CreatePersonalButton" Content="Bordro Oluştur" Style="{StaticResource GoldAction}" IsEnabled="{Binding CanCreate}" Click="CreatePersonal_Click"/><Button x:Name="PersonalFolderButton" Content="Klasör" Style="{StaticResource SecondaryAction}" IsEnabled="{Binding CanOpenFolder}" Click="OpenPersonalFolder_Click"/></WrapPanel>
 <TextBlock Grid.Row="3" Text="{Binding Status}" Style="{StaticResource ValidationText}" TextWrapping="Wrap" Margin="0,10,0,0"/>
 </Grid></Border></Grid>
 <Grid Grid.Row="1" Visibility="{Binding OutputsVisible, Converter={StaticResource Visible}}"><ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,10,0"><StackPanel DataContext="{Binding Outputs}">
 <Border Style="{StaticResource WorkspaceCard}"><StackPanel>
-<Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Kayıtlı Hakedişler" Style="{StaticResource CardTitle}"/><Button Grid.Column="1" Content="Listeyi yenile" Style="{StaticResource SecondaryAction}" Click="ReloadOutputs_Click"/></Grid>
+<Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="Kayıtlı Hakedişler" Style="{StaticResource CardTitle}"/><Button Grid.Column="1" Content="Listeyi Yenile" Style="{StaticResource SecondaryAction}" Click="ReloadOutputs_Click"/></Grid>
 <TextBlock Text="Hakediş modülü" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="OutputModuleCombo" Style="{StaticResource FormCombo}" ItemsSource="{Binding Modules}" SelectedItem="{Binding SelectedModule}" DisplayMemberPath="Name" MaxWidth="520" HorizontalAlignment="Left" MinWidth="320" Margin="0,5,0,14"/>
 <DataGrid x:Name="OutputsGrid" Style="{StaticResource ModernDataGrid}" ItemsSource="{Binding Records}" SelectedItem="{Binding Selected}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" Height="280" RowHeight="48"><DataGrid.Resources><Style TargetType="DataGridCell"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style><Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"><Setter Property="HorizontalContentAlignment" Value="Center"/></Style></DataGrid.Resources><DataGrid.Columns>
 <DataGridTextColumn ElementStyle="{StaticResource HybridText}" Header="DÖNEM" Binding="{Binding Period}" Width="100"/><DataGridTextColumn ElementStyle="{StaticResource ArchiveModuleText}" Header="Modül" Binding="{Binding Module}" Width="150"/><DataGridTextColumn ElementStyle="{StaticResource HybridText}" Header="Öğretmen" Binding="{Binding Count}" Width="70"/><DataGridTextColumn ElementStyle="{StaticResource HybridText}" Header="NET ELE GEÇEN" Binding="{Binding Net, StringFormat={}{0:N2}}" Width="100"/><DataGridTextColumn ElementStyle="{StaticResource HybridText}" Header="Kayıt tarihi" Binding="{Binding SavedAt.LocalDateTime, StringFormat={}{0:dd.MM.yyyy HH:mm}}" Width="105"/>
@@ -278,7 +326,7 @@
 <Grid Grid.Row="1" Visibility="{Binding DetailsVisible, Converter={StaticResource Visible}}"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel DataContext="{Binding Outputs}"><Border Style="{StaticResource WorkspaceCard}"><Expander Header="Kurum, banka ve imza bilgileri" IsExpanded="True" Foreground="White"><StackPanel>
 <WrapPanel Margin="0,14,0,0" DataContext="{Binding Details}">
 <StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="DAİRENİN ADI" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding Institution, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="BANKANIN ADI" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding Bank, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="Gerçekleştirme Görevlisi" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding PreparedBy, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="Gerçekleştirme Görevlisi Ünvanı" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding PreparedTitle, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="Harcama Yetkilisi" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding AuthorizedBy, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="Harcama Yetkilisi Ünvanı" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding AuthorizedTitle, UpdateSourceTrigger=PropertyChanged}"/></StackPanel><StackPanel Width="300" Margin="0,0,16,12"><TextBlock Text="SAYMAN" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding Treasurer, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
-</WrapPanel><Button Content="Belge bilgilerini kaydet" Style="{StaticResource GoldAction}" Click="SaveReportDetails_Click" HorizontalAlignment="Left"/>
+</WrapPanel><Button Content="Belge Bilgilerini Kaydet" Style="{StaticResource GoldAction}" Click="SaveReportDetails_Click" HorizontalAlignment="Left"/>
 <TextBlock Text="Bu bilgiler yeni hakediş kaydına eklenir. Daha önce belge bilgisi bulunmayan kayıtlar için buradaki bilgiler kullanılır." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,8,0,0"/>
 </StackPanel></Expander></Border><TextBlock Text="{Binding DetailsStatus}" Style="{StaticResource ValidationText}" TextWrapping="Wrap"/></StackPanel></ScrollViewer></Grid>
    </Grid>

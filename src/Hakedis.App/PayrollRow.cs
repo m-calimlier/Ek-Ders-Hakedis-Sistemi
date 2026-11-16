@@ -78,11 +78,8 @@ Recalculate();
     public bool HasSingleSchoolHours=>!HasSchoolHourSplit;
     public string PreviousSchoolLabel=>PeriodTransfers.FirstOrDefault()?.FromSchool+" · Gündüz ders saati";
     public string NewSchoolLabel=>PeriodTransfers.LastOrDefault()?.ToSchool+" · Gündüz ders saati";
-    public string PreviousSchoolDayHours {get=>previousSchoolHours;set{if(previousSchoolHours==value)return;previousSchoolHours=value;Update();}}
-    public string NewSchoolDayHours {get=>newSchoolHours;set{if(newSchoolHours==value)return;newSchoolHours=value;Update();}}
-    public string SchoolHoursWarning=>!HasSchoolHourSplit?"":string.Join(" ",new[]{
-        string.IsNullOrWhiteSpace(previousSchoolHours)?PreviousSchoolLabel+" girilmedi; 0 kabul edildi.":"",
-        string.IsNullOrWhiteSpace(newSchoolHours)?NewSchoolLabel+" girilmedi; 0 kabul edildi.":""}.Where(x=>x!=""));
+    public string PreviousSchoolDayHours {get=>previousSchoolHours;set{if(string.IsNullOrWhiteSpace(value))value="";if(previousSchoolHours==value)return;previousSchoolHours=value;Update();}}
+    public string NewSchoolDayHours {get=>newSchoolHours;set{if(string.IsNullOrWhiteSpace(value))value="";if(newSchoolHours==value)return;newSchoolHours=value;Update();}}
     public string DayHours { get {if(!HasSchoolHourSplit)return day;try{return Text((OptionalHours(previousSchoolHours)??0)+(OptionalHours(newSchoolHours)??0));}catch(ArgumentException){return "—";}} set {if(HasSchoolHourSplit){PreviousSchoolDayHours=value;return;} if(day == value) return; day=value; Update(); } }
     private static decimal? OptionalHours(string text)=>string.IsNullOrWhiteSpace(text)?null:PeriodConstantsEditor.Number(text);
 
@@ -147,7 +144,7 @@ Recalculate();
             }
             catch(Exception ex) when(ex is ArgumentException or OverflowException) { SgkError=ex.Message; }
         }
-        foreach(var name in new[]{nameof(StartedInSelectedMonth),nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(SchoolHoursWarning),nameof(Teacher),nameof(FullName),nameof(IdentityNumber),nameof(Iban),nameof(School),nameof(OccupationCode),nameof(StartDate),nameof(EndDate),nameof(IbanCheck),nameof(HasChanges),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(HasInput),nameof(Result),nameof(Error),nameof(MissingDays),nameof(TotalHours),nameof(SgkInformation),nameof(SgkError),nameof(MaximumDaysText),nameof(WorkingDaysText)})
+        foreach(var name in new[]{nameof(StartedInSelectedMonth),nameof(HasSchoolHourSplit),nameof(HasSingleSchoolHours),nameof(PreviousSchoolLabel),nameof(NewSchoolLabel),nameof(PreviousSchoolDayHours),nameof(NewSchoolDayHours),nameof(Teacher),nameof(FullName),nameof(IdentityNumber),nameof(Iban),nameof(School),nameof(OccupationCode),nameof(StartDate),nameof(EndDate),nameof(IbanCheck),nameof(HasChanges),nameof(DayHours),nameof(DykHours),nameof(Garnishment),nameof(HasInput),nameof(Result),nameof(Error),nameof(MissingDays),nameof(TotalHours),nameof(SgkInformation),nameof(SgkError),nameof(MaximumDaysText),nameof(WorkingDaysText)})
             PropertyChanged?.Invoke(this,new(name));
     }
     private static string Text(decimal number)=>number.ToString(CultureInfo.GetCultureInfo("tr-TR"));

@@ -32,7 +32,7 @@ internal static class OutputEntryChecks
         if(hours.Text!="")throw new Exception("Sıfır tıklanınca temizlenmedi.");
         hours.Text="25";Idle(window);if(model.Calculation.Rows.Single().Read().DayHours!=25)throw new Exception("25 saat canlı önizlemeye yansımadı.");
         model.Navigate("Calculation");Idle(window);
-        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş oluştur");create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
+        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur");create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(!notices.Any(n=>n.Contains("IBAN") && n.Contains("güncelle")) || model.Outputs.Records.Count!=0)throw new Exception("IBAN eksikliği açıklayan popup/hakediş engeli yok.");
         model.Navigate("Teachers");Idle(window);var teacherGrid=(DataGrid)window.FindName("TeacherListGrid");teacherGrid.ScrollIntoView(model.Teachers.Records.Single(),teacherGrid.Columns.Last());Idle(window);
         var missing=Descendants<TextBlock>(teacherGrid).SingleOrDefault(t=>t.Text=="IBAN GİRİLMEDİ");

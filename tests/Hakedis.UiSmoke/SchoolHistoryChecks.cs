@@ -31,7 +31,7 @@ internal static class SchoolHistoryChecks
         if(canonical.Assignments?.Transfers.Length!=1 || new TeacherDirectory(path,ModuleId.DinOgretimi).Read().Single().Id!=canonical.Id)
             throw new Exception("Tek kişi kartı veya görev geçmişi kaydedilmedi.");
         model.Monthly.DayHours="117";model.Navigate("Calculation");Idle(window);
-        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş oluştur");
+        var create=Descendants<Button>(window).Single(b=>b.IsVisible && b.Content as string=="Hakediş Oluştur");
         create.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(asked!=1 || model.Outputs.Records.Count!=0 || new TeacherDirectory(path).ReadCanonical().Single().Assignments!.Choices.Length!=0)
             throw new Exception("Vazgeç ödeme tercihi veya hakediş kaydetti.");

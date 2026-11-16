@@ -41,6 +41,6 @@
  </StackPanel></ScrollViewer>
  <StackPanel Grid.Row="2" Margin="0,12,0,0"><CheckBox x:Name="ReviewCheck" Content="İşyeri bilgilerini, ad/soyad ayrımını ve SGK neden kodlarını kontrol ettim." Foreground="White" IsChecked="{Binding Confirmed}" Margin="0,0,0,10"/>
  <TextBlock x:Name="ErrorText" Foreground="#FFD17A" TextWrapping="Wrap" Margin="0,0,0,8"/>
- <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button x:Name="ExportXmlButton" Content="XML oluştur" Style="{StaticResource GoldAction}" Width="130" Click="Export_Click"/><Button Content="Vazgeç" IsCancel="True" Style="{StaticResource SecondaryAction}" Width="130"/></StackPanel>
+ <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button x:Name="ExportXmlButton" Content="XML Oluştur" Style="{StaticResource GoldAction}" Width="130" Click="Export_Click"/><Button Content="Vazgeç" IsCancel="True" Style="{StaticResource SecondaryAction}" Width="130"/></StackPanel>
  </StackPanel></Grid>
 </Window>

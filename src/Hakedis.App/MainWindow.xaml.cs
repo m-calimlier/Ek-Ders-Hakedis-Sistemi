@@ -197,6 +197,38 @@ public partial class MainWindow : Window
             if(ChooseBilling(shell.Calculation.SelectedHybridRow!))ShowSaved();
         });
     }
+    private void ReviewButton_Click(object sender,RoutedEventArgs e)
+    {
+        ReviewPopup.IsOpen=!ReviewPopup.IsOpen;
+    }
+
+    private void ReviewItem_Click(object sender,RoutedEventArgs e)
+    {
+        if(sender is not System.Windows.Controls.Button { DataContext: PeriodWorkspace.ReviewItem item } ||
+           !shell.Calculation.Rows.Contains(item.Row))return;
+        var column=HybridGrid.Columns.FirstOrDefault(column=>Equals(column.Header,item.ColumnHeader));
+        if(column is null)return;
+        ReviewPopup.IsOpen=false;
+        if(!CommitHybrid())return;
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,new Action(()=>
+        {
+            if(!HybridGrid.IsVisible || !shell.Calculation.Rows.Contains(item.Row))return;
+            HybridGrid.SelectedItem=item.Row;
+            HybridGrid.BringIntoView();
+            HybridGrid.ScrollIntoView(item.Row,column);
+            HybridGrid.UpdateLayout();
+            HybridGrid.CurrentCell=new System.Windows.Controls.DataGridCellInfo(item.Row,column);
+            if(column.GetCellContent(item.Row)?.Parent is System.Windows.Controls.DataGridCell cell)
+            {
+                cell.BringIntoView();
+                cell.Focus();
+                if(!column.IsReadOnly && column is System.Windows.Controls.DataGridTextColumn)
+                    HybridGrid.BeginEdit();
+            }
+            else HybridGrid.Focus();
+        }));
+    }
+
     private void CreatePayment_Click(object sender,RoutedEventArgs e)
     {
         if(!HybridGrid.CommitEdit(System.Windows.Controls.DataGridEditingUnit.Cell,true) ||

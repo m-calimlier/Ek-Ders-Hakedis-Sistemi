@@ -80,7 +80,12 @@ public static class TeacherRouting
     public static ModuleId? Choice(TeacherRecord teacher,int year,int month)=>teacher.Assignments?.Choices.SingleOrDefault(c=>c.Year==year && c.Month==month)?.Module;
     public static bool NeedsChoice(TeacherRecord teacher,int year,int month)=>Candidates(teacher,year,month).Count>1 && Choice(teacher,year,month) is null;
     public static bool Included(TeacherRecord teacher,ModuleId module,int year,int month)
-        =>Candidates(teacher,year,month).Contains(module) && (Choice(teacher,year,month) is not ModuleId chosen || chosen==module);
+    {
+        var periodEnd=new DateTime(year,month,DateTime.DaysInMonth(year,month));
+        return (teacher.StartDate is not DateTime start || start.Date<=periodEnd)
+            && Candidates(teacher,year,month).Contains(module)
+            && (Choice(teacher,year,month) is not ModuleId chosen || chosen==module);
+    }
     public static TeacherRecord Project(TeacherRecord teacher,ModuleId module)
     {
         if(!Modules(teacher).Contains(module))throw new InvalidOperationException("Öğretmenin bu modülde görev kaydı yok.");

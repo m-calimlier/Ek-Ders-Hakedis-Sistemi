@@ -13,7 +13,7 @@ public sealed class TeacherRegistrationViewModel : INotifyPropertyChanged
     public bool IsEditingRecord=>original is not null;
     public bool CanSwitchModule=>!IsEditingRecord;
     public bool HasDraft=>Editor.HasSchoolTransfer || new[]{Editor.FullName,Editor.IdentityNumber,Editor.Iban,Editor.School,Editor.OccupationCode}.Any(s=>!string.IsNullOrWhiteSpace(s)) || Editor.StartDate.HasValue || Editor.EndDate.HasValue;
-    public string SaveButtonText=>IsEditingRecord?"Öğretmen Değişiklik kaydet":"Öğretmeni Kaydet";
+    public string SaveButtonText=>IsEditingRecord?"Öğretmen Değişikliklerini Kaydet":"Öğretmeni Kaydet";
     public string CancelButtonText=>IsEditingRecord?"Vazgeç":"Formu Temizle";
     public void BeginEdit(TeacherRecord record,TeacherRecord source)
     {

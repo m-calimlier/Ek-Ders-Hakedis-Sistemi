@@ -8,7 +8,16 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.17 — Kararlı Sürüm
+## 1.0.18 — Kararlı Sürüm
+
+- İşe başlama tarihi seçili aydan sonraysa öğretmen dönem tablosunda gösterilmez.
+- Boş kurum saatleri ince altın çerçeveli sıfır olarak görünür. Hesaplama sıfır saatle devam eder.
+- Görev Yeri ve Gündüz Saat Toplamı sütunları yatay kaydırmada sabit kalır.
+- Hakediş Kontrolleri üst çubuktan açılır ve seçilen kaydın ilgili hücresini görünür alana getirir.
+- Dönem seçimi kaydırma sırasında görünür kalır. Panel düğmeleri ve kart başlıkları ortak yazım biçimini kullanır.
+- Windows kurulum ve taşınabilir paket kişisel ve örnek veri içermez.
+
+## 1.0.17 sürümü
 
 - Koyu lacivert, altın sarısı ve Barut Mavisi teması. Panel içi ana işlemler altın, yardımcı işlemler Barut Mavisi, silme işlemleri bordo.
 - Hakediş özetinde eş boyutlu kartlar, standart başlık ve tutar ölçüleri, Detay penceresinde Sol Simge Plakalı ödenek cetveli.

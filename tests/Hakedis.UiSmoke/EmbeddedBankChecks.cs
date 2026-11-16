@@ -28,7 +28,7 @@ internal static class EmbeddedBankChecks
             var dialog=Application.Current.Windows.OfType<BankExcelWindow>().FirstOrDefault();if(dialog is null)return;timer.Stop();
             try{
                 if(Descendants<Button>(dialog).Any(b=>b.Content as string=="Şablon seç"))throw new Exception("Şablon seçimi kaldırılmadı.");
-                var button=Descendants<Button>(dialog).Single(b=>b.Content as string=="Banka Excel oluştur");
+                var button=Descendants<Button>(dialog).Single(b=>b.Content as string=="Banka Excel Oluştur");
                 button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 if(string.IsNullOrWhiteSpace(((TextBlock)dialog.FindName("ErrorText")).Text) || dialog.OutputPath is not null)throw new Exception("Ödeme tarihi zorunlu olmalı.");
                 ((DatePicker)dialog.FindName("PaymentDate")).SelectedDate=new DateTime(2026,11,5);

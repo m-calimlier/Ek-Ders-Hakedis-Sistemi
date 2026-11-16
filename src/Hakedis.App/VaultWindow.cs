@@ -112,7 +112,7 @@ public sealed class VaultWindow : Window
         {
             body.Children.Add(Text("Ana parola tekrar"));
             var confirm = PasswordInput("VaultPasswordConfirm"); body.Children.Add(confirm);
-            body.Children.Add(ActionButton("Kasamı oluştur", () =>
+            body.Children.Add(ActionButton("Kasamı Oluştur", () =>
             {
                 if (password.Password != confirm.Password) throw new ArgumentException("Parolalar aynı değil.");
                 session = store.Create(password.Password, out var recovery);
@@ -121,17 +121,17 @@ public sealed class VaultWindow : Window
         }
         else
         {
-            body.Children.Add(ActionButton("Kasayı aç", () =>
+            body.Children.Add(ActionButton("Kasayı Aç", () =>
             {
                 session = store.Unlock(password.Password); password.Clear(); ShowEditor();
             }));
             password.KeyDown += (_, e) => { if (e.Key == Key.Enter) Run(() => { session = store.Unlock(password.Password); password.Clear(); ShowEditor(); }); };
-            body.Children.Add(ActionButton("Ana parolamı unuttum", ShowRecover));
+            body.Children.Add(ActionButton("Ana Parolamı Unuttum", ShowRecover));
         }
         body.Children.Add(new Separator { Margin = new Thickness(0, 12, 0, 8), Background = ThemeBrush("PremiumInputBorderBrush") });
         body.Children.Add(Text("Başka bilgisayardan kasa taşıma", 16, true));
         body.Children.Add(Text("Şifreli .edhskasa dosyanızı seçin. Üstteki ana parola alanına, taşıdığınız kasanın parolasını yazın. Mevcut kasa varsa değiştirmeden önce onay istenir."));
-        body.Children.Add(ActionButton("Şifreli kasayı içe aktar…", () =>
+        body.Children.Add(ActionButton("Şifreli Kasayı İçe Aktar…", () =>
         {
             var dialog = new OpenFileDialog { Filter = "Şifreli kasa (*.edhskasa)|*.edhskasa", CheckFileExists = true };
             var selected = Dialog(() => dialog.ShowDialog(this));
@@ -153,10 +153,10 @@ public sealed class VaultWindow : Window
         var recovery = new TextBox { Style = (Style)FindResource("VaultReveal"), Height = double.NaN, Text = code, IsReadOnly = true, TextWrapping = TextWrapping.Wrap, FontFamily = new FontFamily("Consolas"), FontSize = 17, Padding = new Thickness(10), Margin = new Thickness(0, 8, 0, 8) };
         recovery.CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, (_, e) => { Copy(recovery.SelectedText.Length > 0 ? recovery.SelectedText : recovery.Text,120); e.Handled = true; }));
         body.Children.Add(recovery);
-        body.Children.Add(ActionButton("Kurtarma anahtarını kopyala", () => Copy(recovery.Text,120)));
+        body.Children.Add(ActionButton("Kurtarma Anahtarını Kopyala", () => Copy(recovery.Text,120)));
         var acknowledge = new CheckBox { Content = "Kurtarma anahtarını ayrı, güvenli bir yere kaydettim.", Foreground = Brushes.White, Margin = new Thickness(0, 10, 0, 8) };
         body.Children.Add(acknowledge);
-        body.Children.Add(ActionButton("Kasaya devam et", () =>
+        body.Children.Add(ActionButton("Kasaya Devam Et", () =>
         {
             if (acknowledge.IsChecked != true) throw new ArgumentException("Önce kurtarma anahtarınızı saklayın ve kutucuğu işaretleyin.");
             recovery.Clear(); ClearClipboard(); showingRecovery=false;ShowEditor();
@@ -170,7 +170,7 @@ public sealed class VaultWindow : Window
         body.Children.Add(Text("Kurtarma anahtarıyla aç", 17, true));
         body.Children.Add(Text("Kasayı oluştururken sakladığınız 64 karakterlik kurtarma anahtarını girin. Açtıktan sonra yeni bir ana parola belirleyin."));
         var recovery = PasswordInput("RecoveryCode"); body.Children.Add(recovery);
-        body.Children.Add(ActionButton("Kurtarma anahtarıyla aç", () =>
+        body.Children.Add(ActionButton("Kurtarma Anahtarıyla Aç", () =>
         { session = store.Recover(recovery.Password.Replace(" ", "").Replace("-", "").Trim()); recovery.Clear(); ShowEditor(); status.Text = "Kasa kurtarma anahtarıyla açıldı. Yeni ana parolanızı belirleyin."; }));
         body.Children.Add(ActionButton("Geri", ShowLocked));
         WrapBody();
@@ -182,10 +182,10 @@ public sealed class VaultWindow : Window
         showingRecovery=false;var data = session.Read();
         body.Children.Clear(); fields.Clear(); dirty = false;
         var toolbar = new WrapPanel();
-        toolbar.Children.Add(ActionButton("Bilgileri kaydet", Save));
-        toolbar.Children.Add(ActionButton("Şimdi kilitle", Lock));
-        toolbar.Children.Add(ActionButton("Şifreli kasayı dışa aktar…", Export));
-        toolbar.Children.Add(ActionButton("Yeni kurtarma anahtarı oluştur", () =>
+        toolbar.Children.Add(ActionButton("Bilgileri Kaydet", Save));
+        toolbar.Children.Add(ActionButton("Şimdi Kilitle", Lock));
+        toolbar.Children.Add(ActionButton("Şifreli Kasayı Dışa Aktar…", Export));
+        toolbar.Children.Add(ActionButton("Yeni Kurtarma Anahtarı Oluştur", () =>
         {
             if(dirty)throw new ArgumentException("Önce işyeri bilgilerini kaydedin.");
             if(!Confirm("Yeni kurtarma anahtarı oluşturulacak. Mevcut kasa için eski anahtar geçersiz olur; ana parolanız ve kayıtlı bilgileriniz korunur. Yeni anahtarı ayrı, güvenli bir yere kaydedin. Devam edilsin mi?"))return;
@@ -213,13 +213,13 @@ public sealed class VaultWindow : Window
         }
         body.Children.Add(grid);
         var passwordPanel = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
-        var passwordSection = new Expander { Header = "Ana parolayı değiştir", Foreground = ThemeBrush("PremiumMutedTextBrush"), FontSize = 12, Content = passwordPanel };
+        var passwordSection = new Expander { Header = "Ana Parolayı Değiştir", Foreground = ThemeBrush("PremiumMutedTextBrush"), FontSize = 12, Content = passwordPanel };
         body.Children.Add(new Border { Style = (Style)FindResource("CardCompact"), Padding = new Thickness(10), Child = passwordSection });
         passwordPanel.Children.Add(Text("Yeni parola / tekrar. " + VaultStore.PasswordRequirements + " Eski dışa aktarılmış kopyalar eski parolalarıyla açılmaya devam eder.", 11));
         var password = PasswordInput("NewVaultPassword"); var confirm = PasswordInput("NewVaultPasswordConfirm");
         password.Margin = new Thickness(0, 0, 0, 5);
         passwordPanel.Children.Add(password); passwordPanel.Children.Add(confirm);
-        passwordPanel.Children.Add(ActionButton("Yeni ana parolayı kaydet", () =>
+        passwordPanel.Children.Add(ActionButton("Yeni Ana Parolayı Kaydet", () =>
         {
             if (dirty) throw new ArgumentException("Önce işyeri bilgilerini kaydedin.");
             if (password.Password != confirm.Password) throw new ArgumentException("Parolalar aynı değil.");

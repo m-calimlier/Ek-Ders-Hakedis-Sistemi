@@ -19,7 +19,7 @@ internal static class VaultChecks
         Capture(window, Path.Combine(output, "kasa-ilk-kurulum.png"));
         Input(window, "VaultPassword").Password = password;
         Input(window, "VaultPasswordConfirm").Password = password;
-        Click(window, "Kasamı oluştur");
+        Click(window, "Kasamı Oluştur");
         var recovery = All<TextBox>(window).Single(t => t.Text.Length == 64).Text;
         typeof(VaultWindow).GetField("lastInput",BindingFlags.NonPublic|BindingFlags.Instance)!.SetValue(window,DateTime.UtcNow.AddMinutes(-10));
         typeof(VaultWindow).GetMethod("Tick",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(window,[null,EventArgs.Empty]);
@@ -27,11 +27,11 @@ internal static class VaultChecks
         Check(All<TextBox>(window).Any(t=>t.Text==recovery),"Kurtarma kodu onaydan önce kayboldu.");
         Capture(window,Path.Combine(output,"kasa-kurtarma-kaydi.png"));
         All<CheckBox>(window).Single().IsChecked = true;
-        Click(window, "Kasaya devam et");
+        Click(window, "Kasaya Devam Et");
         var inputs = All<PasswordBox>(window).Where(p => p.MaxLength == 4096).ToArray();
         Check(inputs.Length == 10, "İki işyeri için on alan yok.");
         for (var i = 0; i < inputs.Length; i++) inputs[i].Password = "SENTETİK-" + i;
-        Click(window, "Bilgileri kaydet");
+        Click(window, "Bilgileri Kaydet");
         using (var opened = new VaultStore(path).Unlock(password)) Check(opened.Read().Groups[1].RegistrationNumber == "SENTETİK-9", "Ekran kaydı yanlış.");
         Capture(window, Path.Combine(output, "kasa-iki-grup.png"));
         var show = All<Button>(window).First(b => Equals(b.Content, "Göster"));
@@ -61,26 +61,26 @@ internal static class VaultChecks
             }
             finally { if (previousText is null) Clipboard.Clear(); else Clipboard.SetText(previousText); }
         }
-        Click(window, "Şimdi kilitle");
+        Click(window, "Şimdi Kilitle");
         Check(All<PasswordBox>(window).All(p => p.Password.Length == 0), "Kilitte parola alanları temizlenmedi.");
         Check(!All<TextBox>(window).Any(t => t.Text.Contains("SENTETİK")), "Kilitte açık bilgi kaldı.");
-        Input(window, "VaultPassword").Password = "yanlis"; Click(window, "Kasayı aç");
+        Input(window, "VaultPassword").Password = "yanlis"; Click(window, "Kasayı Aç");
         Check(All<TextBlock>(window).Any(t => t.Text.Contains("yanlış veya")), "Yanlış parola bildirimi yok.");
-        Input(window, "VaultPassword").Password = password; Click(window, "Kasayı aç");
+        Input(window, "VaultPassword").Password = password; Click(window, "Kasayı Aç");
         Check(All<PasswordBox>(window).First(p => p.MaxLength == 4096).Password == "SENTETİK-0", "Yeniden açma yanlış.");
         typeof(VaultWindow).GetField("lastInput", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(window, DateTime.UtcNow.AddMinutes(-6));
         typeof(VaultWindow).GetMethod("Tick", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window, [null, EventArgs.Empty]);
         Pump(window); Check(All<PasswordBox>(window).All(p => p.Password.Length == 0), "Hareketsizlik kilidi çalışmadı.");
-        Click(window, "Ana parolamı unuttum"); Input(window, "RecoveryCode").Password = recovery; Click(window, "Kurtarma anahtarıyla aç");
+        Click(window, "Ana Parolamı Unuttum"); Input(window, "RecoveryCode").Password = recovery; Click(window, "Kurtarma Anahtarıyla Aç");
         All<Expander>(window).Single().IsExpanded = true; Pump(window);
         Input(window, "NewVaultPassword").Password = "Yeni1234!?";
         Input(window, "NewVaultPasswordConfirm").Password = "Yeni1234!?";
-        Click(window, "Yeni ana parolayı kaydet");
+        Click(window, "Yeni Ana Parolayı Kaydet");
         using (var opened = new VaultStore(path).Unlock("Yeni1234!?")) Check(opened.Read().Groups[0].UserCode == "SENTETİK-0", "Kurtarma sonrası veri kaybı.");
         typeof(Window).GetMethod("OnDeactivated", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window, [EventArgs.Empty]); Pump(window);
         Check(All<PasswordBox>(window).First(p=>p.MaxLength==4096).Password=="SENTETİK-0", "Başka uygulamaya geçince kasa kapanıyor.");
-        Click(window,"Şimdi kilitle");
-        Input(window, "VaultPassword").Password = "Yeni1234!?"; Click(window, "Kasayı aç");
+        Click(window,"Şimdi Kilitle");
+        Input(window, "VaultPassword").Password = "Yeni1234!?"; Click(window, "Kasayı Aç");
         typeof(VaultWindow).GetMethod("SessionSwitch", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window, [window, new Microsoft.Win32.SessionSwitchEventArgs(Microsoft.Win32.SessionSwitchReason.SessionLock)]);
         Pump(window); Check(All<PasswordBox>(window).All(p => p.Password.Length == 0), "Windows kilidi alanları temizlemedi.");
         window.Close();
@@ -90,8 +90,8 @@ internal static class VaultChecks
             typeof(VaultWindow).GetMethod("SessionSwitch",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(expiring,[expiring,new Microsoft.Win32.SessionSwitchEventArgs(Microsoft.Win32.SessionSwitchReason.SessionLock)]);
             return true;
         }){ShowActivated=false};
-        expiring.Show();Pump(expiring);Input(expiring,"VaultPassword").Password="Yeni1234!?";Click(expiring,"Kasayı aç");
-        var beforeRenewal=File.ReadAllBytes(path);Click(expiring,"Yeni kurtarma anahtarı oluştur");
+        expiring.Show();Pump(expiring);Input(expiring,"VaultPassword").Password="Yeni1234!?";Click(expiring,"Kasayı Aç");
+        var beforeRenewal=File.ReadAllBytes(path);Click(expiring,"Yeni Kurtarma Anahtarı Oluştur");
         Check(beforeRenewal.SequenceEqual(File.ReadAllBytes(path)),"Onay sırasında kilitlenen kasa değiştirildi.");
         Check(All<TextBlock>(expiring).Any(t=>t.Text.Contains("Ana parolanızla tekrar açıp")),"Onay sırasında kilitlenme açıklanmadı.");expiring.Close();
         Console.WriteLine("Kasa UI: boş kurulum, kurtarma anahtarı, iki grup/on alan, kayıt, gösterim süresi, pano/geçmiş kısıtı, kilit, yanlış parola, yeniden açma, hareketsizlik, kurtarma/parola değiştirme, başka uygulamaya geçişte oturum korunması ve Windows kilidi başarılı. Sentetik veri kullanıldı.");

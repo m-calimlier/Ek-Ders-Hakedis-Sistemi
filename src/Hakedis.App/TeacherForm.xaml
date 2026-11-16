@@ -10,7 +10,7 @@
 <StackPanel Grid.Column="2"><TextBlock Text="{x:Static c:ExcelHeadings.EndDate}" Style="{StaticResource FieldLabel}" TextWrapping="Wrap"/><DatePicker Style="{StaticResource FormDate}" SelectedDate="{Binding Editor.EndDate, UpdateSourceTrigger=PropertyChanged}"/></StackPanel></Grid>
 <Expander Header="Kayıtlı okul/modül geçmişi" Foreground="White" Margin="0,6,10,16" Visibility="{Binding Editor.HasAssignmentHistory,Converter={StaticResource Visible}}"><StackPanel>
 <TextBlock Text="{Binding Editor.HistoryText}" Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,10,0,12"/>
-<Button Content="Son geçişi düzenle" Command="{Binding Editor.EditLastTransferCommand}" Style="{StaticResource SecondaryAction}" HorizontalAlignment="Left"/>
+<Button Content="Son Geçişi Düzenle" Command="{Binding Editor.EditLastTransferCommand}" Style="{StaticResource SecondaryAction}" HorizontalAlignment="Left"/>
 </StackPanel></Expander>
 <CheckBox x:Name="SchoolTransferCheck" Content="Okul/modül değişikliği bilgisi ekle" IsChecked="{Binding Editor.HasSchoolTransfer,Mode=TwoWay}" Foreground="White" Margin="0,4,10,14"/>
 <Border x:Name="SchoolTransferFields" Visibility="{Binding Editor.HasSchoolTransfer,Converter={StaticResource Visible}}" Background="#082744" BorderBrush="#73581E" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,10,16"><StackPanel>
@@ -22,6 +22,6 @@
 <TextBlock Text="Geçilen okulun modülü" Style="{StaticResource FieldLabel}"/>
 <ComboBox x:Name="TransferModuleCombo" Style="{StaticResource FormCombo}" ItemsSource="{Binding Editor.TransferModules}" SelectedValue="{Binding Editor.TransferModule,Mode=TwoWay}" SelectedValuePath="Id" DisplayMemberPath="Name"/>
 <TextBlock Text="Bu bilgiler görev geçmişi içindir. SGK işe giriş/çıkış tarihleri değişmez. Geçiş ayında tek ödeme modülü hakediş oluşturulurken seçilir." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,12,0,10"/>
-<Button Content="Yeni geçiş bilgisi gir" Command="{Binding Editor.NewTransferCommand}" Visibility="{Binding Editor.HasAssignmentHistory,Converter={StaticResource Visible}}" Style="{StaticResource SecondaryAction}" HorizontalAlignment="Left"/>
+<Button Content="Yeni Geçiş Bilgisi Gir" Command="{Binding Editor.NewTransferCommand}" Visibility="{Binding Editor.HasAssignmentHistory,Converter={StaticResource Visible}}" Style="{StaticResource SecondaryAction}" HorizontalAlignment="Left"/>
 </StackPanel></Border>
 </StackPanel></UserControl>

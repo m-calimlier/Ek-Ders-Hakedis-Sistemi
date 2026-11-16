@@ -2,7 +2,7 @@
  Title="Bu ayın ödeme modülünü seçin" Width="650" Height="680" MinWidth="500" MinHeight="400" WindowStartupLocation="CenterOwner" Background="#082237">
  <Grid Margin="18"><Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
  <ScrollViewer VerticalScrollBarVisibility="Auto"><Border Style="{StaticResource WorkspaceCard}"><StackPanel>
- <TextBlock Text="Tek kişi · Tek ay · Tek bordro" Style="{StaticResource CardTitle}"/>
+ <TextBlock Text="Tek Kişi · Tek Ay · Tek Bordro" Style="{StaticResource CardTitle}"/>
  <TextBlock Text="{Binding PersonText}" Foreground="White" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,12,0,4"/>
  <TextBlock Text="{Binding PeriodText}" Foreground="#E8C778" FontWeight="Bold" Margin="0,0,0,12"/>
  <TextBlock Text="{Binding HistoryText}" Style="{StaticResource CardSubtitle}" TextWrapping="Wrap" Margin="0,0,0,14"/>
@@ -15,6 +15,6 @@
  <TextBlock Text="İCRA KESİNTİSİ / MANUEL GİRİŞ" Style="{StaticResource FieldLabel}"/><TextBox Style="{StaticResource FormText}" Text="{Binding Garnishment,UpdateSourceTrigger=PropertyChanged}"/>
  <TextBlock Text="{Binding Status}" Style="{StaticResource ValidationText}" TextWrapping="Wrap" Margin="0,16,0,0"/>
  </StackPanel></Border></ScrollViewer>
- <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,12,0,0"><Button x:Name="ConfirmBillingChoiceButton" Content="Tercihi kaydet ve devam et" Style="{StaticResource GoldAction}" IsEnabled="{Binding CanAccept}" Click="Confirm_Click"/><Button Content="Vazgeç" Style="{StaticResource SecondaryAction}" IsCancel="True"/></WrapPanel>
+ <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,12,0,0"><Button x:Name="ConfirmBillingChoiceButton" Content="Tercihi Kaydet Ve Devam Et" Style="{StaticResource GoldAction}" IsEnabled="{Binding CanAccept}" Click="Confirm_Click"/><Button Content="Vazgeç" Style="{StaticResource SecondaryAction}" IsCancel="True"/></WrapPanel>
  </Grid>
 </Window>

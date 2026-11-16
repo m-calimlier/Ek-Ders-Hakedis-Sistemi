@@ -2,7 +2,7 @@
  Title="Halkbank Excel Oluştur" Width="690" Height="540" MinWidth="580" MinHeight="500" WindowStartupLocation="CenterOwner" Background="#061E32" Foreground="White" xml:lang="tr-TR">
  <Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
  <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
- <TextBlock Text="Halkbank ödeme Exceli" Style="{StaticResource CardTitle}"/>
+ <TextBlock Text="Halkbank Ödeme Exceli" Style="{StaticResource CardTitle}"/>
  <TextBlock x:Name="RecordText" TextWrapping="Wrap" Style="{StaticResource CardSubtitle}" Margin="0,10,0,16"/>
  <TextBlock Text="Seçilen bölümün firma bilgileri" Style="{StaticResource FieldLabel}"/>
  <TextBlock x:Name="FirmText" TextWrapping="Wrap" Margin="0,6,0,14"/>
@@ -13,6 +13,6 @@
  <TextBlock Text="Seçilen hakedişin kayıtlı IBAN, kimlik, ad soyad ve net ödeme tutarları aktarılır. Kullanılmayan personel satırları boş bırakılır." Style="{StaticResource CardSubtitle}" TextWrapping="Wrap"/>
  <TextBlock x:Name="ErrorText" Style="{StaticResource ValidationText}" TextWrapping="Wrap" Margin="0,14,0,0"/>
  </StackPanel></ScrollViewer>
- <Button Grid.Row="1" Content="Banka Excel oluştur" Style="{StaticResource GoldAction}" HorizontalAlignment="Right" Margin="0,16,0,0" Click="Export_Click"/>
+ <Button Grid.Row="1" Content="Banka Excel Oluştur" Style="{StaticResource GoldAction}" HorizontalAlignment="Right" Margin="0,16,0,0" Click="Export_Click"/>
  </Grid>
 </Window>
