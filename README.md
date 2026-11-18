@@ -8,7 +8,15 @@ Açılış/kapanış yedekleri aynı gün değişmeyen içerik için tekrarlanma
 TCMB biçimine göre son 16 karakterinde harf içeren TR banka hesapları saklanabilir;
 biçim kontrolü banka doğrulaması anlamına gelmez.
 
-## 1.0.18 — Kararlı Sürüm
+## 1.0.19 — Kararlı Sürüm
+
+- İşten ayrılan öğretmen ayrılış ayında listelenir. Sonraki aylarda dönem listesine alınmaz.
+- Öğretmen Listesi düzenleme kartındaki Kayıt Modülü seçicisi ilk kayıttaki modülü düzeltir. Öğretmen aynı kimlikle yeni modüle taşınır.
+- Tarihli okul ve modül geçişleri görev geçmişi üzerinden yapılır. Kayıtlı bordrolar kendi modüllerinde saklanır.
+- SGK XML kaydedildiğinde başarı bildiriminin ardından çıktı klasörü açılır.
+- Windows kurulum dosyası ve taşınabilir paket kişisel ve örnek veri içermez.
+
+## 1.0.18 sürümü
 
 - İşe başlama tarihi seçili aydan sonraysa öğretmen dönem tablosunda gösterilmez.
 - Boş kurum saatleri ince altın çerçeveli sıfır olarak görünür. Hesaplama sıfır saatle devam eder.

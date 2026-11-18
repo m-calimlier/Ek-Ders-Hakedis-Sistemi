@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using Microsoft.Win32;
 
 namespace Hakedis.App;
@@ -72,7 +72,9 @@ public partial class MainWindow : Window
     private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void Maximize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
-    private void SaveTeacher_Click(object sender, RoutedEventArgs e) => RunTeacher(()=>{shell.Teachers.Save();shell.Monthly.RefreshTeachers();shell.Calculation.RefreshTeachers();Inform(shell.Teachers.Status);});
+    private void SaveTeacher_Click(object sender, RoutedEventArgs e) => RunTeacher(()=>{shell.SaveListedTeacherEdit();Inform(shell.Teachers.Status);});
+    private void EditListedTeacher_Click(object sender,RoutedEventArgs e)
+        => RunTeacher(()=>{shell.BeginListedTeacherEdit();TeacherEntryScroll.ScrollToTop();});
     private void UseTeacher_Click(object sender, RoutedEventArgs e) => RunTeacher(shell.UseSelectedTeacher);
     private void DeleteTeacher_Click(object sender, RoutedEventArgs e)
     {
@@ -169,9 +171,13 @@ public partial class MainWindow : Window
     private void XmlOutput_Click(object sender,RoutedEventArgs e)
     {
         SelectOutput(sender);RunOutput(()=>{
-            var dialog=new SgkXmlWindow(shell.Outputs.ReadSelected(),new Hakedis.Storage.SgkXmlStore(shell.Outputs.DataRoot)){Owner=this};
+            var dialog=new SgkXmlWindow(shell.Outputs.ReadSelected(),new Hakedis.Storage.SgkXmlStore(shell.Outputs.DataRoot),reportOutputRoot,notify){Owner=this};
             if(dialog.ShowDialog()==true)
-            {shell.Outputs.ShowStatus("SGK şemasına uygun XML kaydedildi: "+dialog.OutputPath);MessageBox.Show(this,"XML kaydedildi:\n"+dialog.OutputPath,"SGK XML",MessageBoxButton.OK,MessageBoxImage.Information);}
+            {
+                shell.Outputs.ShowStatus("SGK şemasına uygun XML kaydedildi: "+dialog.OutputPath);
+                Inform("XML kaydedildi:\n"+dialog.OutputPath);
+                openFolder(System.IO.Path.GetDirectoryName(dialog.OutputPath!)!);
+            }
         });
     }
     private void RunOutput(Action action)

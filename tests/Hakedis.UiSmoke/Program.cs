@@ -172,7 +172,7 @@ internal static class Program
         model.Monthly.DayHours = "117";
         var notifications=new List<string>();var archiveConfirm=false;var archivePrompts=new List<string>();
         var openedFolders=new List<string>();
-        var window = new MainWindow(model,notifications.Add,(message,title)=>{archivePrompts.Add(message);return archiveConfirm;},openedFolders.Add,Path.Combine(output,"personal-pdfs")) { ShowActivated = false, ShowInTaskbar = false };
+        var window = new MainWindow(model,notifications.Add,(message,title)=>{archivePrompts.Add(message);return archiveConfirm;},openedFolders.Add,Path.Combine(output,"personal-pdfs"),reportOutputRoot:Path.Combine(output,"xml-test")) { ShowActivated = false, ShowInTaskbar = false };
         if(window.Width!=1920 || window.Height!=1080)throw new InvalidOperationException("Varsayılan pencere boyutu 1920×1080 değil.");
         window.Show();
         if(window.ActualWidth>SystemParameters.WorkArea.Width+1 || window.ActualHeight>SystemParameters.WorkArea.Height+1)
@@ -325,9 +325,11 @@ internal static class Program
         if(args.Length==2 && args[1]=="--verify-bank-layout"){window.Close();Console.WriteLine("Yedi çıktı düğmesi ve banka sabitleri arayüzü doğrulandı.");return 0;}
         var sgkStore=new Hakedis.Storage.SgkXmlStore(model.Outputs.DataRoot);
         sgkStore.Save(Hakedis.Contracts.ModuleId.TemelEgitim,new(new("12345678901234567890120000","ÖRNEK KURUM","ÖRNEK ADRES","13","00000",DefaultMissingReason:"07"),[]));
-        var xmlDialog=new SgkXmlWindow(archived,sgkStore,Path.Combine(output,"xml-test"),notifications.Add){Owner=window};
+        SgkXmlWindow? xmlDialog=null;
         Exception? xmlFailure=null;
-        xmlDialog.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,new Action(()=>{
+        var foldersBeforeXml=openedFolders.Count;
+        window.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,new Action(()=>{
+            xmlDialog=Application.Current.Windows.OfType<SgkXmlWindow>().Single(w=>w.Owner==window);
             try{
                 var button=(Button)xmlDialog.FindName("ExportXmlButton");button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 if(xmlDialog.OutputPath is not null || string.IsNullOrWhiteSpace(((TextBlock)xmlDialog.FindName("ErrorText")).Text))throw new InvalidOperationException("SGK inceleme onayı atlandı.");
@@ -341,7 +343,10 @@ internal static class Program
                 if(xmlDialog.OutputPath is null)throw new InvalidOperationException("SGK XML oluşturulmadı: "+((TextBlock)xmlDialog.FindName("ErrorText")).Text);
             }catch(Exception ex){xmlFailure=ex;xmlDialog.Close();}
         }));
-        if(xmlDialog.ShowDialog()!=true || xmlFailure is not null)throw new InvalidOperationException("SGK XML ekranı başarısız.",xmlFailure);
+        xmlButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        if(xmlDialog?.OutputPath is null || xmlFailure is not null)throw new InvalidOperationException("SGK XML ekranı başarısız.",xmlFailure);
+        if(openedFolders.Count!=foldersBeforeXml+1 || openedFolders.Last()!=Path.GetDirectoryName(xmlDialog.OutputPath))
+            throw new InvalidOperationException("XML çıktı klasörü açılmadı.");
         Hakedis.TemelEgitim.Core.SgkXmlBuilder.Validate(File.ReadAllBytes(xmlDialog.OutputPath!));
         if(System.Xml.Linq.XDocument.Load(xmlDialog.OutputPath!).Root!.Element("BORDRO")!.Attribute("BELGEMAHIYET")!.Value!="İ")throw new InvalidOperationException("İptal seçimi XML'e Türkçe İ olarak yazılmadı.");
         if(!archiveBytes.SequenceEqual(File.ReadAllBytes(archived.Path)))throw new InvalidOperationException("SGK çıktısı hakedişi değiştirdi.");

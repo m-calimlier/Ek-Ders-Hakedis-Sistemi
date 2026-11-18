@@ -98,14 +98,27 @@ public sealed class TeacherListViewModel : INotifyPropertyChanged
     public string Status { get; private set; } = "Düzenlemek için listeden öğretmen seçin. Yeni kayıtlar Veri Girişi ekranından yapılır.";
     public string CountText => $"{Records.Count} kayıtlı öğretmen";
     public bool HasSelection => Selected is not null;
-    public bool HasChanges=>Selected is not null && Editor.ToRecord(Module)!=Selected;
+    public IReadOnlyList<ModuleDescriptor> EditModules { get; } = PayrollCores.Catalog.Where(m=>m.IsAvailable).ToArray();
+    public bool CanCorrectModule => Selected is { Assignments: null };
+    public ModuleId? EditModule
+    {
+        get => editModule;
+        set
+        {
+            if(value is null || value==editModule || !CanCorrectModule || !EditModules.Any(m=>m.Id==value))return;
+            editModule=value;
+            PropertyChanged?.Invoke(this,new(nameof(EditModule)));
+        }
+    }
+    private ModuleId? editModule;
+    public bool HasChanges=>Selected is not null && Editor.ToRecord(EditModule??Module)!=Selected;
     public TeacherRecord? Selected
     {
         get => selected;
         set
         {
             if (value is not null && value.ModuleId != Module) throw new InvalidOperationException("Bu öğretmen seçili modüle ait değil.");
-            selected = value; Editor = value is null ? new() : TeacherEditor.From(value); Notify();
+            selected = value; editModule=value?.ModuleId; Editor = value is null ? new() : TeacherEditor.From(value); Notify();
         }
     }
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -129,7 +142,17 @@ public sealed class TeacherListViewModel : INotifyPropertyChanged
     {
         var id = Selected?.Id ?? throw new InvalidOperationException("Düzenlemek için kayıtlı bir öğretmen seçin. Yeni kayıt için Veri Girişi ekranını kullanın.");
         if (Editor.Id != id) throw new InvalidOperationException("Seçili öğretmen ile düzenlenen kayıt uyuşmuyor.");
-        Replace(directory.UpdateBatch([Selected!],[Editor.ToRecord(Module)])); Selected = Records.Single(r => r.Id == id);
+        var replacement=Editor.ToRecord(EditModule??Module);
+        if(replacement.ModuleId!=Module)
+        {
+            var destination=EditModules.Single(m=>m.Id==replacement.ModuleId);
+            var moved=directory.MoveModule(Selected!,replacement);
+            Reload();
+            Status=$"{moved.FullName}, {destination.DisplayName} modülüne taşındı.";
+            Notify();
+            return;
+        }
+        Replace(directory.UpdateBatch([Selected!],[replacement])); Selected = Records.Single(r => r.Id == id);
         Status = "Öğretmen bilgileri güncellendi."; Notify();
     }
     public void DeleteSelected()
@@ -145,7 +168,7 @@ public sealed class TeacherListViewModel : INotifyPropertyChanged
     }
     private void Notify()
     {
-        foreach (var name in new[] { nameof(Selected), nameof(Editor), nameof(Status), nameof(CountText), nameof(HasSelection) })
+        foreach (var name in new[] { nameof(Selected), nameof(Editor), nameof(Status), nameof(CountText), nameof(HasSelection), nameof(EditModule), nameof(CanCorrectModule) })
             PropertyChanged?.Invoke(this, new(name));
     }
 }

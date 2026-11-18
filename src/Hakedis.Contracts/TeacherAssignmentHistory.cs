@@ -82,7 +82,9 @@ public static class TeacherRouting
     public static bool Included(TeacherRecord teacher,ModuleId module,int year,int month)
     {
         var periodEnd=new DateTime(year,month,DateTime.DaysInMonth(year,month));
+        var periodStart=new DateTime(year,month,1);
         return (teacher.StartDate is not DateTime start || start.Date<=periodEnd)
+            && (teacher.EndDate is not DateTime end || end.Date>=periodStart)
             && Candidates(teacher,year,month).Contains(module)
             && (Choice(teacher,year,month) is not ModuleId chosen || chosen==module);
     }

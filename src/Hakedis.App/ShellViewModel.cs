@@ -132,18 +132,36 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         var row=Calculation.SelectedHybridRow??throw new InvalidOperationException("Önce öğretmen seçin.");
         BeginTeacherEdit(row.Teacher,row.SourceTeacher);
     }
+    public void BeginListedTeacherEdit()
+    {
+        var record=Teachers.Selected??throw new InvalidOperationException("Önce öğretmen seçin.");
+        BeginTeacherEdit(record,record);
+    }
     private void BeginTeacherEdit(TeacherRecord record,TeacherRecord source)
     {
         if(Registration.IsEditingRecord)Registration.Reset();
         RegistrationModule=Workspace.Modules.Single(m=>m.Id==record.ModuleId);
         Registration.BeginEdit(record,source);Navigate("Entry");
     }
-    public void SaveTeacherEdit()
+    public void SaveListedTeacherEdit()
     {
-        var preview=TeacherDirectory.Normalize(Registration.Editor.ToRecord(Registration.Module));
+        if(Teachers.Selected is { } selected && Teachers.EditModule is { } target && target!=selected.ModuleId)
+            EnsureTeacherCanLeavePeriodLists(TeacherDirectory.Normalize(Teachers.Editor.ToRecord(target)));
+        Teachers.Save();
+        Monthly.RefreshTeachers();
+        Calculation.RefreshTeachers();
+    }
+
+    private void EnsureTeacherCanLeavePeriodLists(TeacherRecord preview)
+    {
         foreach(var workspace in new[]{Monthly,Calculation})
             if(workspace.Rows.Any(r=>r.Teacher.Id==preview.Id && r.HasChanges) && !TeacherRouting.Included(preview,workspace.SelectedModule.Id,workspace.Year,workspace.Month))
                 throw new InvalidOperationException("Görev değişikliği bu öğretmeni mevcut dönem listesinden çıkarıyor. Önce aylık ders değişikliklerini kaydedin.");
+    }
+
+    public void SaveTeacherEdit()
+    {
+        EnsureTeacherCanLeavePeriodLists(TeacherDirectory.Normalize(Registration.Editor.ToRecord(Registration.Module)));
         var saved=Registration.SaveEdit();Teachers.Reload();
         foreach(var workspace in new[]{Monthly,Calculation})
         {
@@ -213,7 +231,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         var record = Teachers.Selected ?? throw new InvalidOperationException("Önce öğretmen seçin.");
         Monthly.EntryModule=Monthly.Modules.Single(m=>m.Id==record.ModuleId);
         if(Monthly.EntryModule?.Id!=record.ModuleId)throw new InvalidOperationException("Önce aylık karttaki değişiklikleri kaydedin veya çalışmayı temizleyin.");
-        Monthly.RefreshTeachers();Monthly.EntryTeacher=Monthly.EntryTeachers.Single(t=>t.Id==record.Id);
+        Monthly.RefreshTeachers();Monthly.EntryTeacher=Monthly.EntryTeachers.SingleOrDefault(t=>t.Id==record.Id);
         if(record.ModuleId==activeModule)CalculationTeacher=record;Navigate("Entry");
     }
 }

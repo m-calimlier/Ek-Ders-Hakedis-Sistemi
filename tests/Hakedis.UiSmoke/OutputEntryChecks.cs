@@ -61,6 +61,24 @@ internal static class OutputEntryChecks
         actions.Single(b=>b.Content as string=="Detay").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Idle(window);
         if(!detailSeen || !bytes.SequenceEqual(File.ReadAllBytes(original.Path)))throw new Exception("Detay görüntüleme arşivi değiştirdi veya açılmadı.");
         capture(window,Path.Combine(output,"Outputs-module-filter.png"));
+        model.Navigate("Teachers");
+        var teacher=model.Teachers.Records.Single();
+        model.Teachers.Selected=teacher;Idle(window);
+        var editModule=(ComboBox)window.FindName("TeacherEditModuleCombo");
+        if(!editModule.IsVisible || !editModule.IsEnabled || !Equals(editModule.SelectedValue,ModuleId.TemelEgitim))
+            throw new Exception("Öğretmen kartında kayıt modülü seçicisi görünmüyor.");
+        editModule.SelectedValue=ModuleId.DinOgretimi;Idle(window);
+        if(model.Teachers.Records.Single().Id!=teacher.Id)
+            throw new Exception("Modül seçimi kaydetmeden önce listeyi değiştirdi.");
+        capture(window,Path.Combine(output,"Teacher-edit-module.png"));
+        var card=(FrameworkElement)window.FindName("TeacherDetailsCard");
+        Descendants<Button>(card).Single(b=>b.Content as string=="Değişiklikleri Kaydet").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Idle(window);
+        if(model.Teachers.Records.Count!=0 || !bytes.SequenceEqual(File.ReadAllBytes(original.Path)))
+            throw new Exception("Eski modül listesi veya geçmiş bordro beklenen durumda değil.");
+        model.ListModule=model.Workspace.Modules.Single(m=>m.Id==ModuleId.DinOgretimi);Idle(window);
+        if(model.Teachers.Records.Count!=1 || model.Teachers.Records[0].Id!=teacher.Id)
+            throw new Exception("Öğretmen yeni modül listesinde tek kayıt olarak görünmüyor.");
         model.ClearCurrentWork();window.Close();Console.WriteLine("Çıktı/giriş WPF: boş seçim, sıfır temizleme, IBAN kaydı/popup/kırmızı liste, modül filtresi, salt okunur detay ve Kapat, arşiv özeti doğrulandı.");
     }
     private static void Idle(Window w){w.Dispatcher.Invoke(()=>{},DispatcherPriority.ApplicationIdle);w.UpdateLayout();}

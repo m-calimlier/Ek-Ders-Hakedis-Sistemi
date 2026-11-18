@@ -49,6 +49,44 @@ public sealed class HybridEditingTests : IDisposable
         Assert.True(shell.CalculationVisible);Assert.False(shell.Registration.IsEditingRecord);
         Assert.Equal("Öğretmeni Kaydet",shell.Registration.SaveButtonText);
     }
+    [Fact]
+    public void Editing_module_moves_the_same_teacher_to_one_destination_list()
+    {
+        var shell=Setup();
+        var teacher=shell.Teachers.Records.Single(t=>t.FullName=="Bir");
+        shell.Teachers.Selected=teacher;
+        shell.BeginListedTeacherEdit();
+        shell.RegistrationModule=shell.Workspace.Modules.Single(m=>m.Id==ModuleId.DinOgretimi);
+        Assert.Equal(teacher.Id,shell.Registration.Editor.Id);
+        Assert.Equal(teacher.FullName,shell.Registration.Editor.FullName);
+        shell.SaveTeacherEdit();
+
+        var source=new TeacherDirectory(Catalog);
+        var destination=new TeacherDirectory(Catalog,ModuleId.DinOgretimi);
+        Assert.DoesNotContain(source.Read(),t=>t.Id==teacher.Id);
+        Assert.Equal(teacher with {ModuleId=ModuleId.DinOgretimi},Assert.Single(destination.Read()));
+        Assert.Single(source.ReadCanonical(),t=>t.Id==teacher.Id);
+        Assert.DoesNotContain(shell.Calculation.Rows,r=>r.Teacher.Id==teacher.Id);
+        shell.Calculation.SelectedModule=shell.Calculation.Modules.Single(m=>m.Id==ModuleId.DinOgretimi);
+        Assert.Equal(teacher.Id,Assert.Single(shell.Calculation.Rows).Teacher.Id);
+    }
+
+    [Fact]
+    public void A_teacher_who_left_on_the_first_day_is_listed_only_through_that_month()
+    {
+        var path=Catalog;
+        var teacher=new TeacherRecord(Guid.NewGuid(),"Deneme Öğretmeni","","","Örnek Okul","2341.04",
+            new(2026,9,1),new(2026,10,1));
+        new TeacherDirectory(path).Save(teacher);
+        var workspace=new PeriodWorkspace(path){Year=2026,Month=10};
+        Assert.Equal(teacher.Id,Assert.Single(workspace.Rows).Teacher.Id);
+        workspace.Month=11;
+        Assert.Empty(workspace.Rows);
+        Assert.Empty(workspace.Teachers);
+        workspace.Month=10;
+        Assert.Equal(teacher.Id,Assert.Single(workspace.Rows).Teacher.Id);
+    }
+
     [Fact] public void Hybrid_batch_rejects_all_changes_when_one_row_is_invalid()
     {
         var shell=Setup();var before=File.ReadAllBytes(Catalog);

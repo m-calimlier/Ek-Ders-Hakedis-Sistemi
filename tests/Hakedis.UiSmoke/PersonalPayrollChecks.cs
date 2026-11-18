@@ -60,8 +60,9 @@ internal static class PersonalPayrollChecks
         if(!File.Exists(pdf) || !folder.IsEnabled)throw new InvalidOperationException("Kişisel PDF oluşmadı: "+personal.Status);
         if(pdf.Length>=250)throw new InvalidOperationException("Test çıktısının yolu eski Windows araçları için gereksiz uzun.");
         if(Directory.GetFiles(Path.GetDirectoryName(pdf)!,"*.pdf").Length!=1)throw new InvalidOperationException("Kişisel çıktı birden fazla PDF içeriyor.");
+        var foldersBefore=openedFolders.Count;
         folder.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        if(openedFolders.Count!=1 || openedFolders[0]!=Path.GetDirectoryName(pdf))throw new InvalidOperationException("Klasör düğmesi kaydedilen yeri açmadı.");
+        if(openedFolders.Count!=foldersBefore+1 || openedFolders.Last()!=Path.GetDirectoryName(pdf))throw new InvalidOperationException("Klasör düğmesi kaydedilen yeri açmadı.");
         File.WriteAllText(Path.Combine(output,"personal-pdf-path.txt"),pdf);
         File.WriteAllBytes(Path.Combine(output,"personal-source.json"),bytes);
         var service=new PaymentReportService();var report=service.PreparePersonal(record,teacher.Id,model.Outputs.Details.Read());

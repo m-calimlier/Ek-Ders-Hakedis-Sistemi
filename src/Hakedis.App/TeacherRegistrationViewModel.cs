@@ -11,7 +11,7 @@ public sealed class TeacherRegistrationViewModel : INotifyPropertyChanged
     private readonly string path;
     private TeacherRecord? original;
     public bool IsEditingRecord=>original is not null;
-    public bool CanSwitchModule=>!IsEditingRecord;
+    public bool CanSwitchModule=>original?.Assignments is null;
     public bool HasDraft=>Editor.HasSchoolTransfer || new[]{Editor.FullName,Editor.IdentityNumber,Editor.Iban,Editor.School,Editor.OccupationCode}.Any(s=>!string.IsNullOrWhiteSpace(s)) || Editor.StartDate.HasValue || Editor.EndDate.HasValue;
     public string SaveButtonText=>IsEditingRecord?"Öğretmen Değişikliklerini Kaydet":"Öğretmeni Kaydet";
     public string CancelButtonText=>IsEditingRecord?"Vazgeç":"Formu Temizle";
@@ -22,7 +22,11 @@ public sealed class TeacherRegistrationViewModel : INotifyPropertyChanged
     public TeacherRecord SaveEdit()
     {
         var expected=original??throw new InvalidOperationException("Düzenlenecek öğretmen seçilmedi.");
-        var rows=directory.UpdateBatch([expected],[Editor.ToRecord(Module)]);var saved=rows.Single(t=>t.Id==expected.Id);
+        var replacement=Editor.ToRecord(Module);
+        var saved=expected.ModuleId==Module
+            ?directory.UpdateBatch([expected],[replacement]).Single(t=>t.Id==expected.Id)
+            :directory.MoveModule(expected,replacement);
+        directory=new(path,Module);
         Reset();return saved;
     }
     public ModuleId Module { get; private set; }
@@ -32,7 +36,16 @@ public sealed class TeacherRegistrationViewModel : INotifyPropertyChanged
     public TeacherRegistrationViewModel(string path, ModuleId module = ModuleId.TemelEgitim)
     { this.path = path; Module = module; directory = new(path, module);Editor=new(module); }
     public void SwitchModule(ModuleId module)
-    { if(IsEditingRecord)throw new InvalidOperationException("Düzenleme sırasında modül değiştirilemez.");directory = new(path, module); Module = module; Editor = new(module); ShowStatus("Öğretmen kaydı seçili modüle yapılacaktır."); }
+    {
+        if(!CanSwitchModule)throw new InvalidOperationException("Görev geçmişi olan kayıtlar için tarihli okul/modül değişikliğini kullanın.");
+        Module=module;
+        if(IsEditingRecord)
+        {
+            ShowStatus("Kaydedildiğinde öğretmen seçili modüle taşınır. Kayıtlı hakedişler kendi modülünde kalır.");
+            return;
+        }
+        directory=new(path,module);Editor=new(module);ShowStatus("Öğretmen kaydı seçili modüle yapılacaktır.");
+    }
     public TeacherRecord SaveNew()
     {
         if(IsEditingRecord)throw new InvalidOperationException("Düzenleme sırasında yeni kayıt oluşturulamaz.");
@@ -40,7 +53,7 @@ public sealed class TeacherRegistrationViewModel : INotifyPropertyChanged
         var rows = directory.Save(record); var saved = rows.Single(r => r.Id == record.Id);
         Editor = new(Module); ShowStatus($"{saved.FullName} öğretmen listesine kaydedildi."); return saved;
     }
-    public void Reset() { original=null;Editor = new(Module); ShowStatus("Yeni öğretmen kaydı için bilgiler temizlendi."); }
+    public void Reset() { original=null;directory=new(path,Module);Editor = new(Module); ShowStatus("Yeni öğretmen kaydı için bilgiler temizlendi."); }
     public void ShowStatus(string message)
     {
         Status = message; PropertyChanged?.Invoke(this, new(nameof(Editor))); PropertyChanged?.Invoke(this, new(nameof(Status)));

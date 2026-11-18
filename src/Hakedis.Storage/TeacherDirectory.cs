@@ -76,6 +76,24 @@ public sealed class TeacherDirectory
             if(rows.Where(t=>t.IdentityNumber!="").GroupBy(t=>t.IdentityNumber).Any(g=>g.Count()>1))
                 throw new ArgumentException("Bu T.C. kimlik numarası zaten kayıtlı. Yeni kişi açmak yerine mevcut kartın okul/modül değişikliği alanını kullanın.");
         });
+    public TeacherRecord MoveModule(TeacherRecord expected,TeacherRecord replacement)
+    {
+        var next=Normalize(replacement);
+        if(expected.ModuleId!=module || next.ModuleId==module || next.Id!=expected.Id ||
+           expected.Assignments is not null || next.Assignments is not null)
+            throw new InvalidOperationException("Görev geçmişi olan kayıtlar için tarihli okul/modül değişikliğini kullanın.");
+
+        Mutate(rows =>
+        {
+            var index=rows.FindIndex(t=>t.Id==expected.Id);
+            if(index<0 || !TeacherRouting.Matches(rows[index],expected,module))
+                throw new InvalidOperationException("Öğretmen bilgileri değişmiş. Listeyi yenileyin.");
+            if(next.IdentityNumber!="" && rows.Any(t=>t.Id!=next.Id && t.IdentityNumber==next.IdentityNumber))
+                throw new ArgumentException("Bu T.C. kimlik numarası zaten kayıtlı.");
+            rows[index]=next;
+        });
+        return next;
+    }
     private IReadOnlyList<TeacherRecord> SaveCore(TeacherRecord teacher, bool requireExisting)
     {
         teacher = Normalize(teacher);
